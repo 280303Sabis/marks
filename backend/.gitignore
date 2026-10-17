@@ -1,0 +1,9 @@
+# Entorno virtual de Python
+venv/
+
+# Contraseñas y llaves (NUNCA subir)
+.env
+
+# Archivos temporales de Python
+__pycache__/
+*.pyc

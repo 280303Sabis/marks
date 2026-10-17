@@ -1,0 +1,36 @@
+# =====================================================
+#  MARK'S - Archivos que NUNCA se suben a GitHub
+# =====================================================
+
+# ----- Secretos (contraseñas, llaves) -----
+.env
+.env.*
+!.env.example
+
+# ----- Respaldos de la base de datos (tienen datos personales) -----
+database/respaldos/
+
+# ----- Python (backend) -----
+backend/venv/
+venv/
+__pycache__/
+*.pyc
+backend/static/uploads/
+
+# ----- Flutter (app) -----
+marks_app/build/
+marks_app/.dart_tool/
+marks_app/android/local.properties
+marks_app/android/key.properties
+marks_app/android/app/*.jks
+marks_app/android/app/*.keystore
+
+# ----- Editor y sistema operativo -----
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# ----- Reportes personales de avance -----
+docs/*.docx

@@ -1,0 +1,11 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Este archivo solo se usa en modo desarrollo (flutter run). -->
+
+    <!-- Permiso para usar internet (necesario para hablar con la API). -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!-- Permite conexiones http sin cifrar SOLO en desarrollo,
+         para llegar a la API local (http://192.168.x.x:5000).
+         La version final de la app usara HTTPS. -->
+    <application android:usesCleartextTraffic="true" />
+</manifest>

@@ -1,0 +1,5 @@
+-- =====================================================
+--  MIGRACIÓN 001 - Base inicial (PASOS 1, 2 y 4.1)
+--  Ya aplicada al ejecutar schema.sql el 06/10/2026.
+--  NO es necesario ejecutarla. Queda como registro.
+-- =====================================================

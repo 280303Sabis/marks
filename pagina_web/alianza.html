@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARK'S - Registro de Alianza Comercial</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo">
+            <a href="index.html" style="text-decoration: none; color: white; display: flex; align-items: center;">
+                <img src="img/logo_marks.png" alt="MARK'S Logo" class="logo-img">
+            </a>
+        </div>
+        <nav>
+            <ul class="nav-buttons">
+                <li><a href="index.html" class="nav-btn">Inicio</a></li>
+                <li><a href="supermercados.html" class="nav-btn">Para supermercados</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="main-section" style="max-width: 900px; padding: 45px 55px;">
+        
+        <div style="text-align: center; margin-bottom: 35px;">
+            <span style="background-color: #e2fbe0; color: #2e7d32; padding: 7px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; display: inline-block; margin-bottom: 12px;">Expansión Retail NL</span>
+            <h1 style="font-size: 34px; color: #2b581b; margin-top: 0; margin-bottom: 12px;">Únete a la Red Comercial de MARK'S</h1>
+            <p style="font-size: 16px; color: #555; line-height: 1.5; max-width: 600px; margin: 0 auto;">
+                Registra los datos de tu cadena o sucursal y agenda una reunión con nuestro equipo para integrar tecnología sin filas y control de merma.
+            </p>
+        </div>
+
+        <div class="form-container">
+            <form onsubmit="window.location.href='exito.html'; return false;">
+                
+                <div class="form-grid">
+                    
+                    <div class="form-group">
+                        <label>Nombre de la Empresa / Supermercado</label>
+                        <input type="text" placeholder="Ej. Supermercados del Norte" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nombre del Representante</label>
+                        <input type="text" placeholder="Tu nombre completo" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Cargo / Puesto</label>
+                        <input type="text" placeholder="Ej. Gerente de Operaciones" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Correo Electrónico Corporativo</label>
+                        <input type="email" placeholder="contacto@tusuper.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Teléfono / WhatsApp Directo</label>
+                        <input type="tel" placeholder="81 0000 0000" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Municipio en Nuevo León</label>
+                        <select required>
+                            <option value="" disabled selected>Selecciona una ubicación</option>
+                            <option value="Monterrey">Monterrey</option>
+                            <option value="San Pedro">San Pedro Garza García</option>
+                            <option value="Santa Catarina">Santa Catarina</option>
+                            <option value="San Nicolás">San Nicolás de los Garza</option>
+                            <option value="Guadalupe">Guadalupe</option>
+                            <option value="Apodaca">Apodaca</option>
+                            <option value="Otro">Otro municipio</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Fecha y Hora Preferida para la Reunión</label>
+                        <input type="datetime-local" required>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Comentarios adicionales (Opcional)</label>
+                        <textarea rows="3" placeholder="Cuéntanos cuántas sucursales tienes o qué objetivo principal buscas con MARK'S..."></textarea>
+                    </div>
+
+                </div>
+
+                <div style="text-align: center; display: flex; gap: 15px; justify-content: center; align-items: center; border-top: 1px solid #edf2f7; padding-top: 25px;">
+                    <a href="supermercados.html" style="text-decoration: none; background-color: #f1f5f9; color: #475569; font-size: 15px; font-weight: 600; padding: 13px 28px; border-radius: 30px; display: inline-block; transition: background 0.2s;">
+                        Cancelar
+                    </a>
+                    <button type="submit" class="btn-verde" style="border: none; cursor: pointer; font-size: 15px; padding: 13px 35px; border-radius: 30px;">
+                        Confirmar Solicitud de Reunión
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
+    </section>
+
+</body>
+</html>

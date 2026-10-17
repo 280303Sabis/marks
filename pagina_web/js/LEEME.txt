@@ -1,0 +1,5 @@
+Aqui va el JavaScript que conecta la pagina con la API de MARK'S.
+Lo escribe Sabina (backend). Un archivo .js por pagina:
+  api.js      -> unica pieza que habla con la API
+  sesion.js   -> guarda la sesion y protege paginas por rol
+  login.js, dashboard.js, ... -> uno por pagina

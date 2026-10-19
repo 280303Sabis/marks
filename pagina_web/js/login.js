@@ -1,19 +1,31 @@
 /*
-  login.js - Inicio de sesión del portal (index.html)
-  ----------------------------------------------------
-  1. Si ya hay una sesión de ADMIN abierta, entra directo al dashboard.
-  2. Al tocar "Ingresar" manda correo y contraseña a POST /api/auth/login.
-  3. Solo deja entrar a usuarios con rol ADMIN.
+  login.js - Inicio de sesión (sirve para index.html y acceso-clientes.html)
+  ---------------------------------------------------------------------------
+  Cada formulario indica en su HTML cómo debe comportarse:
+    data-roles="ADMIN"              roles que pueden entrar (separados por coma)
+    data-destino="dashboard.html"   página que se abre al entrar
+    data-mensaje-rol="..."          mensaje si la cuenta es de otro tipo
+
+  1. Si ya hay una sesión con un rol permitido, entra directo al destino.
+  2. Al enviar, manda correo y contraseña a POST /api/auth/login.
+  3. Solo deja entrar a los roles permitidos.
   4. Muestra los errores de la API (contraseña incorrecta, cuenta bloqueada...).
 */
-
-const ROLES_PORTAL = ["ADMIN"];
 
 const formulario = document.getElementById("form-login");
 const campoCorreo = document.getElementById("email");
 const campoPassword = document.getElementById("password");
 const boton = document.getElementById("btn-ingresar");
 const cajaMensaje = document.getElementById("login-mensaje");
+
+// Configuración leída del HTML
+const ROLES_PERMITIDOS = (formulario.dataset.roles || "")
+  .split(",").map((r) => r.trim()).filter(Boolean);
+const DESTINO = formulario.dataset.destino;
+const MENSAJE_ROL = formulario.dataset.mensajeRol
+  || "Esta cuenta no tiene acceso a esta sección.";
+// Nombre de esta página (index.html o acceso-clientes.html): aquí se regresa al salir.
+const PAGINA_ACCESO = location.pathname.split("/").pop() || "index.html";
 
 // Muestra un mensaje arriba del botón. tipo: "error" o "info".
 function mostrarMensaje(texto, tipo = "error") {
@@ -28,15 +40,16 @@ function ocultarMensaje() {
 }
 
 // Bloquea el botón mientras se espera la respuesta (evita doble clic).
+const TEXTO_BOTON = boton.textContent;
 function cargando(activo) {
   boton.disabled = activo;
-  boton.textContent = activo ? "Ingresando..." : "Ingresar";
+  boton.textContent = activo ? "Ingresando..." : TEXTO_BOTON;
 }
 
-// 1. Si ya hay sesión de ADMIN, no tiene caso volver a iniciar sesión.
+// 1. Si ya hay sesión con un rol permitido, no tiene caso volver a iniciar sesión.
 const usuarioActual = Sesion.usuario();
-if (Sesion.token() && usuarioActual && ROLES_PORTAL.includes(usuarioActual.rol)) {
-  location.replace("dashboard.html");
+if (Sesion.token() && usuarioActual && ROLES_PERMITIDOS.includes(usuarioActual.rol)) {
+  location.replace(DESTINO);
 }
 
 // Aviso cuando la sesión se cerró porque el token ya no era válido.
@@ -65,16 +78,15 @@ formulario.addEventListener("submit", async (evento) => {
       conToken: false,
     });
 
-    // 3. Solo administradores
-    if (!ROLES_PORTAL.includes(respuesta.usuario.rol)) {
-      mostrarMensaje("Esta cuenta no tiene acceso al portal de administración. " +
-                     "Si eres cliente, usa la app MARK'S.");
+    // 3. Solo los roles permitidos en esta página
+    if (!ROLES_PERMITIDOS.includes(respuesta.usuario.rol)) {
+      mostrarMensaje(MENSAJE_ROL);
       campoPassword.value = "";
       return;
     }
 
-    Sesion.guardar(respuesta.token, respuesta.usuario);
-    location.replace("dashboard.html");
+    Sesion.guardar(respuesta.token, respuesta.usuario, PAGINA_ACCESO);
+    location.replace(DESTINO);
 
   } catch (e) {
     // 4. Errores de la API

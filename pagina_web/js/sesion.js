@@ -1,21 +1,24 @@
 /*
   sesion.js - Manejo de la sesión del portal web de MARK'S
   ---------------------------------------------------------
-  Guarda el token y los datos del usuario al iniciar sesión.
-  Se usa sessionStorage: la sesión se borra sola al cerrar el navegador.
+  Guarda el token, los datos del usuario y la página por la que entró
+  (index.html para el personal, acceso-clientes.html para clientes).
+  Se usa sessionStorage: la sesión se borra sola al cerrar la pestaña.
 
-  Uso en una página protegida (por ejemplo, dashboard.html):
-    const usuario = await Sesion.proteger(["ADMIN"]);
+  Uso en una página protegida:
+    const usuario = await Sesion.proteger(["ADMIN"], "index.html");
 */
 
 const Sesion = {
   _TOKEN: "marks_token",
   _USUARIO: "marks_usuario",
+  _ACCESO: "marks_acceso",
 
   // Guarda la sesión después de un login correcto.
-  guardar(token, usuario) {
+  guardar(token, usuario, paginaAcceso = "index.html") {
     sessionStorage.setItem(this._TOKEN, token);
     sessionStorage.setItem(this._USUARIO, JSON.stringify(usuario));
+    sessionStorage.setItem(this._ACCESO, paginaAcceso);
   },
 
   // Regresa el token, o null si no hay sesión.
@@ -32,27 +35,40 @@ const Sesion = {
     }
   },
 
+  // Página de acceso por la que entró el usuario (a donde regresa al salir).
+  paginaAcceso() {
+    return sessionStorage.getItem(this._ACCESO) || "index.html";
+  },
+
   // Borra la sesión.
   cerrar() {
     sessionStorage.removeItem(this._TOKEN);
     sessionStorage.removeItem(this._USUARIO);
+    sessionStorage.removeItem(this._ACCESO);
   },
 
-  // Cierra la sesión y regresa al login.
+  // Cierra la sesión y regresa a la página de acceso por la que entró.
   salir() {
+    const pagina = this.paginaAcceso();
     this.cerrar();
-    location.replace("index.html");
+    location.replace(pagina);
   },
 
-  // Protege una página: si no hay sesión o el rol no tiene permiso, regresa al login.
-  // Si todo está bien, regresa los datos actualizados del usuario.
-  async proteger(rolesPermitidos = ["ADMIN"]) {
+  // Protege una página. Si no hay sesión o el rol no tiene permiso,
+  // manda a paginaAcceso. Si todo está bien, regresa los datos del usuario.
+  async proteger(rolesPermitidos, paginaAcceso = "index.html") {
     // Ocultar la página mientras se revisa, para que no se alcance a ver nada.
     document.documentElement.style.visibility = "hidden";
 
     const u = this.usuario();
-    if (!this.token() || !u || !rolesPermitidos.includes(u.rol)) {
-      this.salir();
+    if (!this.token() || !u) {
+      this.cerrar();
+      location.replace(paginaAcceso);
+      return null;
+    }
+    if (!rolesPermitidos.includes(u.rol)) {
+      // Tiene sesión, pero de otro tipo (ej. un cliente en el panel de admin).
+      location.replace(paginaAcceso);
       return null;
     }
 
@@ -60,19 +76,20 @@ const Sesion = {
       // Confirmar con la API que el token sigue siendo válido.
       const yo = await api("/auth/yo");
       if (!rolesPermitidos.includes(yo.rol)) {
-        this.salir();
+        location.replace(paginaAcceso);
         return null;
       }
       document.documentElement.style.visibility = "visible";
       return yo;
     } catch (e) {
       if (e.estado === 0) {
-        // La API está apagada: se muestra la página con un aviso en lugar de sacar al usuario.
+        // La API está apagada: se muestra la página con un aviso.
         document.documentElement.style.visibility = "visible";
         alert(e.message);
         return u;
       }
-      this.salir();   // cualquier otro error de sesión: regresar al login
+      this.cerrar();
+      location.replace(paginaAcceso);
       return null;
     }
   },

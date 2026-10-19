@@ -61,10 +61,12 @@ async function api(ruta, opciones = {}) {
 
   // 4. Errores
   if (!respuesta.ok) {
-    // La sesión ya no es válida (token vencido o cerrado en otro lado): regresar al login.
+    // La sesión ya no es válida (token vencido o cerrado en otro lado):
+    // regresar a la página de acceso por la que entró.
     if (respuesta.status === 401 && conToken && Sesion.token()) {
+      const acceso = Sesion.paginaAcceso();
       Sesion.cerrar();
-      location.replace("index.html?sesion=expirada");
+      location.replace(acceso + "?sesion=expirada");
     }
     throw new ErrorApi(cuerpo.error || "Ocurrió un error (" + respuesta.status + ")",
                        respuesta.status, cuerpo);

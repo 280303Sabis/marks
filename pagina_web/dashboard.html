@@ -26,7 +26,8 @@
                     </div>
                 </li>
 
-                <li><a href="index.html" class="nav-btn logout-btn">Cerrar Sesión</a></li>
+                <!-- El JavaScript (js/dashboard.js) usa este id para cerrar la sesión. No cambiarlo. -->
+                <li><a href="index.html" id="btn-cerrar-sesion" class="nav-btn logout-btn">Cerrar Sesión</a></li>
             </ul>
         </nav>
     </header>
@@ -140,5 +141,9 @@
 
     </section>
 
+    <!-- Conexión con la API: protege la página y hace funcionar "Cerrar Sesión". -->
+    <script src="js/api.js"></script>
+    <script src="js/sesion.js"></script>
+    <script src="js/dashboard.js"></script>
 </body>
 </html>

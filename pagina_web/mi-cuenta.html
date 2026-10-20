@@ -65,6 +65,22 @@
 
                     <p id="datos-mensaje" class="mensaje" role="status" hidden></p>
 
+                    <!-- CONFIRMAR CORREO: solo se ve si el correo está "Sin confirmar" -->
+                    <div id="confirmar-correo" class="cta-confirmar" hidden>
+                        <p class="cta-confirmar-texto">
+                            <i class="ph ph-envelope-simple" aria-hidden="true"></i>
+                            <span>Tu correo no está confirmado. Confírmalo para poder recuperar tu cuenta si olvidas la contraseña.</span>
+                        </p>
+                        <button type="button" id="btn-enviar-codigo" class="cl-boton-sec">Enviar código</button>
+                        <form id="form-codigo-correo" class="cta-confirmar-form" novalidate hidden>
+                            <div class="cl-campo">
+                                <input type="text" id="conf-codigo" class="cl-codigo" maxlength="6" inputmode="numeric" autocomplete="one-time-code" placeholder="000000" aria-label="Código de 6 dígitos">
+                            </div>
+                            <button type="submit" id="btn-confirmar-correo" class="cl-boton">Confirmar</button>
+                        </form>
+                        <p id="conf-mensaje" class="mensaje" role="status" hidden></p>
+                    </div>
+
                     <dl id="cuenta-datos-vista" class="cta-lista">
                         <div class="cta-fila">
                             <dt>Nombre completo</dt>
@@ -140,10 +156,6 @@
                             <span class="cta-pronto-icono" aria-hidden="true"><i class="ph ph-piggy-bank"></i></span>
                             <div><strong>Mis ahorros</strong><span>Lo que te ahorraste con las ofertas.</span></div>
                         </li>
-                        <li>
-                            <span class="cta-pronto-icono" aria-hidden="true"><i class="ph ph-shield-check"></i></span>
-                            <div><strong>Privacidad</strong><span>Descarga tus datos o elimina tu cuenta.</span></div>
-                        </li>
                     </ul>
                 </section>
 
@@ -185,11 +197,60 @@
                     </form>
                 </section>
 
+                <!-- PRIVACIDAD Y SEGURIDAD -->
+                <section class="cl-tarjeta" aria-labelledby="titulo-privacidad">
+                    <h2 id="titulo-privacidad" class="cta-titulo-tarjeta">Privacidad y seguridad</h2>
+                    <p class="cl-texto-sec cta-explica">Lo que puedes hacer con tus datos personales.</p>
+                    <ul class="cta-acciones">
+                        <li>
+                            <button type="button" id="btn-exportar" class="cta-accion">
+                                <span class="cta-pronto-icono" aria-hidden="true"><i class="ph ph-download-simple"></i></span>
+                                <span><strong>Descargar mis datos</strong><small>Una copia de lo que MARK'S guarda sobre ti.</small></span>
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" id="btn-cerrar-todas" class="cta-accion">
+                                <span class="cta-pronto-icono" aria-hidden="true"><i class="ph ph-devices"></i></span>
+                                <span><strong>Cerrar sesión en todos mis dispositivos</strong><small>También en la app del celular.</small></span>
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" id="btn-eliminar" class="cta-accion cta-accion-peligro">
+                                <span class="cta-pronto-icono" aria-hidden="true"><i class="ph ph-trash"></i></span>
+                                <span><strong>Eliminar mi cuenta</strong><small>Se borran tus datos personales. No se puede deshacer.</small></span>
+                            </button>
+                        </li>
+                    </ul>
+                    <p id="privacidad-mensaje" class="mensaje" role="status" hidden></p>
+                    <p class="cta-aviso-enlace"><a href="aviso-privacidad.html" class="cl-enlace">Leer el Aviso de Privacidad</a></p>
+                </section>
+
             </div>
         </div>
     </main>
 
     <footer class="cl-pie">MARK'S - Compra sin filas. Proyecto Integrador, Universidad Tecnológica Santa Catarina.</footer>
+
+    <!-- Ventana para eliminar la cuenta -->
+    <dialog id="dialogo-eliminar" class="cta-dialogo">
+        <h2>Eliminar mi cuenta</h2>
+        <p class="cl-texto-sec">Se borran tu nombre, teléfono, fecha de nacimiento y puntos. Tus compras se conservan, pero ya sin tus datos. No se puede deshacer.</p>
+        <form id="form-eliminar" class="cl-formulario" novalidate>
+            <div class="cl-campo">
+                <label for="eli-password">Tu contraseña</label>
+                <input type="password" id="eli-password" maxlength="64" autocomplete="current-password" placeholder="••••••••">
+            </div>
+            <div class="cl-campo">
+                <label for="eli-confirmacion">Escribe ELIMINAR para confirmar</label>
+                <input type="text" id="eli-confirmacion" maxlength="10" autocomplete="off" placeholder="ELIMINAR">
+            </div>
+            <p id="eliminar-mensaje" class="mensaje" role="alert" hidden></p>
+            <div class="cta-botones">
+                <button type="button" id="btn-cancelar-eliminar" class="cl-boton-sec">Cancelar</button>
+                <button type="submit" id="btn-confirmar-eliminar" class="cl-boton cl-boton-peligro">Eliminar mi cuenta</button>
+            </div>
+        </form>
+    </dialog>
 
     <script src="js/api.js"></script>
     <script src="js/sesion.js"></script>

@@ -6,6 +6,11 @@
   3. Muestra los datos del cliente (GET /api/auth/yo).
   4. Editar mis datos           (PUT  /api/cuenta/perfil).
   5. Cambiar contraseña         (POST /api/cuenta/cambiar-password).
+  6. Confirmar mi correo        (POST /api/auth/correo/enviar-codigo y /confirmar).
+  7. Privacidad y seguridad:
+       Descargar mis datos      (GET    /api/cuenta/exportar)
+       Cerrar sesión en todos   (POST   /api/cuenta/cerrar-sesiones)
+       Eliminar mi cuenta       (DELETE /api/cuenta)
 */
 
 const $ = (id) => document.getElementById(id);
@@ -100,6 +105,9 @@ function pintarDatos(u) {
     insignia.textContent = confirmado ? "Confirmado" : "Sin confirmar";
     insignia.classList.remove("cuenta-insignia-ok", "cuenta-insignia-pendiente");
     insignia.classList.add(confirmado ? "cuenta-insignia-ok" : "cuenta-insignia-pendiente");
+
+    // El recuadro para confirmar el correo solo aparece si falta confirmarlo
+    $("confirmar-correo").hidden = confirmado;
   }
 }
 
@@ -236,6 +244,143 @@ async function cambiarPassword(evento) {
 }
 
 // ------------------------------------------------------------------
+// 6. Confirmar mi correo
+// ------------------------------------------------------------------
+let temporizador = null;
+
+// Desactiva el botón unos segundos para no pedir códigos seguidos.
+function esperarReenvio(segundos) {
+  const boton = $("btn-enviar-codigo");
+  clearInterval(temporizador);
+  boton.disabled = true;
+  let restantes = segundos;
+  boton.textContent = `Reenviar código (${restantes})`;
+  temporizador = setInterval(() => {
+    restantes--;
+    if (restantes <= 0) {
+      clearInterval(temporizador);
+      boton.disabled = false;
+      boton.textContent = "Reenviar código";
+    } else {
+      boton.textContent = `Reenviar código (${restantes})`;
+    }
+  }, 1000);
+}
+
+async function enviarCodigoCorreo() {
+  const caja = $("conf-mensaje");
+  mostrar(caja, "Enviando código...", "info");
+  esperarReenvio(60);
+  try {
+    const r = await api("/auth/correo/enviar-codigo", { metodo: "POST" });
+    mostrar(caja, r.mensaje, "info");
+    $("form-codigo-correo").hidden = false;
+    $("conf-codigo").focus();
+  } catch (e) {
+    mostrar(caja, e.message);
+  }
+}
+
+async function confirmarCorreo(evento) {
+  evento.preventDefault();
+  const caja = $("conf-mensaje");
+  const codigo = $("conf-codigo").value.trim();
+  if (!/^\d{6}$/.test(codigo)) return mostrar(caja, "El código tiene 6 dígitos.");
+
+  const boton = $("btn-confirmar-correo");
+  boton.disabled = true;
+  try {
+    const r = await api("/auth/correo/confirmar", { metodo: "POST", datos: { codigo } });
+    clearInterval(temporizador);
+    usuario.correo_verificado = true;
+    pintarDatos(usuario);               // la insignia cambia a "Confirmado" y el recuadro se oculta
+    mostrar($("datos-mensaje"), r.mensaje + ".", "info");
+  } catch (e) {
+    mostrar(caja, e.message);
+  } finally {
+    boton.disabled = false;
+  }
+}
+
+// ------------------------------------------------------------------
+// 7. Privacidad y seguridad
+// ------------------------------------------------------------------
+
+// Descarga un archivo .json con los datos que regresa la API.
+async function descargarDatos() {
+  const caja = $("privacidad-mensaje");
+  const boton = $("btn-exportar");
+  boton.disabled = true;
+  try {
+    const datos = await api("/cuenta/exportar");
+    const archivo = new Blob([JSON.stringify(datos, null, 2)], { type: "application/json" });
+    const enlace = document.createElement("a");
+    enlace.href = URL.createObjectURL(archivo);
+    enlace.download = `mis-datos-marks-${aTexto(new Date())}.json`;
+    document.body.appendChild(enlace);
+    enlace.click();
+    enlace.remove();
+    URL.revokeObjectURL(enlace.href);
+    mostrar(caja, "Listo. Se descargó el archivo con tus datos.", "info");
+  } catch (e) {
+    mostrar(caja, e.message);
+  } finally {
+    boton.disabled = false;
+  }
+}
+
+async function cerrarTodasLasSesiones() {
+  const seguro = confirm("Se cerrará tu sesión en todos tus dispositivos, también aquí. ¿Continuar?");
+  if (!seguro) return;
+
+  const caja = $("privacidad-mensaje");
+  $("btn-cerrar-todas").disabled = true;
+  try {
+    const r = await api("/cuenta/cerrar-sesiones", { metodo: "POST" });
+    mostrar(caja, r.mensaje + ".", "info");
+    Sesion.cerrar();   // el token de esta página ya no sirve
+    setTimeout(() => location.replace("acceso-clientes.html"), 2000);
+  } catch (e) {
+    mostrar(caja, e.message);
+    $("btn-cerrar-todas").disabled = false;
+  }
+}
+
+function abrirEliminar() {
+  $("form-eliminar").reset();
+  ocultar($("eliminar-mensaje"));
+  $("dialogo-eliminar").showModal();
+  $("eli-password").focus();
+}
+
+async function eliminarCuenta(evento) {
+  evento.preventDefault();
+  const caja = $("eliminar-mensaje");
+  ocultar(caja);
+
+  const password = $("eli-password").value;
+  const confirmacion = $("eli-confirmacion").value.trim();
+  if (!password) return mostrar(caja, "Escribe tu contraseña.");
+  if (confirmacion !== "ELIMINAR") return mostrar(caja, "Escribe la palabra ELIMINAR en mayúsculas.");
+
+  const boton = $("btn-confirmar-eliminar");
+  boton.disabled = true;
+  boton.textContent = "Eliminando...";
+  try {
+    const r = await api("/cuenta", { metodo: "DELETE", datos: { password, confirmacion } });
+    mostrar(caja, r.mensaje + ".", "info");
+    $("btn-cancelar-eliminar").disabled = true;
+    Sesion.cerrar();
+    setTimeout(() => location.replace("acceso-clientes.html"), 2500);
+  } catch (e) {
+    mostrar(caja, e.message);
+    $("eli-password").value = "";
+    boton.disabled = false;
+    boton.textContent = "Eliminar mi cuenta";
+  }
+}
+
+// ------------------------------------------------------------------
 // Inicio
 // ------------------------------------------------------------------
 (async () => {
@@ -267,4 +412,18 @@ async function cambiarPassword(evento) {
   // 5. Cambiar contraseña
   $("pass-nueva").addEventListener("input", revisarReglas);
   $("form-password").addEventListener("submit", cambiarPassword);
+
+  // 6. Confirmar mi correo
+  $("conf-codigo").addEventListener("input", (e) => {
+    e.target.value = e.target.value.replace(/\D/g, "");
+  });
+  $("btn-enviar-codigo").addEventListener("click", enviarCodigoCorreo);
+  $("form-codigo-correo").addEventListener("submit", confirmarCorreo);
+
+  // 7. Privacidad y seguridad
+  $("btn-exportar").addEventListener("click", descargarDatos);
+  $("btn-cerrar-todas").addEventListener("click", cerrarTodasLasSesiones);
+  $("btn-eliminar").addEventListener("click", abrirEliminar);
+  $("btn-cancelar-eliminar").addEventListener("click", () => $("dialogo-eliminar").close());
+  $("form-eliminar").addEventListener("submit", eliminarCuenta);
 })();

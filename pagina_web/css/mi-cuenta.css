@@ -1,249 +1,238 @@
-/* mi-cuenta.css - Estilos del panel del cliente (mi-cuenta.html) */
+/* mi-cuenta.css - Panel del cliente (mi-cuenta.html) */
 
-.cuenta-seccion {
-    max-width: 1100px;
-    padding: 40px 45px;
-}
-
-/* Encabezado: saludo y puntos */
-.cuenta-encabezado {
+/* Encabezado: saludo a la izquierda, puntos a la derecha */
+.cta-portada {
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
+    gap: 28px;
+    margin-bottom: 36px;
+}
+
+.cta-saludo {
+    display: flex;
+    align-items: center;
     gap: 20px;
-    border-bottom: 2px solid #e2fbe0;
-    padding-bottom: 20px;
 }
 
-.cuenta-etiqueta {
-    background-color: #e2fbe0;
-    color: #2e7d32;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+.cta-saludo p {
+    margin-top: 4px;
 }
 
-.cuenta-titulo {
-    font-size: 28px;
-    color: #2b581b;
-    margin-top: 8px;
-    margin-bottom: 5px;
+.cta-avatar {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 72px;
+    height: 72px;
+    border-radius: 24px;
+    background: var(--brote);
+    color: var(--verde-hoja);
+    font-size: 26px;
+    font-weight: 700;
 }
 
-.cuenta-subtitulo {
-    font-size: 14.5px;
-    color: #666;
-}
-
-.cuenta-puntos {
-    background: #e2fbe0;
-    padding: 15px 30px;
-    border-radius: 14px;
-    text-align: center;
-}
-
-.cuenta-puntos-etiqueta {
-    display: block;
-    font-size: 12px;
-    color: #2e7d32;
-    font-weight: bold;
-}
-
-.cuenta-puntos-valor {
-    font-size: 28px;
-    font-weight: bold;
-    color: #2b581b;
-}
-
-/* Columna derecha: tarjetas una debajo de otra */
-.cuenta-columna {
+/* Puntos: tarjeta tipo ticket, el elemento que más resalta de la página */
+.cta-puntos {
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    min-width: 240px;
+    padding: 22px 28px 20px;
+    border-radius: var(--radio-g);
+    background: var(--verde-bosque);
+    color: var(--blanco);
 }
 
-/* Tarjetas */
-.cuenta-card-encabezado {
+.cta-puntos-etiqueta {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--verde-marca);
+}
+
+.cta-puntos-valor {
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+.cta-puntos-nota {
+    margin-top: 6px;
+    font-size: 12.5px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Rejilla: datos a la izquierda, columna a la derecha */
+.cta-rejilla {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 28px;
+    align-items: start;
+}
+
+.cta-columna {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.cta-tarjeta-encabezado {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 15px;
+    gap: 12px;
+    margin-bottom: 20px;
 }
 
-.cuenta-card-encabezado .cuenta-card-titulo {
-    margin-bottom: 0;
+.cta-titulo-tarjeta {
+    margin-bottom: 6px !important;
+    font-size: 20px !important;
 }
 
-.cuenta-card-titulo {
-    color: #2b581b;
-    font-size: 18px;
-    margin-bottom: 15px;
+.cta-datos h2 {
+    font-size: 20px;
 }
 
-/* Botón secundario (Editar, Cancelar) */
-.cuenta-boton-secundario {
-    background: #fff;
-    color: #2e7d32;
-    border: 1.5px solid #72db51;
-    border-radius: 20px;
-    padding: 8px 20px;
-    font: inherit;
+.cta-explica {
+    margin-bottom: 20px !important;
     font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
 }
 
-.cuenta-boton-secundario:hover {
-    background: #e2fbe0;
+.cta-datos .mensaje {
+    margin-bottom: 18px;
 }
 
-/* Lista de datos: etiqueta a la izquierda, valor a la derecha */
-.cuenta-datos {
-    display: grid;
-    grid-template-columns: 170px 1fr;
-    gap: 12px 16px;
-    font-size: 14.5px;
+/* Lista de datos */
+.cta-lista {
+    margin: 0;
 }
 
-.cuenta-datos[hidden] {
+.cta-lista[hidden] {
     display: none;
 }
 
-.cuenta-datos dt {
-    color: #666;
+.cta-fila {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--linea);
 }
 
-.cuenta-datos dd {
+.cta-fila:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.cta-fila:first-child {
+    padding-top: 0;
+}
+
+.cta-fila dt {
+    color: var(--salvia);
+    font-size: 14px;
+}
+
+.cta-fila dd {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
     margin: 0;
-    color: #1e3a12;
     font-weight: 600;
     word-break: break-word;
 }
 
-/* Insignia del correo */
-.cuenta-insignia {
-    display: inline-block;
-    margin-left: 8px;
-    padding: 2px 10px;
-    border-radius: 10px;
-    font-size: 11.5px;
-    font-weight: bold;
+/* Formulario de datos */
+.cta-nota {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--salvia);
 }
 
-.cuenta-insignia-ok {
-    background: #e2fbe0;
-    color: #2e7d32;
-}
-
-.cuenta-insignia-pendiente {
-    background: #fff4d6;
-    color: #8a5a00;
-}
-
-/* Formulario de Mis datos */
-.cuenta-form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px 18px;
-}
-
-.cuenta-form-grid .completo {
-    grid-column: 1 / -1;
-}
-
-.cuenta-form select {
-    width: 100%;
-    padding: 14px 16px;
-    border: 1px solid #dcdcdc;
-    border-radius: 12px;
-    font: inherit;
-    background: #fff;
-    color: #333;
-}
-
-.cuenta-nota {
-    font-size: 12.5px;
-    color: #888;
-    margin: 10px 0;
-}
-
-.cuenta-form-botones {
+.cta-botones {
     display: flex;
     justify-content: flex-end;
+    gap: 12px;
+}
+
+.cta-botones .cl-boton-sec {
+    height: 50px;
+    padding: 0 24px;
+}
+
+/* En camino */
+.cta-pronto ul {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.cta-pronto li {
+    display: flex;
     align-items: center;
     gap: 14px;
-    margin-top: 10px;
 }
 
-.cuenta-form-botones .btn-login {
-    width: auto;
-    padding-left: 30px;
-    padding-right: 30px;
+.cta-pronto strong {
+    display: block;
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--verde-bosque);
 }
 
-/* Reglas de la contraseña: gris = falta, verde = cumple */
-.reglas-password {
-    list-style: none;
-    margin: 4px 0 14px;
-    padding: 12px 16px;
-    background: #f7f9f6;
-    border-radius: 12px;
+.cta-pronto div span {
     font-size: 13px;
-    color: #888;
+    color: var(--salvia);
 }
 
-.reglas-password li {
-    line-height: 1.7;
+.cta-pronto-icono {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    background: var(--papel);
+    color: var(--salvia);
+    font-size: 21px;
 }
 
-.reglas-password li::before {
-    content: "\2022";
-    display: inline-block;
-    width: 16px;
-    font-weight: bold;
-}
-
-.reglas-password li.cumple {
-    color: #2e7d32;
-}
-
-.reglas-password li.cumple::before {
-    content: "\2713";
-}
-
-/* Lista de errores dentro del cuadro de mensaje */
-.mensaje ul {
-    margin: 6px 0 0;
-    padding-left: 18px;
-}
-
-/* Tarjeta "Próximamente" */
-.cuenta-proximamente ul {
-    margin: 0;
-    padding-left: 18px;
-    color: #666;
-    font-size: 14px;
-    line-height: 2;
-}
-
-/* Celular: una sola columna */
-@media (max-width: 600px) {
-    .cuenta-seccion {
-        padding: 25px 20px;
-    }
-    .cuenta-datos,
-    .cuenta-form-grid {
+/* Tableta y celular */
+@media (max-width: 900px) {
+    .cta-rejilla {
         grid-template-columns: 1fr;
     }
-    .cuenta-datos {
+}
+
+@media (max-width: 640px) {
+    .cta-portada {
+        margin-bottom: 28px;
+    }
+    .cta-avatar {
+        width: 56px;
+        height: 56px;
+        border-radius: 18px;
+        font-size: 20px;
+    }
+    .cta-puntos {
+        width: 100%;
+    }
+    .cta-fila {
+        grid-template-columns: 1fr;
         gap: 2px;
     }
-    .cuenta-datos dd {
-        margin-bottom: 10px;
+    .cta-botones {
+        flex-direction: column-reverse;
+    }
+    .cta-botones .cl-boton,
+    .cta-botones .cl-boton-sec {
+        width: 100%;
     }
 }

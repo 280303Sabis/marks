@@ -1,11 +1,11 @@
 /* registro.css - Página Crear cuenta (registro.html) */
 
 .reg {
-    max-width: 760px;
+    max-width: 680px;
 }
 
 .reg-intro {
-    margin-bottom: 28px;
+    margin-bottom: 22px;
 }
 
 .reg-intro p {
@@ -13,13 +13,13 @@
 }
 
 .reg-tarjeta {
-    padding: 36px 40px;
+    padding: 30px 32px;
 }
 
 .reg-pie {
-    margin-top: 22px !important;
+    margin-top: 18px !important;
     text-align: center;
-    font-size: 14px;
+    font-size: 13.5px;
     color: var(--salvia);
 }
 
@@ -65,13 +65,13 @@
 .reg-icono {
     display: inline-grid;
     place-items: center;
-    width: 64px;
-    height: 64px;
-    margin-bottom: 14px;
-    border-radius: 20px;
+    width: 56px;
+    height: 56px;
+    margin-bottom: 12px;
+    border-radius: 18px;
     background: var(--brote);
     color: var(--verde-hoja);
-    font-size: 32px;
+    font-size: 28px;
 }
 
 .reg-acciones {
@@ -144,7 +144,7 @@
 
 @media (max-width: 640px) {
     .reg-tarjeta {
-        padding: 28px 20px;
+        padding: 24px 18px;
     }
     .cl-pasos li {
         font-size: 12px;

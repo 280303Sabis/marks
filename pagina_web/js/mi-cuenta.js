@@ -2,7 +2,7 @@
   mi-cuenta.js - Panel del cliente (mi-cuenta.html)
   --------------------------------------------------
   1. Protege la página: solo CLIENTE. Sin sesión regresa a acceso-clientes.html.
-  2. Hace funcionar el botón "Cerrar Sesión".
+  2. Hace funcionar el botón "Cerrar sesión".
   3. Muestra los datos del cliente (GET /api/auth/yo).
   4. Editar mis datos           (PUT  /api/cuenta/perfil).
   5. Cambiar contraseña         (POST /api/cuenta/cambiar-password).
@@ -34,6 +34,12 @@ function fechaLarga(isoTexto) {
   return new Date(anio, mes - 1, dia).toLocaleDateString("es-MX", {
     day: "numeric", month: "long", year: "numeric",
   });
+}
+
+// "Sabina Isabel" + "Ortega González" -> "SO"
+function iniciales(nombre, apellidos) {
+  const primera = (texto) => (texto || "").trim().charAt(0).toUpperCase();
+  return (primera(nombre) + primera(apellidos)) || "M";
 }
 
 // Fecha a texto "AAAA-MM-DD" (formato del input date y de la API)
@@ -76,6 +82,7 @@ function ocultar(caja) {
 // 3. Mostrar datos
 // ------------------------------------------------------------------
 function pintarDatos(u) {
+  poner("cliente-iniciales", iniciales(u.nombre, u.apellidos));
   poner("cliente-nombre", u.nombre);
   poner("cliente-desde", fechaLarga(u.creado_en));
   poner("cliente-puntos", Number(u.puntos_saldo ?? u.puntos ?? 0).toLocaleString("es-MX"));

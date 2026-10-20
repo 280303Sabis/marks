@@ -4,132 +4,173 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MARK'S - Mi cuenta</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/mensajes.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+    <link rel="stylesheet" href="css/clientes.css">
     <link rel="stylesheet" href="css/mi-cuenta.css">
 </head>
-<body>
+<body class="cl">
 
-    <header class="navbar">
-        <div class="logo">
-            <img src="img/logo_marks.png" alt="MARK'S Logo" class="logo-img">
+    <header class="cl-encabezado">
+        <div class="cl-encabezado-interior">
+            <a href="mi-cuenta.html" class="cl-logo"><img src="img/logo_marks.png" alt="MARK'S"></a>
+            <nav aria-label="Menú principal">
+                <ul class="cl-menu">
+                    <li><a href="mi-cuenta.html" aria-current="page">Mi cuenta</a></li>
+                    <!-- El JavaScript (js/mi-cuenta.js) usa este id para cerrar la sesión. No cambiarlo. -->
+                    <li><a href="acceso-clientes.html" id="btn-cerrar-sesion">Cerrar sesión</a></li>
+                </ul>
+            </nav>
         </div>
-        <nav>
-            <ul class="nav-buttons">
-                <li><a href="mi-cuenta.html" class="nav-btn active">Mi cuenta</a></li>
-                <!-- El JavaScript (js/mi-cuenta.js) usa este id para cerrar la sesión. No cambiarlo. -->
-                <li><a href="acceso-clientes.html" id="btn-cerrar-sesion" class="nav-btn logout-btn">Cerrar Sesión</a></li>
-            </ul>
-        </nav>
     </header>
 
     <!--
         Los elementos con id los usa el JavaScript (js/mi-cuenta.js).
         Se pueden cambiar estilos y acomodo, pero NO los id ni los data-regla.
     -->
-    <section class="main-section cuenta-seccion">
+    <main class="cl-contenido cta">
 
-        <div class="cuenta-encabezado">
-            <div>
-                <span class="cuenta-etiqueta">Mi cuenta MARK'S</span>
-                <h1 class="cuenta-titulo">Hola, <span id="cliente-nombre">cliente</span></h1>
-                <p class="cuenta-subtitulo">Cliente desde <span id="cliente-desde">-</span></p>
-            </div>
-            <div class="cuenta-puntos">
-                <span class="cuenta-puntos-etiqueta">Mis puntos</span>
-                <span class="cuenta-puntos-valor" id="cliente-puntos">0</span>
-            </div>
-        </div>
-
-        <div class="dashboard-grid">
-
-            <!-- MIS DATOS: lista (vista) y formulario (edición) -->
-            <div class="dashboard-card">
-                <div class="cuenta-card-encabezado">
-                    <h3 class="cuenta-card-titulo">Mis datos</h3>
-                    <button type="button" id="btn-editar-datos" class="cuenta-boton-secundario">Editar</button>
+        <!-- ENCABEZADO: saludo y puntos -->
+        <section class="cta-portada">
+            <div class="cta-saludo">
+                <span id="cliente-iniciales" class="cta-avatar" aria-hidden="true"></span>
+                <div>
+                    <h1>Hola, <span id="cliente-nombre">cliente</span></h1>
+                    <p class="cl-texto-sec">Cliente desde el <span id="cliente-desde">-</span></p>
                 </div>
+            </div>
 
-                <p id="datos-mensaje" class="mensaje" role="status" hidden></p>
+            <div class="cta-puntos cl-ticket">
+                <span class="cta-puntos-etiqueta">Mis puntos</span>
+                <span class="cta-puntos-valor" id="cliente-puntos">0</span>
+                <span class="cta-puntos-nota">Se suman con cada compra en la app</span>
+            </div>
+        </section>
 
-                <dl id="cuenta-datos-vista" class="cuenta-datos">
-                    <dt>Nombre completo</dt>
-                    <dd id="cliente-nombre-completo">-</dd>
+        <div class="cta-rejilla">
 
-                    <dt>Correo</dt>
-                    <dd>
-                        <span id="cliente-correo">-</span>
-                        <span id="cliente-correo-estado" class="cuenta-insignia"></span>
-                    </dd>
+            <!-- COLUMNA IZQUIERDA -->
+            <div class="cta-columna">
 
-                    <dt>Teléfono</dt>
-                    <dd id="cliente-telefono">-</dd>
-
-                    <dt>Fecha de nacimiento</dt>
-                    <dd id="cliente-nacimiento">-</dd>
-
-                    <dt>Sexo</dt>
-                    <dd id="cliente-sexo">-</dd>
-                </dl>
-
-                <form id="form-datos" class="login-form cuenta-form" novalidate hidden>
-                    <div class="cuenta-form-grid">
-                        <div class="input-group">
-                            <label for="dat-nombre">Nombre</label>
-                            <input type="text" id="dat-nombre" maxlength="80" autocomplete="given-name">
-                        </div>
-                        <div class="input-group">
-                            <label for="dat-apellidos">Apellidos (opcional)</label>
-                            <input type="text" id="dat-apellidos" maxlength="80" autocomplete="family-name">
-                        </div>
-                        <div class="input-group">
-                            <label for="dat-telefono">Teléfono (opcional)</label>
-                            <input type="tel" id="dat-telefono" maxlength="10" inputmode="numeric" autocomplete="tel-national" placeholder="10 dígitos">
-                        </div>
-                        <div class="input-group">
-                            <label for="dat-nacimiento">Fecha de nacimiento</label>
-                            <input type="date" id="dat-nacimiento" autocomplete="bday">
-                        </div>
-                        <div class="input-group completo">
-                            <label for="dat-sexo">Sexo</label>
-                            <select id="dat-sexo">
-                                <option value="">Selecciona una opción</option>
-                                <option value="F">Femenino</option>
-                                <option value="M">Masculino</option>
-                                <option value="N">Prefiero no decirlo</option>
-                            </select>
-                        </div>
+                <!-- MIS DATOS: lista (vista) y formulario (edición) -->
+                <section class="cl-tarjeta cta-datos" aria-labelledby="titulo-datos">
+                    <div class="cta-tarjeta-encabezado">
+                        <h2 id="titulo-datos">Mis datos</h2>
+                        <button type="button" id="btn-editar-datos" class="cl-boton-sec">
+                            <i class="ph ph-pencil-simple" aria-hidden="true"></i> Editar
+                        </button>
                     </div>
-                    <p class="cuenta-nota">El correo no se puede cambiar.</p>
-                    <p id="form-datos-mensaje" class="mensaje" role="alert" hidden></p>
-                    <div class="cuenta-form-botones">
-                        <button type="button" id="btn-cancelar-datos" class="cuenta-boton-secundario">Cancelar</button>
-                        <button type="submit" id="btn-guardar-datos" class="btn-login">Guardar cambios</button>
-                    </div>
-                </form>
+
+                    <p id="datos-mensaje" class="mensaje" role="status" hidden></p>
+
+                    <dl id="cuenta-datos-vista" class="cta-lista">
+                        <div class="cta-fila">
+                            <dt>Nombre completo</dt>
+                            <dd id="cliente-nombre-completo">-</dd>
+                        </div>
+                        <div class="cta-fila">
+                            <dt>Correo</dt>
+                            <dd>
+                                <span id="cliente-correo">-</span>
+                                <span id="cliente-correo-estado" class="cuenta-insignia"></span>
+                            </dd>
+                        </div>
+                        <div class="cta-fila">
+                            <dt>Teléfono</dt>
+                            <dd id="cliente-telefono">-</dd>
+                        </div>
+                        <div class="cta-fila">
+                            <dt>Fecha de nacimiento</dt>
+                            <dd id="cliente-nacimiento">-</dd>
+                        </div>
+                        <div class="cta-fila">
+                            <dt>Sexo</dt>
+                            <dd id="cliente-sexo">-</dd>
+                        </div>
+                    </dl>
+
+                    <form id="form-datos" class="cl-formulario" novalidate hidden>
+                        <div class="cl-rejilla">
+                            <div class="cl-campo">
+                                <label for="dat-nombre">Nombre</label>
+                                <input type="text" id="dat-nombre" maxlength="80" autocomplete="given-name">
+                            </div>
+                            <div class="cl-campo">
+                                <label for="dat-apellidos">Apellidos <span class="cl-opcional">(opcional)</span></label>
+                                <input type="text" id="dat-apellidos" maxlength="80" autocomplete="family-name">
+                            </div>
+                            <div class="cl-campo">
+                                <label for="dat-telefono">Teléfono <span class="cl-opcional">(opcional)</span></label>
+                                <input type="tel" id="dat-telefono" maxlength="10" inputmode="numeric" autocomplete="tel-national" placeholder="10 dígitos">
+                            </div>
+                            <div class="cl-campo">
+                                <label for="dat-nacimiento">Fecha de nacimiento</label>
+                                <input type="date" id="dat-nacimiento" autocomplete="bday">
+                            </div>
+                            <div class="cl-campo cl-completo">
+                                <label for="dat-sexo">Sexo</label>
+                                <select id="dat-sexo">
+                                    <option value="">Selecciona una opción</option>
+                                    <option value="F">Femenino</option>
+                                    <option value="M">Masculino</option>
+                                    <option value="N">Prefiero no decirlo</option>
+                                </select>
+                            </div>
+                        </div>
+                        <p class="cta-nota"><i class="ph ph-info" aria-hidden="true"></i> El correo no se puede cambiar.</p>
+                        <p id="form-datos-mensaje" class="mensaje" role="alert" hidden></p>
+                        <div class="cta-botones">
+                            <button type="button" id="btn-cancelar-datos" class="cl-boton-sec">Cancelar</button>
+                            <button type="submit" id="btn-guardar-datos" class="cl-boton">Guardar cambios</button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- EN CAMINO: lo que se agrega más adelante -->
+                <section class="cl-tarjeta cta-pronto" aria-labelledby="titulo-pronto">
+                    <h2 id="titulo-pronto" class="cta-titulo-tarjeta">En camino</h2>
+                    <ul>
+                        <li>
+                            <span class="cta-pronto-icono" aria-hidden="true"><i class="ph ph-receipt"></i></span>
+                            <div><strong>Mis compras</strong><span>Tus tickets de cada compra con la app.</span></div>
+                        </li>
+                        <li>
+                            <span class="cta-pronto-icono" aria-hidden="true"><i class="ph ph-piggy-bank"></i></span>
+                            <div><strong>Mis ahorros</strong><span>Lo que te ahorraste con las ofertas.</span></div>
+                        </li>
+                        <li>
+                            <span class="cta-pronto-icono" aria-hidden="true"><i class="ph ph-shield-check"></i></span>
+                            <div><strong>Privacidad</strong><span>Descarga tus datos o elimina tu cuenta.</span></div>
+                        </li>
+                    </ul>
+                </section>
+
             </div>
 
             <!-- COLUMNA DERECHA -->
-            <div class="cuenta-columna">
+            <div class="cta-columna">
 
                 <!-- CAMBIAR CONTRASEÑA -->
-                <div class="dashboard-card">
-                    <h3 class="cuenta-card-titulo">Cambiar contraseña</h3>
-                    <form id="form-password" class="login-form" novalidate>
-                        <div class="input-group">
+                <section class="cl-tarjeta" aria-labelledby="titulo-password">
+                    <h2 id="titulo-password" class="cta-titulo-tarjeta">Cambiar contraseña</h2>
+                    <p class="cl-texto-sec cta-explica">Al cambiarla se cierra tu sesión en tus otros dispositivos.</p>
+                    <form id="form-password" class="cl-formulario" novalidate>
+                        <div class="cl-campo">
                             <label for="pass-actual">Contraseña actual</label>
                             <input type="password" id="pass-actual" maxlength="64" autocomplete="current-password" placeholder="••••••••">
                         </div>
-                        <div class="input-group">
+                        <div class="cl-campo">
                             <label for="pass-nueva">Nueva contraseña</label>
                             <input type="password" id="pass-nueva" maxlength="64" autocomplete="new-password" placeholder="••••••••">
                         </div>
-                        <div class="input-group">
+                        <div class="cl-campo">
                             <label for="pass-nueva2">Repite la nueva contraseña</label>
                             <input type="password" id="pass-nueva2" maxlength="64" autocomplete="new-password" placeholder="••••••••">
                         </div>
 
-                        <ul id="reglas-password" class="reglas-password">
+                        <ul id="reglas-password" class="reglas-password" aria-label="Reglas de la contraseña">
                             <li data-regla="largo">De 8 a 64 caracteres</li>
                             <li data-regla="mayuscula">Una letra MAYÚSCULA</li>
                             <li data-regla="minuscula">Una letra minúscula</li>
@@ -137,27 +178,18 @@
                             <li data-regla="simbolo">Un símbolo (ej. ! # $ % &amp; *)</li>
                             <li data-regla="correo">Que no contenga tu correo</li>
                         </ul>
+                        <p class="cl-ayuda">Usa 8 o más caracteres con mayúscula, minúscula, número y símbolo, sin incluir tu correo.</p>
 
                         <p id="password-mensaje" class="mensaje" role="alert" hidden></p>
-                        <button type="submit" id="btn-cambiar-password" class="btn-login">Cambiar contraseña</button>
+                        <button type="submit" id="btn-cambiar-password" class="cl-boton cl-boton-ancho">Cambiar contraseña</button>
                     </form>
-                </div>
-
-                <!-- PRÓXIMAMENTE -->
-                <div class="dashboard-card cuenta-proximamente">
-                    <h3 class="cuenta-card-titulo">Próximamente</h3>
-                    <ul>
-                        <li>Mis compras</li>
-                        <li>Mis ahorros</li>
-                        <li>Privacidad y seguridad</li>
-                    </ul>
-                </div>
+                </section>
 
             </div>
-
         </div>
+    </main>
 
-    </section>
+    <footer class="cl-pie">MARK'S - Compra sin filas. Proyecto Integrador, Universidad Tecnológica Santa Catarina.</footer>
 
     <script src="js/api.js"></script>
     <script src="js/sesion.js"></script>

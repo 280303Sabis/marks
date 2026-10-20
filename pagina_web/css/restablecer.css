@@ -1,32 +1,32 @@
 /* restablecer.css - Página Recuperar contraseña (restablecer.html) */
 
 .rec {
-    max-width: 520px;
+    max-width: 460px;
 }
 
 .rec-tarjeta {
-    padding: 40px 36px 30px;
+    padding: 32px 30px 26px;
 }
 
 .rec-icono {
     display: inline-grid;
     place-items: center;
-    width: 64px;
-    height: 64px;
-    margin-bottom: 16px;
-    border-radius: 20px;
+    width: 52px;
+    height: 52px;
+    margin-bottom: 14px;
+    border-radius: 16px;
     background: var(--brote);
     color: var(--verde-hoja);
-    font-size: 32px;
+    font-size: 26px;
 }
 
 .rec-titulo {
-    font-size: 28px !important;
-    margin-bottom: 24px !important;
+    font-size: 24px !important;
+    margin-bottom: 20px !important;
 }
 
 .rec-texto {
-    margin-bottom: 20px !important;
+    margin-bottom: 16px !important;
     color: var(--salvia);
 }
 
@@ -47,8 +47,8 @@
 }
 
 .rec-volver {
-    margin-top: 26px !important;
-    padding-top: 20px;
+    margin-top: 22px !important;
+    padding-top: 16px;
     border-top: 1px dashed var(--linea);
     text-align: center;
     font-size: 14px;
@@ -90,6 +90,6 @@
 
 @media (max-width: 640px) {
     .rec-tarjeta {
-        padding: 32px 20px 24px;
+        padding: 26px 18px 22px;
     }
 }

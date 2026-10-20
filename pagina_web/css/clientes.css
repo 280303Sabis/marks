@@ -38,8 +38,8 @@
     --aviso: #7A5000;
     --aviso-fondo: #FFF4D6;
 
-    --radio-g: 24px;
-    --radio-m: 14px;
+    --radio-g: 20px;
+    --radio-m: 12px;
     --sombra: 0 1px 2px rgba(31, 68, 22, 0.06), 0 10px 30px rgba(31, 68, 22, 0.08);
     --anillo: 0 0 0 4px rgba(114, 219, 81, 0.30);
 }
@@ -59,7 +59,7 @@ body.cl {
     display: flex;
     flex-direction: column;
     font-family: 'Poppins', system-ui, sans-serif;
-    font-size: 15px;
+    font-size: 14px;
     line-height: 1.6;
     color: var(--tinta);
     background: var(--papel);
@@ -74,19 +74,19 @@ body.cl {
 }
 
 .cl h1 {
-    font-size: clamp(30px, 4vw, 42px);
+    font-size: clamp(26px, 3vw, 32px);
     font-weight: 700;
     letter-spacing: -0.02em;
 }
 
 .cl h2 {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: 700;
     letter-spacing: -0.01em;
 }
 
 .cl h3 {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
 }
 
@@ -106,9 +106,9 @@ body.cl {
 }
 
 .cl-encabezado-interior {
-    max-width: 1160px;
+    max-width: 1040px;
     margin: 0 auto;
-    padding: 12px 24px;
+    padding: 10px 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -117,7 +117,7 @@ body.cl {
 
 .cl-logo img {
     display: block;
-    height: 44px;
+    height: 36px;
     width: auto;
 }
 
@@ -131,10 +131,10 @@ body.cl {
 
 .cl-menu a {
     display: inline-block;
-    padding: 9px 18px;
+    padding: 7px 16px;
     border-radius: 999px;
     color: var(--verde-bosque);
-    font-size: 14.5px;
+    font-size: 14px;
     font-weight: 600;
     text-decoration: none;
     white-space: nowrap;
@@ -152,16 +152,16 @@ body.cl {
 .cl-contenido {
     flex: 1;
     width: 100%;
-    max-width: 1160px;
+    max-width: 1040px;
     margin: 0 auto;
-    padding: 56px 24px 72px;
+    padding: 40px 24px 56px;
 }
 
 .cl-pie {
-    padding: 22px 24px;
+    padding: 18px 24px;
     border-top: 1px solid var(--linea);
     text-align: center;
-    font-size: 13px;
+    font-size: 12.5px;
     color: var(--salvia);
 }
 
@@ -172,7 +172,7 @@ body.cl {
     background: var(--blanco);
     border-radius: var(--radio-g);
     box-shadow: var(--sombra);
-    padding: 32px;
+    padding: 28px;
 }
 
 /* Borde superior "cortado" como ticket de supermercado */
@@ -197,7 +197,7 @@ body.cl {
 .cl-formulario {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 16px;
 }
 
 .cl-formulario[hidden] {
@@ -207,7 +207,7 @@ body.cl {
 .cl-rejilla {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 18px;
+    gap: 14px;
 }
 
 .cl-completo {
@@ -221,7 +221,7 @@ body.cl {
 }
 
 .cl-campo label {
-    font-size: 13.5px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--verde-bosque);
 }
@@ -234,8 +234,8 @@ body.cl {
 .cl-campo input,
 .cl-campo select {
     width: 100%;
-    height: 48px;
-    padding: 0 16px;
+    height: 42px;
+    padding: 0 14px;
     border: 1.5px solid var(--linea);
     border-radius: var(--radio-m);
     background: #FBFCFA;
@@ -275,10 +275,10 @@ body.cl {
 /* Campo del código de 6 dígitos */
 .cl-codigo {
     text-align: center;
-    font-size: 26px !important;
+    font-size: 22px !important;
     font-weight: 700;
-    letter-spacing: 12px;
-    height: 60px !important;
+    letter-spacing: 10px;
+    height: 52px !important;
 }
 
 /* ------------------------------------------------------------------
@@ -289,14 +289,14 @@ body.cl {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    height: 50px;
-    padding: 0 28px;
+    height: 44px;
+    padding: 0 24px;
     border: none;
     border-radius: 999px;
     background: var(--verde-hoja);
     color: var(--blanco);
     font: inherit;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     text-decoration: none;
     cursor: pointer;
@@ -325,14 +325,14 @@ body.cl {
     align-items: center;
     justify-content: center;
     gap: 6px;
-    height: 40px;
-    padding: 0 18px;
+    height: 36px;
+    padding: 0 16px;
     border: 1.5px solid var(--brote-borde);
     border-radius: 999px;
     background: var(--blanco);
     color: var(--verde-hoja);
     font: inherit;
-    font-size: 14px;
+    font-size: 13.5px;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.15s;
@@ -379,9 +379,9 @@ body.cl {
    ------------------------------------------------------------------ */
 .mensaje {
     margin: 0;
-    padding: 12px 16px;
+    padding: 10px 14px;
     border-radius: var(--radio-m);
-    font-size: 14px;
+    font-size: 13.5px;
     line-height: 1.5;
 }
 
@@ -466,7 +466,7 @@ body.cl {
 .cl-pasos {
     display: flex;
     gap: 10px;
-    margin: 0 0 28px;
+    margin: 0 0 22px;
     padding: 0;
     list-style: none;
 }
@@ -476,7 +476,7 @@ body.cl {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    font-size: 13px;
+    font-size: 12.5px;
     color: var(--salvia);
 }
 
@@ -509,17 +509,17 @@ body.cl {
         padding: 10px 16px;
     }
     .cl-logo img {
-        height: 34px;
+        height: 30px;
     }
     .cl-menu a {
         padding: 8px 12px;
         font-size: 13.5px;
     }
     .cl-contenido {
-        padding: 32px 16px 48px;
+        padding: 28px 16px 40px;
     }
     .cl-tarjeta {
-        padding: 24px 20px;
+        padding: 22px 18px;
     }
     .cl-rejilla {
         grid-template-columns: 1fr;

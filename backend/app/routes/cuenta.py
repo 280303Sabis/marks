@@ -5,13 +5,14 @@ MI CUENTA (perfil del cliente) y DOCUMENTOS LEGALES
     GET    /api/legal/aviso-privacidad        texto vigente del Aviso de Privacidad
 
   Requieren sesión:
+    PUT    /api/cuenta/perfil                 editar mis datos (solo CLIENTE, Rectificación)
     POST   /api/cuenta/cambiar-password       {"password_actual", "password_nueva"}
     POST   /api/cuenta/cerrar-sesiones        cierra la sesión en todos los dispositivos
     GET    /api/cuenta/exportar               copia de mis datos (derecho de Acceso)
     DELETE /api/cuenta                        {"password", "confirmacion": "ELIMINAR"}  (Cancelación)
 """
 import secrets
-from datetime import datetime
+from datetime import date, datetime
 
 from flask import Blueprint, g, jsonify, request
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -20,6 +21,7 @@ from ..db import get_db, query
 from ..legal import aviso_privacidad
 from ..utils import correo as mail
 from ..utils.seguridad import crear_token, registrar_bitacora, requiere_rol, validar_password
+from .auth import EDAD_MINIMA, SEXOS_VALIDOS, _calcular_edad
 
 bp = Blueprint("cuenta", __name__)
 
@@ -37,6 +39,65 @@ def _usuario_actual():
 @bp.get("/legal/aviso-privacidad")
 def ver_aviso():
     return jsonify(aviso_privacidad.como_diccionario())
+
+
+# ------------------------------------------------------------------
+# EDITAR MIS DATOS (derecho de Rectificación)
+# ------------------------------------------------------------------
+@bp.put("/cuenta/perfil")
+@requiere_rol("CLIENTE")
+def editar_perfil():
+    """
+    Body JSON (se envían todos; apellidos y teléfono pueden ir vacíos):
+    {
+      "nombre": "Ana", "apellidos": "López", "telefono": "8112345678",
+      "fecha_nacimiento": "2000-05-20", "sexo": "F"
+    }
+    El correo NO se cambia aquí.
+    """
+    d = request.get_json(silent=True) or {}
+    nombre = (d.get("nombre") or "").strip()
+    apellidos = (d.get("apellidos") or "").strip() or None
+    telefono = (d.get("telefono") or "").strip() or None
+    fecha_txt = (d.get("fecha_nacimiento") or "").strip()
+    sexo = (d.get("sexo") or "").strip().upper()
+
+    # 1. Validaciones (las mismas reglas del registro)
+    if len(nombre) < 2 or len(nombre) > 80:
+        return jsonify(error="Escribe tu nombre (2 a 80 caracteres)"), 400
+    if apellidos and len(apellidos) > 80:
+        return jsonify(error="Los apellidos pueden tener máximo 80 caracteres"), 400
+    if telefono and (not telefono.isdigit() or len(telefono) != 10):
+        return jsonify(error="El teléfono debe tener 10 dígitos"), 400
+
+    try:
+        fecha_nacimiento = date.fromisoformat(fecha_txt)
+    except ValueError:
+        return jsonify(error="Escribe tu fecha de nacimiento"), 400
+    hoy = date.today()
+    edad = _calcular_edad(fecha_nacimiento, hoy)
+    if fecha_nacimiento > hoy or edad > 120:
+        return jsonify(error="La fecha de nacimiento no es válida"), 400
+    if edad < EDAD_MINIMA:
+        return jsonify(error=f"Debes tener al menos {EDAD_MINIMA} años"), 400
+    if sexo not in SEXOS_VALIDOS:
+        return jsonify(error="Selecciona una opción en sexo"), 400
+
+    # 2. Guardar
+    conn = get_db()
+    with conn.cursor() as cur:
+        cur.execute("""UPDATE usuarios
+                       SET nombre = %s, apellidos = %s, telefono = %s,
+                           fecha_nacimiento = %s, sexo = %s
+                       WHERE id = %s""",
+                    (nombre, apellidos, telefono, fecha_nacimiento, sexo, g.usuario_id))
+    conn.commit()
+    registrar_bitacora("PERFIL_ACTUALIZADO", g.usuario_id)
+
+    # 3. Regresar los datos como quedaron
+    perfil = query("""SELECT nombre, apellidos, correo, telefono, fecha_nacimiento, sexo
+                      FROM usuarios WHERE id = %s""", (g.usuario_id,), one=True)
+    return jsonify(mensaje="Tus datos se actualizaron", usuario=perfil)
 
 
 # ------------------------------------------------------------------

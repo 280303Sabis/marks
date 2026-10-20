@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARK'S - Mi cuenta</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mi-cuenta.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo">
+            <img src="img/logo_marks.png" alt="MARK'S Logo" class="logo-img">
+        </div>
+        <nav>
+            <ul class="nav-buttons">
+                <li><a href="mi-cuenta.html" class="nav-btn active">Mi cuenta</a></li>
+                <!-- El JavaScript (js/mi-cuenta.js) usa este id para cerrar la sesión. No cambiarlo. -->
+                <li><a href="acceso-clientes.html" id="btn-cerrar-sesion" class="nav-btn logout-btn">Cerrar Sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!--
+        Los elementos con id="cliente-..." los llena el JavaScript con los datos de la API.
+        Se pueden cambiar estilos y acomodo, pero NO los id.
+    -->
+    <section class="main-section cuenta-seccion">
+
+        <div class="cuenta-encabezado">
+            <div>
+                <span class="cuenta-etiqueta">Mi cuenta MARK'S</span>
+                <h1 class="cuenta-titulo">Hola, <span id="cliente-nombre">cliente</span></h1>
+                <p class="cuenta-subtitulo">Cliente desde <span id="cliente-desde">-</span></p>
+            </div>
+            <div class="cuenta-puntos">
+                <span class="cuenta-puntos-etiqueta">Mis puntos</span>
+                <span class="cuenta-puntos-valor" id="cliente-puntos">0</span>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+
+            <div class="dashboard-card">
+                <h3 class="cuenta-card-titulo">Mis datos</h3>
+                <dl class="cuenta-datos">
+                    <dt>Nombre completo</dt>
+                    <dd id="cliente-nombre-completo">-</dd>
+
+                    <dt>Correo</dt>
+                    <dd>
+                        <span id="cliente-correo">-</span>
+                        <span id="cliente-correo-estado" class="cuenta-insignia"></span>
+                    </dd>
+
+                    <dt>Teléfono</dt>
+                    <dd id="cliente-telefono">-</dd>
+
+                    <dt>Fecha de nacimiento</dt>
+                    <dd id="cliente-nacimiento">-</dd>
+
+                    <dt>Sexo</dt>
+                    <dd id="cliente-sexo">-</dd>
+                </dl>
+            </div>
+
+            <div class="dashboard-card cuenta-proximamente">
+                <h3 class="cuenta-card-titulo">Próximamente</h3>
+                <ul>
+                    <li>Mis compras</li>
+                    <li>Mis ahorros</li>
+                    <li>Editar mis datos</li>
+                    <li>Cambiar contraseña</li>
+                </ul>
+            </div>
+
+        </div>
+
+    </section>
+
+    <script src="js/api.js"></script>
+    <script src="js/sesion.js"></script>
+    <script src="js/mi-cuenta.js"></script>
+</body>
+</html>

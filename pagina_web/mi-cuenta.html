@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MARK'S - Mi cuenta</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mensajes.css">
     <link rel="stylesheet" href="css/mi-cuenta.css">
 </head>
 <body>
@@ -23,8 +24,8 @@
     </header>
 
     <!--
-        Los elementos con id="cliente-..." los llena el JavaScript con los datos de la API.
-        Se pueden cambiar estilos y acomodo, pero NO los id.
+        Los elementos con id los usa el JavaScript (js/mi-cuenta.js).
+        Se pueden cambiar estilos y acomodo, pero NO los id ni los data-regla.
     -->
     <section class="main-section cuenta-seccion">
 
@@ -42,9 +43,16 @@
 
         <div class="dashboard-grid">
 
+            <!-- MIS DATOS: lista (vista) y formulario (edición) -->
             <div class="dashboard-card">
-                <h3 class="cuenta-card-titulo">Mis datos</h3>
-                <dl class="cuenta-datos">
+                <div class="cuenta-card-encabezado">
+                    <h3 class="cuenta-card-titulo">Mis datos</h3>
+                    <button type="button" id="btn-editar-datos" class="cuenta-boton-secundario">Editar</button>
+                </div>
+
+                <p id="datos-mensaje" class="mensaje" role="status" hidden></p>
+
+                <dl id="cuenta-datos-vista" class="cuenta-datos">
                     <dt>Nombre completo</dt>
                     <dd id="cliente-nombre-completo">-</dd>
 
@@ -63,16 +71,88 @@
                     <dt>Sexo</dt>
                     <dd id="cliente-sexo">-</dd>
                 </dl>
+
+                <form id="form-datos" class="login-form cuenta-form" novalidate hidden>
+                    <div class="cuenta-form-grid">
+                        <div class="input-group">
+                            <label for="dat-nombre">Nombre</label>
+                            <input type="text" id="dat-nombre" maxlength="80" autocomplete="given-name">
+                        </div>
+                        <div class="input-group">
+                            <label for="dat-apellidos">Apellidos (opcional)</label>
+                            <input type="text" id="dat-apellidos" maxlength="80" autocomplete="family-name">
+                        </div>
+                        <div class="input-group">
+                            <label for="dat-telefono">Teléfono (opcional)</label>
+                            <input type="tel" id="dat-telefono" maxlength="10" inputmode="numeric" autocomplete="tel-national" placeholder="10 dígitos">
+                        </div>
+                        <div class="input-group">
+                            <label for="dat-nacimiento">Fecha de nacimiento</label>
+                            <input type="date" id="dat-nacimiento" autocomplete="bday">
+                        </div>
+                        <div class="input-group completo">
+                            <label for="dat-sexo">Sexo</label>
+                            <select id="dat-sexo">
+                                <option value="">Selecciona una opción</option>
+                                <option value="F">Femenino</option>
+                                <option value="M">Masculino</option>
+                                <option value="N">Prefiero no decirlo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <p class="cuenta-nota">El correo no se puede cambiar.</p>
+                    <p id="form-datos-mensaje" class="mensaje" role="alert" hidden></p>
+                    <div class="cuenta-form-botones">
+                        <button type="button" id="btn-cancelar-datos" class="cuenta-boton-secundario">Cancelar</button>
+                        <button type="submit" id="btn-guardar-datos" class="btn-login">Guardar cambios</button>
+                    </div>
+                </form>
             </div>
 
-            <div class="dashboard-card cuenta-proximamente">
-                <h3 class="cuenta-card-titulo">Próximamente</h3>
-                <ul>
-                    <li>Mis compras</li>
-                    <li>Mis ahorros</li>
-                    <li>Editar mis datos</li>
-                    <li>Cambiar contraseña</li>
-                </ul>
+            <!-- COLUMNA DERECHA -->
+            <div class="cuenta-columna">
+
+                <!-- CAMBIAR CONTRASEÑA -->
+                <div class="dashboard-card">
+                    <h3 class="cuenta-card-titulo">Cambiar contraseña</h3>
+                    <form id="form-password" class="login-form" novalidate>
+                        <div class="input-group">
+                            <label for="pass-actual">Contraseña actual</label>
+                            <input type="password" id="pass-actual" maxlength="64" autocomplete="current-password" placeholder="••••••••">
+                        </div>
+                        <div class="input-group">
+                            <label for="pass-nueva">Nueva contraseña</label>
+                            <input type="password" id="pass-nueva" maxlength="64" autocomplete="new-password" placeholder="••••••••">
+                        </div>
+                        <div class="input-group">
+                            <label for="pass-nueva2">Repite la nueva contraseña</label>
+                            <input type="password" id="pass-nueva2" maxlength="64" autocomplete="new-password" placeholder="••••••••">
+                        </div>
+
+                        <ul id="reglas-password" class="reglas-password">
+                            <li data-regla="largo">De 8 a 64 caracteres</li>
+                            <li data-regla="mayuscula">Una letra MAYÚSCULA</li>
+                            <li data-regla="minuscula">Una letra minúscula</li>
+                            <li data-regla="numero">Un número</li>
+                            <li data-regla="simbolo">Un símbolo (ej. ! # $ % &amp; *)</li>
+                            <li data-regla="correo">Que no contenga tu correo</li>
+                        </ul>
+
+                        <p id="password-mensaje" class="mensaje" role="alert" hidden></p>
+                        <button type="submit" id="btn-cambiar-password" class="btn-login">Cambiar contraseña</button>
+                    </form>
+                </div>
+
+                <!-- PRÓXIMAMENTE -->
+                <div class="dashboard-card cuenta-proximamente">
+                    <h3 class="cuenta-card-titulo">Próximamente</h3>
+                    <ul>
+                        <li>Mis compras</li>
+                        <li>Mis ahorros</li>
+                        <li>Privacidad y seguridad</li>
+                    </ul>
+                </div>
+
             </div>
 
         </div>

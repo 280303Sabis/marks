@@ -1,0 +1,128 @@
+/* acceso-clientes.css - Página de acceso de clientes (acceso-clientes.html) */
+
+.acc {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 64px;
+    align-items: center;
+}
+
+/* Lado izquierdo: qué encuentras en tu cuenta */
+.acc-presentacion h1 {
+    font-size: clamp(36px, 5vw, 56px);
+    line-height: 1.05;
+    max-width: 11ch;
+}
+
+.acc-entrada {
+    margin-top: 16px !important;
+    max-width: 44ch;
+    font-size: 17px;
+    color: var(--salvia);
+}
+
+.acc-beneficios {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin: 36px 0;
+    padding: 0;
+    list-style: none;
+}
+
+.acc-beneficios li {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.acc-beneficios strong {
+    display: block;
+    color: var(--verde-bosque);
+    font-weight: 600;
+}
+
+.acc-beneficios div span {
+    color: var(--salvia);
+    font-size: 14px;
+}
+
+.acc-icono {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    background: var(--brote);
+    color: var(--verde-hoja);
+    font-size: 24px;
+}
+
+.acc-app {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--verde-hoja);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.acc-app i {
+    font-size: 20px;
+}
+
+.acc-app:hover {
+    text-decoration: underline;
+}
+
+/* Lado derecho: tarjeta de inicio de sesión */
+.acc-tarjeta {
+    padding: 40px 36px 32px;
+}
+
+.acc-sub {
+    margin: 6px 0 26px !important;
+}
+
+.acc-etiqueta-fila {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.acc-olvido {
+    font-size: 13px;
+}
+
+.acc-registro {
+    margin-top: 22px !important;
+    padding-top: 20px;
+    border-top: 1px dashed var(--linea);
+    text-align: center;
+    font-size: 14px;
+    color: var(--salvia);
+}
+
+/* Celular y tableta: una columna, la tarjeta primero */
+@media (max-width: 900px) {
+    .acc {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    .acc-tarjeta {
+        order: -1;
+        max-width: 480px;
+        width: 100%;
+        margin: 0 auto;
+    }
+    .acc-presentacion h1 {
+        max-width: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .acc-tarjeta {
+        padding: 32px 22px 26px;
+    }
+}

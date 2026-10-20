@@ -1,97 +1,95 @@
-/* restablecer.css - Estilos de Recuperar contraseña (restablecer.html) */
+/* restablecer.css - Página Recuperar contraseña (restablecer.html) */
+
+.rec {
+    max-width: 520px;
+}
+
+.rec-tarjeta {
+    padding: 40px 36px 30px;
+}
+
+.rec-icono {
+    display: inline-grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
+    border-radius: 20px;
+    background: var(--brote);
+    color: var(--verde-hoja);
+    font-size: 32px;
+}
+
+.rec-titulo {
+    font-size: 28px !important;
+    margin-bottom: 24px !important;
+}
 
 .rec-texto {
-    font-size: 15px;
-    color: #555;
-    line-height: 1.5;
-    margin-bottom: 25px;
+    margin-bottom: 20px !important;
+    color: var(--salvia);
 }
 
-/* Campo del código: números grandes y separados */
-.rec-codigo {
-    text-align: center;
-    font-size: 24px !important;
-    letter-spacing: 10px;
-    font-weight: bold;
+.rec-texto strong {
+    color: var(--tinta);
+    overflow-wrap: anywhere;
 }
 
-/* Reglas de la contraseña: gris = falta, verde = cumple */
-.reglas-password {
-    list-style: none;
-    margin: 15px 0;
-    padding: 12px 16px;
-    background: #f7f9f6;
-    border-radius: 12px;
-    font-size: 13px;
-    color: #888;
-    text-align: left;
-}
-
-.reglas-password li {
-    line-height: 1.7;
-}
-
-.reglas-password li::before {
-    content: "\2022";
-    display: inline-block;
-    width: 16px;
-    font-weight: bold;
-}
-
-.reglas-password li.cumple {
-    color: #2e7d32;
-}
-
-.reglas-password li.cumple::before {
-    content: "\2713";
-}
-
-/* Lista de errores dentro del cuadro de mensaje */
-.mensaje ul {
-    margin: 6px 0 0;
-    padding-left: 18px;
-}
-
-/* Reenviar código / Usar otro correo */
 .rec-acciones {
     display: flex;
     justify-content: space-between;
-    margin-top: 14px;
-}
-
-.rec-enlace {
-    background: none;
-    border: none;
-    padding: 6px 0;
-    font: inherit;
+    margin-top: 16px;
     font-size: 14px;
-    color: #2e7d32;
-    font-weight: bold;
-    cursor: pointer;
 }
 
-.rec-enlace:disabled {
-    color: #999;
-    cursor: wait;
+.rec-listo-boton {
+    margin-top: 16px;
 }
 
-/* Botón "Iniciar sesión" de la pantalla final (es un enlace con forma de botón) */
-.rec-boton-enlace {
-    display: block;
-    width: 100%;
-    text-align: center;
-    text-decoration: none;
-    margin-top: 10px;
-}
-
-/* Enlace de abajo */
 .rec-volver {
-    margin-top: 25px;
+    margin-top: 26px !important;
+    padding-top: 20px;
+    border-top: 1px dashed var(--linea);
+    text-align: center;
     font-size: 14px;
 }
 
-.rec-volver a {
-    color: #2e7d32;
-    font-weight: bold;
-    text-decoration: none;
+/* Pasos: se marca el activo según la pantalla visible */
+.rec-paso-1 {
+    color: var(--verde-bosque) !important;
+    font-weight: 600;
+}
+
+.rec-paso-1::before {
+    background: var(--verde-hoja) !important;
+}
+
+.rec-tarjeta:has(#paso-cambiar:not([hidden])) .rec-paso-1,
+.rec-tarjeta:has(#paso-listo:not([hidden])) .rec-paso-1,
+.rec-tarjeta:has(#paso-listo:not([hidden])) .rec-paso-2 {
+    color: var(--salvia) !important;
+    font-weight: 400;
+}
+
+.rec-tarjeta:has(#paso-cambiar:not([hidden])) .rec-paso-1::before,
+.rec-tarjeta:has(#paso-listo:not([hidden])) .rec-paso-1::before,
+.rec-tarjeta:has(#paso-listo:not([hidden])) .rec-paso-2::before {
+    background: var(--verde-marca) !important;
+}
+
+.rec-tarjeta:has(#paso-cambiar:not([hidden])) .rec-paso-2,
+.rec-tarjeta:has(#paso-listo:not([hidden])) .rec-paso-3 {
+    color: var(--verde-bosque);
+    font-weight: 600;
+}
+
+.rec-tarjeta:has(#paso-cambiar:not([hidden])) .rec-paso-2::before,
+.rec-tarjeta:has(#paso-listo:not([hidden])) .rec-paso-3::before {
+    background: var(--verde-hoja);
+}
+
+@media (max-width: 640px) {
+    .rec-tarjeta {
+        padding: 32px 20px 24px;
+    }
 }

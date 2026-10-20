@@ -4,83 +4,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MARK'S - Crear cuenta</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/mensajes.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+    <link rel="stylesheet" href="css/clientes.css">
     <link rel="stylesheet" href="css/registro.css">
 </head>
-<body>
+<body class="cl">
 
-    <header class="navbar">
-        <div class="logo">
-            <img src="img/logo_marks.png" alt="MARK'S Logo" class="logo-img">
+    <header class="cl-encabezado">
+        <div class="cl-encabezado-interior">
+            <a href="index.html" class="cl-logo"><img src="img/logo_marks.png" alt="MARK'S"></a>
+            <nav aria-label="Menú principal">
+                <ul class="cl-menu">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="acceso-clientes.html" aria-current="page">Clientes</a></li>
+                </ul>
+            </nav>
         </div>
-        <nav>
-            <ul class="nav-buttons">
-                <li><a href="index.html" class="nav-btn">Inicio</a></li>
-                <li><a href="acceso-clientes.html" class="nav-btn active">Clientes</a></li>
-            </ul>
-        </nav>
     </header>
 
     <!--
         El JavaScript (js/registro.js) usa todos los id de esta página. Se pueden cambiar
         estilos y acomodo, pero NO los id ni los data-regla.
     -->
-    <section class="main-section registro-seccion">
+    <main class="cl-contenido reg">
 
-        <div class="registro-intro">
-            <h1>CREA TU CUENTA MARK'S</h1>
-            <p>Es la misma cuenta que usas en la app: con ella consultas tus puntos, tus compras y tus ahorros.</p>
+        <div class="reg-intro">
+            <h1>Crea tu cuenta</h1>
+            <p class="cl-texto-sec">Es la misma cuenta que usas en la app MARK'S.</p>
         </div>
 
-        <div class="visual-card registro-tarjeta">
-            <div class="login-container">
+        <section class="cl-tarjeta cl-ticket reg-tarjeta">
 
-                <!-- PANTALLA 1: DATOS -->
-                <div id="paso-datos">
-                    <h2>Tus datos</h2>
-                    <form id="form-registro" class="login-form" novalidate>
-                        <div class="registro-grid">
-                            <div class="input-group">
-                                <label for="reg-nombre">Nombre</label>
-                                <input type="text" id="reg-nombre" maxlength="80" autocomplete="given-name" placeholder="Ana">
-                            </div>
-                            <div class="input-group">
-                                <label for="reg-apellidos">Apellidos (opcional)</label>
-                                <input type="text" id="reg-apellidos" maxlength="80" autocomplete="family-name" placeholder="López García">
-                            </div>
-                            <div class="input-group completo">
-                                <label for="reg-correo">Correo</label>
-                                <input type="email" id="reg-correo" maxlength="120" autocomplete="email" placeholder="tucorreo@ejemplo.com">
-                            </div>
-                            <div class="input-group">
-                                <label for="reg-telefono">Teléfono (opcional)</label>
-                                <input type="tel" id="reg-telefono" maxlength="10" inputmode="numeric" autocomplete="tel-national" placeholder="10 dígitos">
-                            </div>
-                            <div class="input-group">
-                                <label for="reg-nacimiento">Fecha de nacimiento</label>
-                                <input type="date" id="reg-nacimiento" autocomplete="bday">
-                            </div>
-                            <div class="input-group completo">
-                                <label for="reg-sexo">Sexo</label>
-                                <select id="reg-sexo">
-                                    <option value="">Selecciona una opción</option>
-                                    <option value="F">Femenino</option>
-                                    <option value="M">Masculino</option>
-                                    <option value="N">Prefiero no decirlo</option>
-                                </select>
-                            </div>
-                            <div class="input-group">
-                                <label for="reg-password">Contraseña</label>
-                                <input type="password" id="reg-password" maxlength="64" autocomplete="new-password" placeholder="••••••••">
-                            </div>
-                            <div class="input-group">
-                                <label for="reg-password2">Repite la contraseña</label>
-                                <input type="password" id="reg-password2" maxlength="64" autocomplete="new-password" placeholder="••••••••">
-                            </div>
+            <ol class="cl-pasos reg-pasos" aria-label="Pasos para crear tu cuenta">
+                <li class="reg-paso-1">Paso 1 de 2: tus datos</li>
+                <li class="reg-paso-2">Paso 2 de 2: confirma tu correo</li>
+            </ol>
+
+            <!-- PANTALLA 1: DATOS -->
+            <div id="paso-datos">
+                <form id="form-registro" class="cl-formulario" novalidate>
+
+                    <div class="cl-rejilla">
+                        <div class="cl-campo">
+                            <label for="reg-nombre">Nombre</label>
+                            <input type="text" id="reg-nombre" maxlength="80" autocomplete="given-name" placeholder="Ana">
                         </div>
-
-                        <ul id="reglas-password" class="reglas-password">
+                        <div class="cl-campo">
+                            <label for="reg-apellidos">Apellidos <span class="cl-opcional">(opcional)</span></label>
+                            <input type="text" id="reg-apellidos" maxlength="80" autocomplete="family-name" placeholder="López García">
+                        </div>
+                        <div class="cl-campo cl-completo">
+                            <label for="reg-correo">Correo</label>
+                            <input type="email" id="reg-correo" maxlength="120" autocomplete="email" placeholder="tucorreo@ejemplo.com">
+                        </div>
+                        <div class="cl-campo">
+                            <label for="reg-telefono">Teléfono <span class="cl-opcional">(opcional)</span></label>
+                            <input type="tel" id="reg-telefono" maxlength="10" inputmode="numeric" autocomplete="tel-national" placeholder="10 dígitos">
+                        </div>
+                        <div class="cl-campo">
+                            <label for="reg-nacimiento">Fecha de nacimiento</label>
+                            <input type="date" id="reg-nacimiento" autocomplete="bday">
+                        </div>
+                        <div class="cl-campo cl-completo">
+                            <label for="reg-sexo">Sexo</label>
+                            <select id="reg-sexo">
+                                <option value="">Selecciona una opción</option>
+                                <option value="F">Femenino</option>
+                                <option value="M">Masculino</option>
+                                <option value="N">Prefiero no decirlo</option>
+                            </select>
+                        </div>
+                        <div class="cl-campo">
+                            <label for="reg-password">Contraseña</label>
+                            <input type="password" id="reg-password" maxlength="64" autocomplete="new-password" placeholder="••••••••">
+                        </div>
+                        <div class="cl-campo">
+                            <label for="reg-password2">Repite la contraseña</label>
+                            <input type="password" id="reg-password2" maxlength="64" autocomplete="new-password" placeholder="••••••••">
+                        </div>
+                        <ul id="reglas-password" class="reglas-password cl-completo" aria-label="Reglas de la contraseña">
                             <li data-regla="largo">De 8 a 64 caracteres</li>
                             <li data-regla="mayuscula">Una letra MAYÚSCULA</li>
                             <li data-regla="minuscula">Una letra minúscula</li>
@@ -88,52 +93,57 @@
                             <li data-regla="simbolo">Un símbolo (ej. ! # $ % &amp; *)</li>
                             <li data-regla="correo">Que no contenga tu correo</li>
                         </ul>
-
-                        <label class="registro-check">
-                            <input type="checkbox" id="reg-privacidad">
-                            <span>He leído y acepto el <a href="#" id="ver-aviso">Aviso de Privacidad</a></span>
-                        </label>
-
-                        <p id="registro-mensaje" class="mensaje" role="alert" hidden></p>
-                        <button type="submit" id="btn-registrar" class="btn-login">Crear cuenta</button>
-                    </form>
-                    <div class="login-footer">
-                        <p>¿Ya tienes cuenta? <a href="acceso-clientes.html">Inicia sesión</a></p>
+                        <p class="cl-ayuda cl-completo">Usa 8 o más caracteres con mayúscula, minúscula, número y símbolo, sin incluir tu correo.</p>
                     </div>
-                </div>
 
-                <!-- PANTALLA 2: CÓDIGO DE CONFIRMACIÓN -->
-                <div id="paso-codigo" hidden>
-                    <h2>Confirma tu correo</h2>
-                    <p class="registro-texto">
-                        Te enviamos un código de 6 dígitos a <strong id="codigo-correo"></strong>.
-                        Revisa también la carpeta de correo no deseado.
-                    </p>
-                    <form id="form-codigo" class="login-form" novalidate>
-                        <div class="input-group">
-                            <label for="reg-codigo">Código</label>
-                            <input type="text" id="reg-codigo" class="registro-codigo" maxlength="6" inputmode="numeric" autocomplete="one-time-code" placeholder="000000">
-                        </div>
-                        <p id="codigo-mensaje" class="mensaje" role="alert" hidden></p>
-                        <button type="submit" id="btn-confirmar" class="btn-login">Confirmar correo</button>
-                    </form>
-                    <div class="registro-acciones">
-                        <button type="button" id="btn-reenviar" class="registro-enlace">Reenviar código</button>
-                        <a href="mi-cuenta.html" class="registro-enlace">Hacerlo después</a>
-                    </div>
-                </div>
+                    <label class="cl-casilla">
+                        <input type="checkbox" id="reg-privacidad">
+                        <span>He leído y acepto el <a href="#" id="ver-aviso" class="cl-enlace">Aviso de Privacidad</a></span>
+                    </label>
 
+                    <p id="registro-mensaje" class="mensaje" role="alert" hidden></p>
+                    <button type="submit" id="btn-registrar" class="cl-boton cl-boton-ancho">Crear cuenta</button>
+                </form>
+
+                <p class="reg-pie">¿Ya tienes cuenta? <a href="acceso-clientes.html" class="cl-enlace">Inicia sesión</a></p>
             </div>
-        </div>
-    </section>
+
+            <!-- PANTALLA 2: CÓDIGO DE CONFIRMACIÓN -->
+            <div id="paso-codigo" hidden>
+                <div class="reg-codigo-intro">
+                    <span class="reg-icono" aria-hidden="true"><i class="ph ph-envelope-simple-open"></i></span>
+                    <h2>Revisa tu correo</h2>
+                    <p class="cl-texto-sec">
+                        Enviamos un código de 6 dígitos a <strong id="codigo-correo"></strong>.
+                        Si no lo ves, busca en correo no deseado.
+                    </p>
+                </div>
+                <form id="form-codigo" class="cl-formulario" novalidate>
+                    <div class="cl-campo">
+                        <label for="reg-codigo">Código</label>
+                        <input type="text" id="reg-codigo" class="cl-codigo" maxlength="6" inputmode="numeric" autocomplete="one-time-code" placeholder="000000">
+                    </div>
+                    <p id="codigo-mensaje" class="mensaje" role="alert" hidden></p>
+                    <button type="submit" id="btn-confirmar" class="cl-boton cl-boton-ancho">Confirmar correo</button>
+                </form>
+                <div class="reg-acciones">
+                    <button type="button" id="btn-reenviar" class="cl-enlace">Reenviar código</button>
+                    <a href="mi-cuenta.html" class="cl-enlace">Hacerlo después</a>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <footer class="cl-pie">MARK'S - Compra sin filas. Proyecto Integrador, Universidad Tecnológica Santa Catarina.</footer>
 
     <!-- Ventana del Aviso de Privacidad (el texto viene de la API) -->
     <dialog id="aviso-dialogo" class="aviso-dialogo">
         <h2 id="aviso-titulo">Aviso de Privacidad</h2>
         <div id="aviso-contenido" class="aviso-contenido">Cargando...</div>
         <div class="aviso-botones">
-            <button type="button" id="aviso-cerrar" class="registro-enlace">Cerrar</button>
-            <button type="button" id="aviso-aceptar" class="btn-login">Acepto</button>
+            <button type="button" id="aviso-cerrar" class="cl-boton-sec">Cerrar</button>
+            <button type="button" id="aviso-aceptar" class="cl-boton">Acepto</button>
         </div>
     </dialog>
 

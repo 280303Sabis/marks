@@ -3,106 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MARK'S - Restablecer Contraseña</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/mensajes.css">
+    <title>MARK'S - Recuperar contraseña</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+    <link rel="stylesheet" href="css/clientes.css">
     <link rel="stylesheet" href="css/restablecer.css">
 </head>
-<body>
+<body class="cl">
 
-    <header class="navbar">
-        <div class="logo">
-            <img src="img/logo_marks.png" alt="MARK'S Logo" class="logo-img">
+    <header class="cl-encabezado">
+        <div class="cl-encabezado-interior">
+            <a href="index.html" class="cl-logo"><img src="img/logo_marks.png" alt="MARK'S"></a>
+            <nav aria-label="Menú principal">
+                <ul class="cl-menu">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="acceso-clientes.html">Clientes</a></li>
+                </ul>
+            </nav>
         </div>
-        <nav>
-            <ul class="nav-buttons">
-                <li><a href="index.html" class="nav-btn">Inicio</a></li>
-                <li><a href="acceso-clientes.html" class="nav-btn">Clientes</a></li>
-            </ul>
-        </nav>
     </header>
 
     <!--
         El JavaScript (js/restablecer.js) usa todos los id de esta página.
-        Se pueden cambiar estilos y textos, pero NO los id ni los data-regla.
+        Se pueden cambiar estilos y textos, pero NO los id, los data-regla ni la clase volver-login.
     -->
-    <section class="main-section" style="max-width: 500px; padding: 45px 40px; text-align: center;">
-        
-        <div style="font-size: 50px; margin-bottom: 10px;">🔒</div>
-        
-        <span style="background-color: #e2fbe0; color: #2e7d32; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; display: inline-block; margin-bottom: 12px;">Validación de Seguridad</span>
-        
-        <h1 style="font-size: 28px; color: #2b581b; margin-top: 0; margin-bottom: 12px;">Recupera tu Contraseña</h1>
+    <main class="cl-contenido rec">
+        <section class="cl-tarjeta cl-ticket rec-tarjeta">
 
-        <!-- PANTALLA 1: PEDIR CÓDIGO -->
-        <div id="paso-solicitar">
-            <p class="rec-texto">
-                Escribe el correo de tu cuenta. Te enviaremos un código de 6 dígitos para crear una nueva contraseña.
-            </p>
-            <form id="form-solicitar" class="login-form" style="text-align: left;" novalidate>
-                <div class="input-group">
-                    <label for="rec-correo">Correo de tu cuenta</label>
-                    <input type="email" id="rec-correo" placeholder="Correo electrónico" autocomplete="email">
-                </div>
-                <p id="solicitar-mensaje" class="mensaje" role="alert" hidden></p>
-                <button type="submit" id="btn-solicitar" class="btn-login" style="width: 100%;">
-                    Enviar código
-                </button>
-            </form>
-        </div>
+            <span class="rec-icono" aria-hidden="true"><i class="ph ph-lock-key"></i></span>
+            <h1 class="rec-titulo">Recupera tu contraseña</h1>
 
-        <!-- PANTALLA 2: CÓDIGO Y NUEVA CONTRASEÑA -->
-        <div id="paso-cambiar" hidden>
-            <p class="rec-texto">
-                Escribe el código que enviamos a <strong id="rec-correo-texto"></strong> y define tu nueva contraseña.
-            </p>
-            <form id="form-cambiar" class="login-form" style="text-align: left;" novalidate>
-                <div class="input-group">
-                    <label for="rec-codigo">Código de 6 dígitos</label>
-                    <input type="text" id="rec-codigo" class="rec-codigo" maxlength="6" inputmode="numeric" autocomplete="one-time-code" placeholder="000000">
-                </div>
+            <ol class="cl-pasos rec-pasos" aria-label="Pasos para recuperar tu contraseña">
+                <li class="rec-paso-1">Tu correo</li>
+                <li class="rec-paso-2">Código y contraseña</li>
+                <li class="rec-paso-3">Listo</li>
+            </ol>
 
-                <div class="input-group" style="margin-top: 15px;">
-                    <label for="rec-password">Nueva Contraseña</label>
-                    <input type="password" id="rec-password" maxlength="64" autocomplete="new-password" placeholder="••••••••">
-                </div>
-
-                <div class="input-group" style="margin-top: 15px;">
-                    <label for="rec-password2">Confirmar Nueva Contraseña</label>
-                    <input type="password" id="rec-password2" maxlength="64" autocomplete="new-password" placeholder="••••••••">
-                </div>
-
-                <ul id="reglas-password" class="reglas-password">
-                    <li data-regla="largo">De 8 a 64 caracteres</li>
-                    <li data-regla="mayuscula">Una letra MAYÚSCULA</li>
-                    <li data-regla="minuscula">Una letra minúscula</li>
-                    <li data-regla="numero">Un número</li>
-                    <li data-regla="simbolo">Un símbolo (ej. ! # $ % &amp; *)</li>
-                    <li data-regla="correo">Que no contenga tu correo</li>
-                </ul>
-
-                <p id="cambiar-mensaje" class="mensaje" role="alert" hidden></p>
-                <button type="submit" id="btn-cambiar" class="btn-login" style="width: 100%;">
-                    Actualizar Contraseña
-                </button>
-            </form>
-            <div class="rec-acciones">
-                <button type="button" id="btn-reenviar" class="rec-enlace">Reenviar código</button>
-                <button type="button" id="btn-otro-correo" class="rec-enlace">Usar otro correo</button>
+            <!-- PANTALLA 1: PEDIR CÓDIGO -->
+            <div id="paso-solicitar">
+                <p class="rec-texto">Escribe el correo de tu cuenta y te enviaremos un código de 6 dígitos.</p>
+                <form id="form-solicitar" class="cl-formulario" novalidate>
+                    <div class="cl-campo">
+                        <label for="rec-correo">Correo de tu cuenta</label>
+                        <input type="email" id="rec-correo" placeholder="tucorreo@ejemplo.com" autocomplete="email">
+                    </div>
+                    <p id="solicitar-mensaje" class="mensaje" role="alert" hidden></p>
+                    <button type="submit" id="btn-solicitar" class="cl-boton cl-boton-ancho">Enviar código</button>
+                </form>
             </div>
-        </div>
 
-        <!-- PANTALLA 3: LISTO -->
-        <div id="paso-listo" hidden>
-            <p id="listo-mensaje" class="mensaje mensaje-info"></p>
-            <a href="index.html" class="btn-login rec-boton-enlace volver-login">Iniciar sesión</a>
-        </div>
+            <!-- PANTALLA 2: CÓDIGO Y NUEVA CONTRASEÑA -->
+            <div id="paso-cambiar" hidden>
+                <p class="rec-texto">Escribe el código que enviamos a <strong id="rec-correo-texto"></strong> y elige tu nueva contraseña.</p>
+                <form id="form-cambiar" class="cl-formulario" novalidate>
+                    <div class="cl-campo">
+                        <label for="rec-codigo">Código de 6 dígitos</label>
+                        <input type="text" id="rec-codigo" class="cl-codigo" maxlength="6" inputmode="numeric" autocomplete="one-time-code" placeholder="000000">
+                    </div>
+                    <div class="cl-campo">
+                        <label for="rec-password">Nueva contraseña</label>
+                        <input type="password" id="rec-password" maxlength="64" autocomplete="new-password" placeholder="••••••••">
+                    </div>
+                    <div class="cl-campo">
+                        <label for="rec-password2">Repite la nueva contraseña</label>
+                        <input type="password" id="rec-password2" maxlength="64" autocomplete="new-password" placeholder="••••••••">
+                    </div>
 
-        <p class="rec-volver">
-            <a href="index.html" class="volver-login">Volver a iniciar sesión</a>
-        </p>
+                    <ul id="reglas-password" class="reglas-password" aria-label="Reglas de la contraseña">
+                        <li data-regla="largo">De 8 a 64 caracteres</li>
+                        <li data-regla="mayuscula">Una letra MAYÚSCULA</li>
+                        <li data-regla="minuscula">Una letra minúscula</li>
+                        <li data-regla="numero">Un número</li>
+                        <li data-regla="simbolo">Un símbolo (ej. ! # $ % &amp; *)</li>
+                        <li data-regla="correo">Que no contenga tu correo</li>
+                    </ul>
+                    <p class="cl-ayuda">Usa 8 o más caracteres con mayúscula, minúscula, número y símbolo, sin incluir tu correo.</p>
 
-    </section>
+                    <p id="cambiar-mensaje" class="mensaje" role="alert" hidden></p>
+                    <button type="submit" id="btn-cambiar" class="cl-boton cl-boton-ancho">Actualizar Contraseña</button>
+                </form>
+                <div class="rec-acciones">
+                    <button type="button" id="btn-reenviar" class="cl-enlace">Reenviar código</button>
+                    <button type="button" id="btn-otro-correo" class="cl-enlace">Usar otro correo</button>
+                </div>
+            </div>
+
+            <!-- PANTALLA 3: LISTO -->
+            <div id="paso-listo" hidden>
+                <p id="listo-mensaje" class="mensaje mensaje-info"></p>
+                <a href="index.html" class="cl-boton cl-boton-ancho volver-login rec-listo-boton">Iniciar sesión</a>
+            </div>
+
+            <p class="rec-volver">
+                <a href="index.html" class="cl-enlace volver-login">Volver a iniciar sesión</a>
+            </p>
+
+        </section>
+    </main>
+
+    <footer class="cl-pie">MARK'S - Compra sin filas. Proyecto Integrador, Universidad Tecnológica Santa Catarina.</footer>
 
     <script src="js/api.js"></script>
     <script src="js/sesion.js"></script>

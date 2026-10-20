@@ -1,0 +1,533 @@
+/*
+  clientes.css - Diseño base del área de clientes de MARK'S
+  ----------------------------------------------------------
+  Lo usan: acceso-clientes.html, registro.html, restablecer.html y mi-cuenta.html.
+  No depende de style.css (ese archivo es del resto de la página).
+
+  Contenido:
+    1. Colores y medidas (variables)
+    2. Base y tipografía
+    3. Encabezado, contenido y pie
+    4. Tarjetas y borde de ticket
+    5. Formularios
+    6. Botones y enlaces
+    7. Mensajes, insignias y reglas de contraseña
+    8. Pasos (1, 2, 3)
+    9. Celular
+*/
+
+/* ------------------------------------------------------------------
+   1. Colores y medidas
+   ------------------------------------------------------------------ */
+:root {
+    --verde-marca: #72DB51;     /* barra superior, acentos */
+    --verde-hoja: #2E7D32;      /* botones, enlaces */
+    --verde-hoja-osc: #256628;  /* botón al pasar el mouse */
+    --verde-bosque: #1F4416;    /* títulos */
+    --brote: #E6F8DE;           /* fondos suaves */
+    --brote-borde: #C9EDBB;
+    --papel: #F4F7F1;           /* fondo de la página */
+    --blanco: #FFFFFF;
+    --tinta: #23301F;           /* texto */
+    --salvia: #66735F;          /* texto secundario */
+    --linea: #DDE5D8;           /* bordes */
+
+    --error: #B3261E;
+    --error-fondo: #FDECEA;
+    --error-borde: #F5C2BD;
+    --aviso: #7A5000;
+    --aviso-fondo: #FFF4D6;
+
+    --radio-g: 24px;
+    --radio-m: 14px;
+    --sombra: 0 1px 2px rgba(31, 68, 22, 0.06), 0 10px 30px rgba(31, 68, 22, 0.08);
+    --anillo: 0 0 0 4px rgba(114, 219, 81, 0.30);
+}
+
+/* ------------------------------------------------------------------
+   2. Base y tipografía
+   ------------------------------------------------------------------ */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body.cl {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Poppins', system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--tinta);
+    background: var(--papel);
+}
+
+.cl h1,
+.cl h2,
+.cl h3 {
+    margin: 0;
+    color: var(--verde-bosque);
+    line-height: 1.2;
+}
+
+.cl h1 {
+    font-size: clamp(30px, 4vw, 42px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.cl h2 {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.cl h3 {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.cl p {
+    margin: 0;
+}
+
+.cl-texto-sec {
+    color: var(--salvia);
+}
+
+/* ------------------------------------------------------------------
+   3. Encabezado, contenido y pie
+   ------------------------------------------------------------------ */
+.cl-encabezado {
+    background: var(--verde-marca);
+}
+
+.cl-encabezado-interior {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.cl-logo img {
+    display: block;
+    height: 44px;
+    width: auto;
+}
+
+.cl-menu {
+    display: flex;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.cl-menu a {
+    display: inline-block;
+    padding: 9px 18px;
+    border-radius: 999px;
+    color: var(--verde-bosque);
+    font-size: 14.5px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.15s;
+}
+
+.cl-menu a:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.cl-menu a[aria-current="page"] {
+    background: var(--blanco);
+}
+
+.cl-contenido {
+    flex: 1;
+    width: 100%;
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 56px 24px 72px;
+}
+
+.cl-pie {
+    padding: 22px 24px;
+    border-top: 1px solid var(--linea);
+    text-align: center;
+    font-size: 13px;
+    color: var(--salvia);
+}
+
+/* ------------------------------------------------------------------
+   4. Tarjetas y borde de ticket
+   ------------------------------------------------------------------ */
+.cl-tarjeta {
+    background: var(--blanco);
+    border-radius: var(--radio-g);
+    box-shadow: var(--sombra);
+    padding: 32px;
+}
+
+/* Borde superior "cortado" como ticket de supermercado */
+.cl-ticket {
+    position: relative;
+}
+
+.cl-ticket::before {
+    content: "";
+    position: absolute;
+    top: -7px;
+    left: 18px;
+    right: 18px;
+    height: 14px;
+    background: radial-gradient(circle at 7px 7px, var(--papel) 6px, transparent 6.5px) 0 0 / 20px 14px repeat-x;
+    pointer-events: none;
+}
+
+/* ------------------------------------------------------------------
+   5. Formularios
+   ------------------------------------------------------------------ */
+.cl-formulario {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.cl-formulario[hidden] {
+    display: none;
+}
+
+.cl-rejilla {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.cl-completo {
+    grid-column: 1 / -1;
+}
+
+.cl-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.cl-campo label {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--verde-bosque);
+}
+
+.cl-opcional {
+    font-weight: 400;
+    color: var(--salvia);
+}
+
+.cl-campo input,
+.cl-campo select {
+    width: 100%;
+    height: 48px;
+    padding: 0 16px;
+    border: 1.5px solid var(--linea);
+    border-radius: var(--radio-m);
+    background: #FBFCFA;
+    font: inherit;
+    color: var(--tinta);
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+
+.cl-campo input::placeholder {
+    color: #A3AD9E;
+}
+
+.cl-campo input:focus,
+.cl-campo select:focus {
+    outline: none;
+    border-color: var(--verde-hoja);
+    background: var(--blanco);
+    box-shadow: var(--anillo);
+}
+
+.cl-casilla {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.cl-casilla input {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    margin-top: 3px;
+    accent-color: var(--verde-hoja);
+}
+
+/* Campo del código de 6 dígitos */
+.cl-codigo {
+    text-align: center;
+    font-size: 26px !important;
+    font-weight: 700;
+    letter-spacing: 12px;
+    height: 60px !important;
+}
+
+/* ------------------------------------------------------------------
+   6. Botones y enlaces
+   ------------------------------------------------------------------ */
+.cl-boton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 50px;
+    padding: 0 28px;
+    border: none;
+    border-radius: 999px;
+    background: var(--verde-hoja);
+    color: var(--blanco);
+    font: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+}
+
+.cl-boton:hover {
+    background: var(--verde-hoja-osc);
+}
+
+.cl-boton:active {
+    transform: scale(0.98);
+}
+
+.cl-boton:disabled {
+    opacity: 0.65;
+    cursor: wait;
+}
+
+.cl-boton-ancho {
+    width: 100%;
+}
+
+.cl-boton-sec {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 40px;
+    padding: 0 18px;
+    border: 1.5px solid var(--brote-borde);
+    border-radius: 999px;
+    background: var(--blanco);
+    color: var(--verde-hoja);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.cl-boton-sec:hover {
+    background: var(--brote);
+}
+
+.cl-boton-sec[hidden] {
+    display: none;
+}
+
+.cl-enlace {
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
+    font-weight: 600;
+    color: var(--verde-hoja);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.cl-enlace:hover {
+    text-decoration: underline;
+}
+
+.cl-enlace:disabled {
+    color: var(--salvia);
+    text-decoration: none;
+    cursor: wait;
+}
+
+.cl a:focus-visible,
+.cl button:focus-visible,
+.cl input[type="checkbox"]:focus-visible {
+    outline: 3px solid var(--verde-hoja);
+    outline-offset: 3px;
+}
+
+/* ------------------------------------------------------------------
+   7. Mensajes, insignias y reglas de contraseña
+   ------------------------------------------------------------------ */
+.mensaje {
+    margin: 0;
+    padding: 12px 16px;
+    border-radius: var(--radio-m);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.mensaje[hidden] {
+    display: none;
+}
+
+.mensaje-error {
+    background: var(--error-fondo);
+    color: var(--error);
+    border: 1px solid var(--error-borde);
+}
+
+.mensaje-info {
+    background: var(--brote);
+    color: var(--verde-hoja);
+    border: 1px solid var(--brote-borde);
+}
+
+.mensaje ul {
+    margin: 6px 0 0;
+    padding-left: 18px;
+}
+
+.cuenta-insignia {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.cuenta-insignia:empty {
+    display: none;
+}
+
+.cuenta-insignia-ok {
+    background: var(--brote);
+    color: var(--verde-hoja);
+}
+
+.cuenta-insignia-pendiente {
+    background: var(--aviso-fondo);
+    color: var(--aviso);
+}
+
+/* Reglas de la contraseña: una barra de 6 segmentos.
+   Cada segmento es una regla; se pone verde cuando se cumple (clase "cumple"). */
+.reglas-password {
+    display: flex;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.reglas-password li {
+    flex: 1;
+    height: 5px;
+    border-radius: 999px;
+    background: var(--linea);
+    font-size: 0;           /* el texto no se ve, pero los lectores de pantalla lo leen */
+    overflow: hidden;
+    transition: background 0.2s;
+}
+
+.reglas-password li.cumple {
+    background: var(--verde-hoja);
+}
+
+.cl-ayuda {
+    margin-top: -8px !important;
+    font-size: 12.5px;
+    color: var(--salvia);
+}
+
+/* ------------------------------------------------------------------
+   8. Pasos (1, 2, 3)
+   La página marca el paso activo con :has() según la pantalla visible.
+   ------------------------------------------------------------------ */
+.cl-pasos {
+    display: flex;
+    gap: 10px;
+    margin: 0 0 28px;
+    padding: 0;
+    list-style: none;
+}
+
+.cl-pasos li {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--salvia);
+}
+
+.cl-pasos li::before {
+    content: "";
+    height: 6px;
+    border-radius: 999px;
+    background: var(--linea);
+    transition: background 0.3s;
+}
+
+.cl-pasos li.hecho::before {
+    background: var(--verde-marca);
+}
+
+.cl-pasos li.activo {
+    color: var(--verde-bosque);
+    font-weight: 600;
+}
+
+.cl-pasos li.activo::before {
+    background: var(--verde-hoja);
+}
+
+/* ------------------------------------------------------------------
+   9. Celular
+   ------------------------------------------------------------------ */
+@media (max-width: 640px) {
+    .cl-encabezado-interior {
+        padding: 10px 16px;
+    }
+    .cl-logo img {
+        height: 34px;
+    }
+    .cl-menu a {
+        padding: 8px 12px;
+        font-size: 13.5px;
+    }
+    .cl-contenido {
+        padding: 32px 16px 48px;
+    }
+    .cl-tarjeta {
+        padding: 24px 20px;
+    }
+    .cl-rejilla {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cl * {
+        transition: none !important;
+    }
+}

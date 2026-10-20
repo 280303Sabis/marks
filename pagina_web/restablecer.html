@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MARK'S - Restablecer Contraseña</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mensajes.css">
+    <link rel="stylesheet" href="css/restablecer.css">
 </head>
 <body>
 
@@ -15,48 +17,95 @@
         <nav>
             <ul class="nav-buttons">
                 <li><a href="index.html" class="nav-btn">Inicio</a></li>
+                <li><a href="acceso-clientes.html" class="nav-btn">Clientes</a></li>
             </ul>
         </nav>
     </header>
 
+    <!--
+        El JavaScript (js/restablecer.js) usa todos los id de esta página.
+        Se pueden cambiar estilos y textos, pero NO los id ni los data-regla.
+    -->
     <section class="main-section" style="max-width: 500px; padding: 45px 40px; text-align: center;">
         
         <div style="font-size: 50px; margin-bottom: 10px;">🔒</div>
         
         <span style="background-color: #e2fbe0; color: #2e7d32; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; display: inline-block; margin-bottom: 12px;">Validación de Seguridad</span>
         
-        <h1 style="font-size: 28px; color: #2b581b; margin-top: 0; margin-bottom: 12px;">Crea tu Nueva Contraseña</h1>
-        
-        <p style="font-size: 15px; color: #555; line-height: 1.5; margin-bottom: 30px;">
-            Introduce el código alfanumérico que recibiste en tu correo y define tu nueva contraseña de acceso al portal.
-        </p>
+        <h1 style="font-size: 28px; color: #2b581b; margin-top: 0; margin-bottom: 12px;">Recupera tu Contraseña</h1>
 
-        <form onsubmit="alert('¡Contraseña actualizada con éxito! Ya puedes iniciar sesión.'); window.location.href='index.html'; return false;" class="login-form" style="text-align: left;">
-            <div class="input-group">
-                <label>Ingresa tu correo</label>
-                <input type="text" placeholder="Correo electrónico" required>
-            </div>
-            
-            <div class="input-group" style="margin-top: 15px;">
-                <label>Nueva Contraseña</label>
-                <input type="password" placeholder="••••••••" required>
-            </div>
+        <!-- PANTALLA 1: PEDIR CÓDIGO -->
+        <div id="paso-solicitar">
+            <p class="rec-texto">
+                Escribe el correo de tu cuenta. Te enviaremos un código de 6 dígitos para crear una nueva contraseña.
+            </p>
+            <form id="form-solicitar" class="login-form" style="text-align: left;" novalidate>
+                <div class="input-group">
+                    <label for="rec-correo">Correo de tu cuenta</label>
+                    <input type="email" id="rec-correo" placeholder="Correo electrónico" autocomplete="email">
+                </div>
+                <p id="solicitar-mensaje" class="mensaje" role="alert" hidden></p>
+                <button type="submit" id="btn-solicitar" class="btn-login" style="width: 100%;">
+                    Enviar código
+                </button>
+            </form>
+        </div>
 
-            <div class="input-group" style="margin-top: 15px;">
-                <label>Confirmar Nueva Contraseña</label>
-                <input type="password" placeholder="••••••••" required>
-            </div>
-            
-            <div style="margin-top: 25px;">
-                <button type="submit" class="btn-login" style="width: 100%;">
+        <!-- PANTALLA 2: CÓDIGO Y NUEVA CONTRASEÑA -->
+        <div id="paso-cambiar" hidden>
+            <p class="rec-texto">
+                Escribe el código que enviamos a <strong id="rec-correo-texto"></strong> y define tu nueva contraseña.
+            </p>
+            <form id="form-cambiar" class="login-form" style="text-align: left;" novalidate>
+                <div class="input-group">
+                    <label for="rec-codigo">Código de 6 dígitos</label>
+                    <input type="text" id="rec-codigo" class="rec-codigo" maxlength="6" inputmode="numeric" autocomplete="one-time-code" placeholder="000000">
+                </div>
+
+                <div class="input-group" style="margin-top: 15px;">
+                    <label for="rec-password">Nueva Contraseña</label>
+                    <input type="password" id="rec-password" maxlength="64" autocomplete="new-password" placeholder="••••••••">
+                </div>
+
+                <div class="input-group" style="margin-top: 15px;">
+                    <label for="rec-password2">Confirmar Nueva Contraseña</label>
+                    <input type="password" id="rec-password2" maxlength="64" autocomplete="new-password" placeholder="••••••••">
+                </div>
+
+                <ul id="reglas-password" class="reglas-password">
+                    <li data-regla="largo">De 8 a 64 caracteres</li>
+                    <li data-regla="mayuscula">Una letra MAYÚSCULA</li>
+                    <li data-regla="minuscula">Una letra minúscula</li>
+                    <li data-regla="numero">Un número</li>
+                    <li data-regla="simbolo">Un símbolo (ej. ! # $ % &amp; *)</li>
+                    <li data-regla="correo">Que no contenga tu correo</li>
+                </ul>
+
+                <p id="cambiar-mensaje" class="mensaje" role="alert" hidden></p>
+                <button type="submit" id="btn-cambiar" class="btn-login" style="width: 100%;">
                     Actualizar Contraseña
                 </button>
+            </form>
+            <div class="rec-acciones">
+                <button type="button" id="btn-reenviar" class="rec-enlace">Reenviar código</button>
+                <button type="button" id="btn-otro-correo" class="rec-enlace">Usar otro correo</button>
             </div>
-        </form>
+        </div>
+
+        <!-- PANTALLA 3: LISTO -->
+        <div id="paso-listo" hidden>
+            <p id="listo-mensaje" class="mensaje mensaje-info"></p>
+            <a href="index.html" class="btn-login rec-boton-enlace volver-login">Iniciar sesión</a>
+        </div>
+
+        <p class="rec-volver">
+            <a href="index.html" class="volver-login">Volver a iniciar sesión</a>
+        </p>
 
     </section>
 
+    <script src="js/api.js"></script>
+    <script src="js/sesion.js"></script>
+    <script src="js/restablecer.js"></script>
 </body>
 </html>
-
-```

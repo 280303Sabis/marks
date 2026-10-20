@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARK'S - Crear cuenta</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mensajes.css">
+    <link rel="stylesheet" href="css/registro.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo">
+            <img src="img/logo_marks.png" alt="MARK'S Logo" class="logo-img">
+        </div>
+        <nav>
+            <ul class="nav-buttons">
+                <li><a href="index.html" class="nav-btn">Inicio</a></li>
+                <li><a href="acceso-clientes.html" class="nav-btn active">Clientes</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!--
+        El JavaScript (js/registro.js) usa todos los id de esta página. Se pueden cambiar
+        estilos y acomodo, pero NO los id ni los data-regla.
+    -->
+    <section class="main-section registro-seccion">
+
+        <div class="registro-intro">
+            <h1>CREA TU CUENTA MARK'S</h1>
+            <p>Es la misma cuenta que usas en la app: con ella consultas tus puntos, tus compras y tus ahorros.</p>
+        </div>
+
+        <div class="visual-card registro-tarjeta">
+            <div class="login-container">
+
+                <!-- PANTALLA 1: DATOS -->
+                <div id="paso-datos">
+                    <h2>Tus datos</h2>
+                    <form id="form-registro" class="login-form" novalidate>
+                        <div class="registro-grid">
+                            <div class="input-group">
+                                <label for="reg-nombre">Nombre</label>
+                                <input type="text" id="reg-nombre" maxlength="80" autocomplete="given-name" placeholder="Ana">
+                            </div>
+                            <div class="input-group">
+                                <label for="reg-apellidos">Apellidos (opcional)</label>
+                                <input type="text" id="reg-apellidos" maxlength="80" autocomplete="family-name" placeholder="López García">
+                            </div>
+                            <div class="input-group completo">
+                                <label for="reg-correo">Correo</label>
+                                <input type="email" id="reg-correo" maxlength="120" autocomplete="email" placeholder="tucorreo@ejemplo.com">
+                            </div>
+                            <div class="input-group">
+                                <label for="reg-telefono">Teléfono (opcional)</label>
+                                <input type="tel" id="reg-telefono" maxlength="10" inputmode="numeric" autocomplete="tel-national" placeholder="10 dígitos">
+                            </div>
+                            <div class="input-group">
+                                <label for="reg-nacimiento">Fecha de nacimiento</label>
+                                <input type="date" id="reg-nacimiento" autocomplete="bday">
+                            </div>
+                            <div class="input-group completo">
+                                <label for="reg-sexo">Sexo</label>
+                                <select id="reg-sexo">
+                                    <option value="">Selecciona una opción</option>
+                                    <option value="F">Femenino</option>
+                                    <option value="M">Masculino</option>
+                                    <option value="N">Prefiero no decirlo</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="reg-password">Contraseña</label>
+                                <input type="password" id="reg-password" maxlength="64" autocomplete="new-password" placeholder="••••••••">
+                            </div>
+                            <div class="input-group">
+                                <label for="reg-password2">Repite la contraseña</label>
+                                <input type="password" id="reg-password2" maxlength="64" autocomplete="new-password" placeholder="••••••••">
+                            </div>
+                        </div>
+
+                        <ul id="reglas-password" class="reglas-password">
+                            <li data-regla="largo">De 8 a 64 caracteres</li>
+                            <li data-regla="mayuscula">Una letra MAYÚSCULA</li>
+                            <li data-regla="minuscula">Una letra minúscula</li>
+                            <li data-regla="numero">Un número</li>
+                            <li data-regla="simbolo">Un símbolo (ej. ! # $ % &amp; *)</li>
+                            <li data-regla="correo">Que no contenga tu correo</li>
+                        </ul>
+
+                        <label class="registro-check">
+                            <input type="checkbox" id="reg-privacidad">
+                            <span>He leído y acepto el <a href="#" id="ver-aviso">Aviso de Privacidad</a></span>
+                        </label>
+
+                        <p id="registro-mensaje" class="mensaje" role="alert" hidden></p>
+                        <button type="submit" id="btn-registrar" class="btn-login">Crear cuenta</button>
+                    </form>
+                    <div class="login-footer">
+                        <p>¿Ya tienes cuenta? <a href="acceso-clientes.html">Inicia sesión</a></p>
+                    </div>
+                </div>
+
+                <!-- PANTALLA 2: CÓDIGO DE CONFIRMACIÓN -->
+                <div id="paso-codigo" hidden>
+                    <h2>Confirma tu correo</h2>
+                    <p class="registro-texto">
+                        Te enviamos un código de 6 dígitos a <strong id="codigo-correo"></strong>.
+                        Revisa también la carpeta de correo no deseado.
+                    </p>
+                    <form id="form-codigo" class="login-form" novalidate>
+                        <div class="input-group">
+                            <label for="reg-codigo">Código</label>
+                            <input type="text" id="reg-codigo" class="registro-codigo" maxlength="6" inputmode="numeric" autocomplete="one-time-code" placeholder="000000">
+                        </div>
+                        <p id="codigo-mensaje" class="mensaje" role="alert" hidden></p>
+                        <button type="submit" id="btn-confirmar" class="btn-login">Confirmar correo</button>
+                    </form>
+                    <div class="registro-acciones">
+                        <button type="button" id="btn-reenviar" class="registro-enlace">Reenviar código</button>
+                        <a href="mi-cuenta.html" class="registro-enlace">Hacerlo después</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Ventana del Aviso de Privacidad (el texto viene de la API) -->
+    <dialog id="aviso-dialogo" class="aviso-dialogo">
+        <h2 id="aviso-titulo">Aviso de Privacidad</h2>
+        <div id="aviso-contenido" class="aviso-contenido">Cargando...</div>
+        <div class="aviso-botones">
+            <button type="button" id="aviso-cerrar" class="registro-enlace">Cerrar</button>
+            <button type="button" id="aviso-aceptar" class="btn-login">Acepto</button>
+        </div>
+    </dialog>
+
+    <script src="js/api.js"></script>
+    <script src="js/sesion.js"></script>
+    <script src="js/registro.js"></script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+/* aviso-privacidad.css - Página pública del Aviso de Privacidad (aviso-privacidad.html) */
+
+.avp {
+    max-width: 760px;
+}
+
+.avp-encabezado {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 26px;
+}
+
+.avp-encabezado p {
+    margin-top: 4px;
+}
+
+.avp-icono {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    background: var(--brote);
+    color: var(--verde-hoja);
+    font-size: 26px;
+}
+
+.avp-tarjeta {
+    padding: 30px 34px;
+}
+
+/* Texto del aviso: líneas cómodas de leer */
+.avp-contenido {
+    max-width: 68ch;
+    line-height: 1.75;
+}
+
+.avp-contenido section + section {
+    margin-top: 22px;
+    padding-top: 22px;
+    border-top: 1px dashed var(--linea);
+}
+
+.avp-contenido h2 {
+    margin-bottom: 8px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.avp-contenido p + p {
+    margin-top: 10px;
+}
+
+.avp-contenido pre {
+    white-space: pre-wrap;
+    font-family: inherit;
+}
+
+.avp-volver {
+    margin-top: 22px !important;
+    font-size: 14px;
+}
+
+@media (max-width: 640px) {
+    .avp-tarjeta {
+        padding: 24px 18px;
+    }
+}

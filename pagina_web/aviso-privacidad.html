@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARK'S - Aviso de Privacidad</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+    <link rel="stylesheet" href="css/clientes.css">
+    <link rel="stylesheet" href="css/aviso-privacidad.css">
+</head>
+<body class="cl">
+
+    <header class="cl-encabezado">
+        <div class="cl-encabezado-interior">
+            <a href="index.html" class="cl-logo"><img src="img/logo_marks.png" alt="MARK'S"></a>
+            <nav aria-label="Menú principal">
+                <ul class="cl-menu">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="acceso-clientes.html">Clientes</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- El texto lo llena js/aviso-privacidad.js con los datos de la API. No cambiar los id. -->
+    <main class="cl-contenido avp">
+
+        <div class="avp-encabezado">
+            <span class="avp-icono" aria-hidden="true"><i class="ph ph-shield-check"></i></span>
+            <div>
+                <h1 id="aviso-titulo">Aviso de Privacidad</h1>
+                <p id="aviso-meta" class="cl-texto-sec"></p>
+            </div>
+        </div>
+
+        <article class="cl-tarjeta cl-ticket avp-tarjeta">
+            <div id="aviso-contenido" class="avp-contenido">
+                <p class="cl-texto-sec">Cargando el Aviso de Privacidad...</p>
+            </div>
+        </article>
+
+        <p class="avp-volver">
+            <a href="javascript:history.back()" class="cl-enlace">Regresar</a>
+        </p>
+
+    </main>
+
+    <footer class="cl-pie">MARK'S - Compra sin filas. Proyecto Integrador, Universidad Tecnológica Santa Catarina.</footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/sesion.js"></script>
+    <script src="js/aviso-privacidad.js"></script>
+</body>
+</html>

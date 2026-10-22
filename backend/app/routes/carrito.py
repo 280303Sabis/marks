@@ -8,6 +8,9 @@ CARRITO (lado del cliente)
   así, si un producto caducó, se agotó o cambió de precio mientras el
   cliente compraba, se marca antes de pagar.
 
+  El cálculo está en calcular_carrito() para que el PAGO (compras.py)
+  use exactamente la misma regla que la cotización.
+
   Cuerpo que envía la app:
     {
       "sucursal_id": 1,
@@ -45,6 +48,10 @@ MAX_PIEZAS = 20          # piezas del mismo producto en una línea
 CENTAVO = Decimal("0.01")
 
 
+class CarritoInvalido(Exception):
+    """El carrito completo no se puede calcular (sucursal o formato inválido)."""
+
+
 def _buscar(codigo, sucursal_id):
     """Busca el producto por código de barras o por PLU (etiqueta de báscula).
        Devuelve (producto, peso_de_bascula) o lanza ValueError con el motivo."""
@@ -63,26 +70,24 @@ def _buscar(codigo, sucursal_id):
     return _completar(p), peso
 
 
-@bp.post("/carrito/cotizar")
-@requiere_rol()
-def cotizar():
-    datos = request.get_json(silent=True) or {}
-
+def calcular_carrito(datos):
+    """Calcula el carrito. Devuelve un diccionario con líneas y totales.
+       Lanza CarritoInvalido si la sucursal o el formato no son válidos."""
     # 1. Sucursal
     try:
         sucursal_id = int(datos.get("sucursal_id"))
     except (TypeError, ValueError):
-        return jsonify(error="Elige una sucursal válida"), 400
+        raise CarritoInvalido("Elige una sucursal válida")
     if not query("SELECT id FROM sucursales WHERE id = %s AND activa = 1",
                  (sucursal_id,), one=True):
-        return jsonify(error="Elige una sucursal válida"), 400
+        raise CarritoInvalido("Elige una sucursal válida")
 
     # 2. Líneas
     lineas = datos.get("lineas")
     if not isinstance(lineas, list):
-        return jsonify(error="El carrito no es válido"), 400
+        raise CarritoInvalido("El carrito no es válido")
     if len(lineas) > MAX_LINEAS:
-        return jsonify(error=f"El carrito admite máximo {MAX_LINEAS} productos distintos"), 400
+        raise CarritoInvalido(f"El carrito admite máximo {MAX_LINEAS} productos distintos")
 
     resultado = []
     pedido_por_producto = {}   # producto_id -> piezas o kg pedidos (para revisar existencias)
@@ -164,13 +169,23 @@ def cotizar():
         ahorro += fila["importe_normal"] - fila["importe"]
 
     con_error = sum(1 for f in resultado if "error" in f)
-    return jsonify(
-        sucursal_id=sucursal_id,
-        lineas=resultado,
-        articulos=sum(f.get("cantidad", 1) for f in resultado if "error" not in f),
-        subtotal=subtotal.quantize(CENTAVO),
-        ahorro=ahorro.quantize(CENTAVO),
-        total=total.quantize(CENTAVO),
-        lineas_con_error=con_error,
-        se_puede_pagar=bool(resultado) and con_error == 0,
-    )
+    return {
+        "sucursal_id": sucursal_id,
+        "lineas": resultado,
+        "articulos": sum(f.get("cantidad", 1) for f in resultado if "error" not in f),
+        "subtotal": subtotal.quantize(CENTAVO),
+        "ahorro": ahorro.quantize(CENTAVO),
+        "total": total.quantize(CENTAVO),
+        "lineas_con_error": con_error,
+        "se_puede_pagar": bool(resultado) and con_error == 0,
+    }
+
+
+@bp.post("/carrito/cotizar")
+@requiere_rol()
+def cotizar():
+    datos = request.get_json(silent=True) or {}
+    try:
+        return jsonify(calcular_carrito(datos))
+    except CarritoInvalido as e:
+        return jsonify(error=str(e)), 400

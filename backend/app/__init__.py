@@ -38,11 +38,13 @@ def create_app():
     from .routes.auth import bp as auth_bp
     from .routes.verificacion import bp as verificacion_bp
     from .routes.cuenta import bp as cuenta_bp
+    from .routes.compras import bp as compras_bp
     app.register_blueprint(productos_bp, url_prefix="/api")
     app.register_blueprint(carrito_bp, url_prefix="/api")
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(verificacion_bp, url_prefix="/api/auth")
     app.register_blueprint(cuenta_bp, url_prefix="/api")
+    app.register_blueprint(compras_bp, url_prefix="/api")
 
     @app.get("/")
     def inicio():

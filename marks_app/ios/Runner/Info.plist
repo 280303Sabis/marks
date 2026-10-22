@@ -45,7 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
-		<key>NSCameraUsageDescription</key>
-	<string>MARK'S usa la cámara para escanear el código de barras de tus productos.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>MARK'S usa la cámara para escanear el código de barras de tus productos y para tomar fotos de tus opiniones.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>MARK'S necesita acceso a tus fotos para que puedas agregarlas a tus opiniones.</string>
 </dict>
 </plist>

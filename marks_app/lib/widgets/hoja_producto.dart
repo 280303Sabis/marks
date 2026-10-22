@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import '../models/opinion.dart';
 import '../models/producto.dart';
+import '../screens/opiniones_producto_screen.dart';
 import '../services/api_service.dart';
+import '../services/opiniones_service.dart';
 import '../services/producto_service.dart';
 import '../theme/colores.dart';
 import '../utils/formato.dart';
 import 'campos_registro.dart' show fechaLarga;
+import 'opiniones_ui.dart';
 import 'soft_ui.dart';
 
 /// Muestra la hoja con el producto escaneado.
@@ -50,6 +54,9 @@ class _HojaProductoState extends State<_HojaProducto> {
   /// Producto con peso e importe que calculó la API (granel con peso escrito).
   Producto? _conPeso;
 
+  /// Calificación del producto (PASO 13). null mientras carga o si falló.
+  OpinionesProducto? _opiniones;
+
   Producto get p => widget.producto;
 
   /// Granel que todavía necesita que el cliente escriba el peso.
@@ -86,9 +93,35 @@ class _HojaProductoState extends State<_HojaProducto> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _cargarOpiniones();
+  }
+
+  @override
   void dispose() {
     _peso.dispose();
     super.dispose();
+  }
+
+  /// Trae el promedio de estrellas. Si falla, la hoja se muestra sin calificación.
+  Future<void> _cargarOpiniones() async {
+    try {
+      final datos = await OpinionesService.deProducto(p.id, limite: 1);
+      if (mounted) setState(() => _opiniones = datos);
+    } on ApiException {
+      // Sin calificación: no es necesaria para comprar
+    }
+  }
+
+  /// Abre la pantalla de opiniones y, al volver, actualiza el promedio.
+  Future<void> _verOpiniones() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => OpinionesProductoScreen(productoId: p.id, nombre: p.nombre),
+      ),
+    );
+    if (mounted) _cargarOpiniones();
   }
 
   /// Si el cliente cambia el peso o la unidad, el total anterior ya no sirve.
@@ -203,6 +236,12 @@ class _HojaProductoState extends State<_HojaProducto> {
                             p.categoria,
                             style: const TextStyle(fontSize: 13, color: MarksColores.textoSuave),
                           ),
+                          // Calificación (PASO 13)
+                          if (_opiniones != null && _opiniones!.activas)
+                            _FilaCalificacion(
+                              resumen: _opiniones!.resumen,
+                              alTocar: _verOpiniones,
+                            ),
                         ],
                       ),
                     ),
@@ -572,6 +611,50 @@ class _AvisoNoVenta extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// "★★★★½ 4.5 (12 opiniones) >" debajo del nombre. Al tocarla abre las opiniones.
+class _FilaCalificacion extends StatelessWidget {
+  final ResumenOpiniones resumen;
+  final VoidCallback alTocar;
+
+  const _FilaCalificacion({required this.resumen, required this.alTocar});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: InkWell(
+        onTap: alTocar,
+        borderRadius: BorderRadius.circular(10),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Estrellas(valor: resumen.promedio, tamano: 15),
+              const SizedBox(width: 6),
+              Flexible(
+                child: Text(
+                  resumen.vacio
+                      ? 'Sin opiniones todavía'
+                      : '${resumen.promedio.toStringAsFixed(1)}  (${textoOpiniones(resumen.total)})',
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: resumen.vacio ? FontWeight.w400 : FontWeight.w600,
+                    color: resumen.vacio ? MarksColores.textoSuave : MarksColores.azul,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 2),
+              const Icon(PhosphorIconsLight.caretRight, size: 14, color: MarksColores.textoSuave),
+            ],
+          ),
+        ),
       ),
     );
   }

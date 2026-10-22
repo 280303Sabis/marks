@@ -1,6 +1,6 @@
-/// Modelo de una compra pagada (lo que responde /api/compras/pagar
-/// y /api/compras/FOLIO).
-/// 
+// Modelo de una compra pagada (lo que responde /api/compras/pagar
+// y /api/compras/FOLIO).
+
 double _numero(dynamic v) {
   if (v == null) return 0;
   if (v is num) return v.toDouble();
@@ -9,6 +9,7 @@ double _numero(dynamic v) {
 
 /// Un producto dentro del ticket.
 class LineaVenta {
+  final int? productoId;     // PASO 13: para opinar sobre el producto
   final String nombre;
   final String tipoVenta;    // UNIDAD o GRANEL
   final double cantidad;     // piezas o kg
@@ -17,8 +18,11 @@ class LineaVenta {
   final double importe;      // lo que se cobró
   final double importeNormal;
   final bool esLocal;
+  final int? opinionId;          // PASO 13: null si todavía no opina
+  final bool opinionesActivas;   // PASO 13: el admin puede apagarlas
 
   const LineaVenta({
+    required this.productoId,
     required this.nombre,
     required this.tipoVenta,
     required this.cantidad,
@@ -27,12 +31,21 @@ class LineaVenta {
     required this.importe,
     required this.importeNormal,
     required this.esLocal,
+    required this.opinionId,
+    required this.opinionesActivas,
   });
 
   bool get esGranel => tipoVenta == 'GRANEL';
   bool get tieneOferta => precioFinal < precio;
 
+  /// Ya calificó este producto (el botón dice "Editar opinión").
+  bool get yaOpino => opinionId != null;
+
+  /// Se puede mostrar el botón "Opinar" o "Editar opinión".
+  bool get admiteOpinion => productoId != null && opinionesActivas;
+
   factory LineaVenta.fromJson(Map<String, dynamic> j) => LineaVenta(
+        productoId: (j['producto_id'] as num?)?.toInt(),
         nombre: (j['nombre'] ?? '') as String,
         tipoVenta: (j['tipo_venta'] ?? 'UNIDAD') as String,
         cantidad: _numero(j['cantidad']),
@@ -41,6 +54,8 @@ class LineaVenta {
         importe: _numero(j['importe']),
         importeNormal: _numero(j['importe_normal'] ?? j['importe']),
         esLocal: j['es_local'] == true || j['es_local'] == 1,
+        opinionId: (j['opinion_id'] as num?)?.toInt(),
+        opinionesActivas: j['opiniones_activas'] != false && j['opiniones_activas'] != 0,
       );
 }
 
@@ -83,6 +98,9 @@ class Venta {
   /// Pagada pero el guardia todavía no escanea el QR.
   bool get pendienteDeSalida => estado == 'PAGADA' && qr != null;
 
+  /// Solo se opina sobre compras pagadas o validadas (no canceladas).
+  bool get permiteOpinar => estado == 'PAGADA' || estado == 'VALIDADA';
+
   factory Venta.fromJson(Map<String, dynamic> j) {
     final tarjeta = (j['tarjeta'] as Map?) ?? const {};
     return Venta(
@@ -106,7 +124,6 @@ class Venta {
     );
   }
 }
-
 
 /// Una compra en la lista de "Mis compras" (resumen, sin productos).
 class ResumenCompra {

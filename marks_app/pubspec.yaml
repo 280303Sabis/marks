@@ -19,6 +19,7 @@ dependencies:
     sdk: flutter
   mobile_scanner: ^7.4.2
   qr_flutter: ^4.1.0         # dibuja el QR de salida
+  image_picker: ^1.2.2
 
 dev_dependencies:
   flutter_test:

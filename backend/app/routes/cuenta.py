@@ -8,18 +8,20 @@ MI CUENTA (perfil del cliente) y DOCUMENTOS LEGALES
     PUT    /api/cuenta/perfil                 editar mis datos (solo CLIENTE, Rectificación)
     POST   /api/cuenta/cambiar-password       {"password_actual", "password_nueva"}
     POST   /api/cuenta/cerrar-sesiones        cierra la sesión en todos los dispositivos
-    GET    /api/cuenta/exportar               copia de mis datos (derecho de Acceso)
+    GET    /api/cuenta/exportar               copia de mis datos: perfil, compras, puntos y opiniones (Acceso)
     DELETE /api/cuenta                        {"password", "confirmacion": "ELIMINAR"}  (Cancelación)
+                                              anonimiza la cuenta y BORRA sus opiniones y fotos
 """
 import secrets
 from datetime import date, datetime
 
-from flask import Blueprint, g, jsonify, request
+from flask import Blueprint, current_app, g, jsonify, request
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from ..db import get_db, query
 from ..legal import aviso_privacidad
 from ..utils import correo as mail
+from ..utils.fotos import borrar_fotos
 from ..utils.seguridad import crear_token, registrar_bitacora, requiere_rol, validar_password
 from .auth import EDAD_MINIMA, SEXOS_VALIDOS, _calcular_edad
 
@@ -173,6 +175,20 @@ def exportar_datos():
     accesos = query("""SELECT evento, ip, fecha FROM bitacora_accesos
                        WHERE usuario_id = %s ORDER BY fecha DESC LIMIT 100""", (g.usuario_id,))
 
+    compras = query("""SELECT v.folio, v.estado, s.nombre AS sucursal, v.pagada_en, v.articulos,
+                              v.subtotal, v.ahorro, v.puntos_usados, v.descuento_puntos,
+                              v.total, v.puntos_ganados, v.tarjeta_marca, v.tarjeta_ultimos4
+                       FROM ventas v JOIN sucursales s ON s.id = v.sucursal_id
+                       WHERE v.usuario_id = %s ORDER BY v.pagada_en DESC""", (g.usuario_id,))
+    puntos = query("""SELECT tipo, puntos, saldo_final, nota, fecha FROM movimientos_puntos
+                      WHERE usuario_id = %s ORDER BY id DESC""", (g.usuario_id,))
+    opiniones = query("""SELECT p.nombre AS producto, o.estrellas, o.comentario, o.estado,
+                                o.creada_en, o.editada_en,
+                                (SELECT COUNT(*) FROM opinion_fotos f
+                                 WHERE f.opinion_id = o.id) AS fotos
+                         FROM opiniones o JOIN productos p ON p.id = o.producto_id
+                         WHERE o.usuario_id = %s ORDER BY o.creada_en DESC""", (g.usuario_id,))
+
     registrar_bitacora("DATOS_EXPORTADOS", g.usuario_id, perfil["correo"])
     return jsonify(
         generado_en=datetime.now(),
@@ -180,8 +196,9 @@ def exportar_datos():
         perfil=perfil,
         aviso_privacidad_aceptado=consentimiento,
         historial_de_accesos=accesos,
-        compras=[],          # se llenará en el PASO 9
-        puntos_y_cupones=[], # se llenará en el PASO 11
+        compras=compras,                 # PASO 10
+        movimientos_de_puntos=puntos,    # PASO 11
+        opiniones=opiniones,             # PASO 13
     )
 
 
@@ -201,10 +218,16 @@ def eliminar_cuenta():
 
     registrar_bitacora("CUENTA_ELIMINADA", u["id"], None, "Solicitada por el titular")
 
-    # Se ANONIMIZA en lugar de borrar la fila: así las compras futuras (PASO 9)
+    # Sus opiniones y fotos se BORRAN (son contenido público que escribió el titular)
+    fotos = [f["archivo"] for f in query(
+        """SELECT f.archivo FROM opinion_fotos f JOIN opiniones o ON o.id = f.opinion_id
+           WHERE o.usuario_id = %s""", (u["id"],))]
+
+    # Se ANONIMIZA en lugar de borrar la fila: así las compras (PASO 10)
     # se conservan para contabilidad, pero ya sin datos que identifiquen a la persona.
     conn = get_db()
     with conn.cursor() as cur:
+        cur.execute("DELETE FROM opiniones WHERE usuario_id = %s", (u["id"],))
         cur.execute("""UPDATE usuarios
                        SET nombre = 'Usuario eliminado', apellidos = NULL, telefono = NULL, fecha_nacimiento = NULL, sexo = NULL,
                            correo = %s, password_hash = %s, activo = FALSE,
@@ -217,5 +240,6 @@ def eliminar_cuenta():
         cur.execute("DELETE FROM codigos_verificacion WHERE usuario_id = %s", (u["id"],))
         cur.execute("UPDATE bitacora_accesos SET correo = NULL WHERE usuario_id = %s", (u["id"],))
     conn.commit()
+    borrar_fotos(current_app.config["UPLOADS_OPINIONES"], fotos)
 
     return jsonify(mensaje="Tu cuenta fue eliminada. Gracias por usar MARK'S")

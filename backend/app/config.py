@@ -37,3 +37,12 @@ class Config:
     MAIL_PASSWORD = os.getenv("MAIL_PASSWORD", "").replace(" ", "")
     MAIL_PUERTO = int(os.getenv("MAIL_PUERTO", 465))   # 465 = SSL (recomendado) | 587 = STARTTLS
     MAIL_NOMBRE_REMITENTE = "MARK'S"
+
+
+
+    
+    # ---------- Fotos de las opiniones (PASO 13) ----------
+    # Carpeta backend/uploads/opiniones (no se sube a GitHub)
+    UPLOADS_OPINIONES = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "uploads", "opiniones")
+    MAX_CONTENT_LENGTH = 20 * 1024 * 1024   # máximo 20 MB por petición (3 fotos de 5 MB + datos)

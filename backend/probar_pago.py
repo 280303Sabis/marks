@@ -174,7 +174,8 @@ with app.app_context():
         # ---------- QR falso ----------
         falso = venta["qr"][:-1] + ("A" if venta["qr"][-1] != "A" else "B")
         revisar("QR alterado: no es válido", leer_qr(falso) is None)
-        otro_folio = venta["qr"].replace(folio, folio[:-1] + "9")
+        # Cambia el último dígito por otro distinto (si termina en 9, usa 8)
+        otro_folio = venta["qr"].replace(folio, folio[:-1] + ("8" if folio[-1] == "9" else "9"))
         revisar("QR con otro folio: no es válido", leer_qr(otro_folio) is None)
     finally:
         limpiar()

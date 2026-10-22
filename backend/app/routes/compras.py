@@ -69,13 +69,19 @@ def _ticket(venta_id):
                         v.tarjeta_marca, v.tarjeta_ultimos4, v.pagada_en, v.validada_en
                  FROM ventas v JOIN sucursales s ON s.id = v.sucursal_id
                  WHERE v.id = %s""", (venta_id,), one=True)
-    lineas = query("""SELECT nombre, tipo_venta, cantidad, precio, precio_final,
-                             importe, importe_normal, es_local
-                      FROM venta_detalle WHERE venta_id = %s ORDER BY id""", (venta_id,))
+    # Cada línea dice si el cliente ya opinó sobre ese producto (PASO 13)
+    lineas = query("""SELECT d.producto_id, d.nombre, d.tipo_venta, d.cantidad, d.precio,
+                             d.precio_final, d.importe, d.importe_normal, d.es_local,
+                             o.id AS opinion_id, p.opiniones_activas
+                      FROM venta_detalle d
+                      JOIN ventas v    ON v.id = d.venta_id
+                      JOIN productos p ON p.id = d.producto_id
+                      LEFT JOIN opiniones o ON o.producto_id = d.producto_id
+                                           AND o.usuario_id = v.usuario_id
+                      WHERE d.venta_id = %s ORDER BY d.id""", (venta_id,))
     for l in lineas:
         l["es_local"] = bool(l["es_local"])
-        if l["tipo_venta"] == "UNIDAD":
-            l["cantidad"] = int(l["cantidad"])
+        l["opiniones_activas"] = bool(l["opiniones_activas"])
     return {
         "folio": v["folio"],
         "estado": v["estado"],

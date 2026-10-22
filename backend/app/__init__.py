@@ -39,12 +39,14 @@ def create_app():
     from .routes.verificacion import bp as verificacion_bp
     from .routes.cuenta import bp as cuenta_bp
     from .routes.compras import bp as compras_bp
+    from .routes.opiniones import bp as opiniones_bp          # PASO 13
     app.register_blueprint(productos_bp, url_prefix="/api")
     app.register_blueprint(carrito_bp, url_prefix="/api")
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(verificacion_bp, url_prefix="/api/auth")
     app.register_blueprint(cuenta_bp, url_prefix="/api")
     app.register_blueprint(compras_bp, url_prefix="/api")
+    app.register_blueprint(opiniones_bp, url_prefix="/api")    # PASO 13
 
     @app.get("/")
     def inicio():
@@ -70,5 +72,10 @@ def create_app():
     @app.errorhandler(404)
     def no_encontrado(_e):
         return jsonify(error="Ruta no encontrada"), 404
+
+    @app.errorhandler(413)
+    def demasiado_grande(_e):
+        """Cuando la petición pasa de MAX_CONTENT_LENGTH (fotos muy pesadas)."""
+        return jsonify(error="Las fotos pesan demasiado. Máximo 5 MB cada una"), 413
 
     return app

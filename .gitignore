@@ -16,6 +16,7 @@ venv/
 __pycache__/
 *.pyc
 backend/static/uploads/
+backend/uploads/
 
 # ----- Flutter (app) -----
 marks_app/build/

@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../models/carrito.dart';
 import '../models/producto.dart';
+import '../models/venta.dart';
 import 'api_service.dart';
 
 /// Resultado de intentar agregar un producto al carrito.
@@ -181,5 +182,32 @@ class CarritoService extends ChangeNotifier {
       conToken: true,
     );
     return CotizacionCarrito.fromJson(respuesta as Map<String, dynamic>);
+  }
+  /// Paga el carrito (PASO 10). Solo envía la marca y los últimos 4 dígitos.
+  /// Si el pago se aprueba, vacía el carrito y devuelve el ticket.
+  /// [clavePago] debe ser LA MISMA si se reintenta este mismo pago.
+  Future<Venta> pagar({
+    required String clavePago,
+    required double totalEsperado,
+    required String marca,
+    required String ultimos4,
+  }) async {
+    await cargar();
+    final respuesta = await ApiService.post(
+      '/api/compras/pagar',
+      datos: {
+        'sucursal_id': _sucursalId,
+        'lineas': _lineas.map((l) => l.paraApi()).toList(),
+        'total_esperado': totalEsperado,
+        'clave_pago': clavePago,
+        'tarjeta': {'marca': marca, 'ultimos4': ultimos4},
+      },
+      conToken: true,
+    );
+    final venta = Venta.fromJson(
+      (respuesta as Map<String, dynamic>)['venta'] as Map<String, dynamic>,
+    );
+    await vaciar(); // la compra ya quedó guardada en la API
+    return venta;
   }
 }

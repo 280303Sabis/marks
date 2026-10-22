@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../theme/colores.dart';
@@ -126,6 +127,7 @@ class CampoSuave extends StatelessWidget {
   final String? Function(String?)? validador;
   final void Function(String)? alEnviar;
   final Widget? sufijo;
+  final List<TextInputFormatter>? formateadores;
 
   const CampoSuave({
     super.key,
@@ -140,6 +142,7 @@ class CampoSuave extends StatelessWidget {
     this.validador,
     this.alEnviar,
     this.sufijo,
+    this.formateadores,
   });
 
   static const double _alto = 58;
@@ -171,6 +174,7 @@ class CampoSuave extends StatelessWidget {
           autocorrect: !ocultarTexto && tipoTeclado != TextInputType.emailAddress,
           validator: validador,
           onFieldSubmitted: alEnviar,
+          inputFormatters: formateadores,
           style: const TextStyle(fontSize: 15.5, color: MarksColores.azul),
           decoration: InputDecoration(
             hintText: hint,

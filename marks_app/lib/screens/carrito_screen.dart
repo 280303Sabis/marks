@@ -8,6 +8,7 @@ import '../services/carrito_service.dart';
 import '../theme/colores.dart';
 import '../utils/formato.dart';
 import '../widgets/soft_ui.dart';
+import 'pago_screen.dart';
 
 /// Pantalla del carrito.
 /// Muestra lo que el cliente escaneó y le pide a la API el total real.
@@ -119,10 +120,14 @@ class _CarritoScreenState extends State<CarritoScreen> {
     if (ok) await _carrito.vaciar();
   }
 
-  void _continuarAlPago() {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(const SnackBar(content: Text('El pago lo programamos en el PASO 10')));
+  Future<void> _continuarAlPago() async {
+    final c = _cotizacion;
+    if (c == null || !c.sePuedePagar) return;
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => PagoScreen(sucursal: widget.sucursal, cotizacion: c)),
+    );
+    // Si regresó sin pagar (por ejemplo, el total cambió), se recalcula el carrito
+    if (mounted && !_carrito.vacio) _cotizar();
   }
 
   @override

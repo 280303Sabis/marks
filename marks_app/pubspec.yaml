@@ -18,6 +18,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   mobile_scanner: ^7.4.2
+  qr_flutter: ^4.1.0         # dibuja el QR de salida
 
 dev_dependencies:
   flutter_test:

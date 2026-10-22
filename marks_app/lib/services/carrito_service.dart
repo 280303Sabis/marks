@@ -24,6 +24,7 @@ enum ResultadoAgregar {
 /// - Avisa a las pantallas cuando cambia (ChangeNotifier), así el botón
 ///   "Ver carrito" del escáner se actualiza solo.
 /// - El total real lo calcula la API con cotizar().
+/// - pagar() registra la compra en la API y vacía el carrito (PASO 10 y 11).
 class CarritoService extends ChangeNotifier {
   CarritoService._();
 
@@ -37,9 +38,14 @@ class CarritoService extends ChangeNotifier {
 
   final List<LineaCarrito> _lineas = [];
   int? _sucursalId;
+  int? _puntosSaldo; // saldo de puntos después del último pago (PASO 11)
 
   List<LineaCarrito> get lineas => List.unmodifiable(_lineas);
   int? get sucursalId => _sucursalId;
+
+  /// Saldo de puntos que devolvió la API en el último pago (null si no ha pagado).
+  int? get puntosSaldo => _puntosSaldo;
+
   bool get vacio => _lineas.isEmpty;
 
   /// Piezas + bolsas de granel (cada bolsa cuenta 1).
@@ -183,14 +189,18 @@ class CarritoService extends ChangeNotifier {
     );
     return CotizacionCarrito.fromJson(respuesta as Map<String, dynamic>);
   }
-  /// Paga el carrito (PASO 10). Solo envía la marca y los últimos 4 dígitos.
-  /// Si el pago se aprueba, vacía el carrito y devuelve el ticket.
+
+  /// Paga el carrito (PASO 10 y 11). Solo envía la marca y los últimos 4 dígitos.
+  /// [usarPuntos] canjea puntos; entonces [totalEsperado] debe ser el total CON descuento.
+  /// Si el pago se aprueba, guarda el saldo nuevo de puntos, vacía el carrito
+  /// y devuelve el ticket.
   /// [clavePago] debe ser LA MISMA si se reintenta este mismo pago.
   Future<Venta> pagar({
     required String clavePago,
     required double totalEsperado,
     required String marca,
     required String ultimos4,
+    bool usarPuntos = false,
   }) async {
     await cargar();
     final respuesta = await ApiService.post(
@@ -198,16 +208,16 @@ class CarritoService extends ChangeNotifier {
       datos: {
         'sucursal_id': _sucursalId,
         'lineas': _lineas.map((l) => l.paraApi()).toList(),
+        'usar_puntos': usarPuntos,
         'total_esperado': totalEsperado,
         'clave_pago': clavePago,
         'tarjeta': {'marca': marca, 'ultimos4': ultimos4},
       },
       conToken: true,
-    );
-    final venta = Venta.fromJson(
-      (respuesta as Map<String, dynamic>)['venta'] as Map<String, dynamic>,
-    );
-    await vaciar(); // la compra ya quedó guardada en la API
+    ) as Map<String, dynamic>;
+    final venta = Venta.fromJson(respuesta['venta'] as Map<String, dynamic>);
+    _puntosSaldo = (respuesta['puntos_saldo'] as num?)?.toInt();
+    await vaciar(); // la compra ya quedó guardada; vaciar() también avisa a Inicio
     return venta;
   }
 }

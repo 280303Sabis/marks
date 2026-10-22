@@ -2,6 +2,7 @@
 ///
 /// LineaCarrito: lo que se guarda en el celular (lo que el cliente escaneó).
 /// CotizacionCarrito: lo que responde la API con precios y existencias actuales.
+/// PuntosCotizacion: los puntos que puede usar y ganar en esta compra (PASO 11).
 
 double _numero(dynamic v) {
   if (v == null) return 0;
@@ -119,6 +120,38 @@ class LineaCotizada {
       );
 }
 
+/// Puntos del cliente para esta compra (PASO 11).
+/// Reglas: 1 punto por cada $10, productos locales x2,
+/// 100 puntos = $10 de descuento (hasta 50% de la compra).
+class PuntosCotizacion {
+  final int saldo;              // puntos que tiene el cliente
+  final int puntosUsables;      // puntos que puede usar en esta compra (0 = no alcanza)
+  final double descuento;       // $ que descuentan esos puntos
+  final double totalConPuntos;  // lo que pagaría con tarjeta si los usa
+  final int ganarias;           // puntos que gana si NO usa sus puntos
+  final int ganariasConPuntos;  // puntos que gana si SÍ los usa
+
+  const PuntosCotizacion({
+    required this.saldo,
+    required this.puntosUsables,
+    required this.descuento,
+    required this.totalConPuntos,
+    required this.ganarias,
+    required this.ganariasConPuntos,
+  });
+
+  bool get puedeCanjear => puntosUsables > 0;
+
+  factory PuntosCotizacion.fromJson(Map<String, dynamic> j) => PuntosCotizacion(
+        saldo: (j['saldo'] as num?)?.toInt() ?? 0,
+        puntosUsables: (j['puntos_usables'] as num?)?.toInt() ?? 0,
+        descuento: _numero(j['descuento']),
+        totalConPuntos: _numero(j['total_con_puntos']),
+        ganarias: (j['ganarias'] as num?)?.toInt() ?? 0,
+        ganariasConPuntos: (j['ganarias_con_puntos'] as num?)?.toInt() ?? 0,
+      );
+}
+
 /// Respuesta completa de POST /api/carrito/cotizar.
 class CotizacionCarrito {
   final List<LineaCotizada> lineas;
@@ -128,6 +161,7 @@ class CotizacionCarrito {
   final int articulos;
   final int lineasConError;
   final bool sePuedePagar;
+  final PuntosCotizacion? puntos; // PASO 11
 
   const CotizacionCarrito({
     required this.lineas,
@@ -137,6 +171,7 @@ class CotizacionCarrito {
     required this.articulos,
     required this.lineasConError,
     required this.sePuedePagar,
+    this.puntos,
   });
 
   /// La línea calculada que corresponde a la posición [i] del carrito.
@@ -157,5 +192,8 @@ class CotizacionCarrito {
         articulos: (j['articulos'] as num?)?.toInt() ?? 0,
         lineasConError: (j['lineas_con_error'] as num?)?.toInt() ?? 0,
         sePuedePagar: j['se_puede_pagar'] == true,
+        puntos: j['puntos'] is Map<String, dynamic>
+            ? PuntosCotizacion.fromJson(j['puntos'] as Map<String, dynamic>)
+            : null,
       );
 }

@@ -32,11 +32,12 @@ CARRITO (lado del cliente)
 import re
 from decimal import Decimal
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, g, jsonify, request
 
 from ..db import query
 from ..utils.granel import (calcular_importe, es_codigo_bascula,
                             leer_codigo_bascula, normalizar_peso)
+from ..utils.puntos import resumen_puntos
 from ..utils.seguridad import requiere_rol
 from .productos import CAMPOS, _completar
 
@@ -186,6 +187,11 @@ def calcular_carrito(datos):
 def cotizar():
     datos = request.get_json(silent=True) or {}
     try:
-        return jsonify(calcular_carrito(datos))
+        carrito = calcular_carrito(datos)
     except CarritoInvalido as e:
         return jsonify(error=str(e)), 400
+
+    # Puntos del cliente: cuántos puede usar y cuántos ganaría (PASO 11)
+    u = query("SELECT puntos_saldo FROM usuarios WHERE id = %s", (g.usuario_id,), one=True)
+    carrito["puntos"] = resumen_puntos(carrito, u["puntos_saldo"])
+    return jsonify(carrito)

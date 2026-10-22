@@ -36,8 +36,23 @@ class _InicioScreenState extends State<InicioScreen> {
     _usuario = widget.usuario;
     _cargarSucursal();
     CarritoService.instancia.cargar(); // para mostrar el carrito guardado
+    CarritoService.instancia.addListener(_alCambiarCarrito); // puntos nuevos al pagar
   }
 
+  @override
+  void dispose() {
+    CarritoService.instancia.removeListener(_alCambiarCarrito);
+    super.dispose();
+  }
+
+  /// Después de pagar, el carrito guarda el saldo nuevo de puntos (PASO 11).
+  void _alCambiarCarrito() {
+    final saldo = CarritoService.instancia.puntosSaldo;
+    if (mounted && saldo != null && saldo != _usuario.puntos) {
+      setState(() => _usuario = _usuario.copiarCon(puntos: saldo));
+    }
+  }
+  
   Future<void> _cargarSucursal() async {
     final guardada = await SucursalService.leerSeleccion();
     if (!mounted) return;
@@ -500,7 +515,7 @@ class _TarjetaPuntos extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 const Text(
-                  'Acumulas puntos con cada compra',
+                  '100 puntos = \$10 de descuento',
                   style: TextStyle(color: MarksColores.blanco, fontSize: 13),
                 ),
               ],

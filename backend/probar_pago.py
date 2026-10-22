@@ -68,6 +68,7 @@ def limpiar():
                         (f["vendido"], f["producto_id"], f["sucursal_id"]))
         cur.execute(f"""DELETE m FROM movimientos_inventario m JOIN ventas v ON v.id = m.venta_id
                         WHERE v.usuario_id IN ({marcas})""", ids)
+        cur.execute(f"DELETE FROM movimientos_puntos WHERE usuario_id IN ({marcas})", ids)
         cur.execute(f"DELETE FROM ventas WHERE usuario_id IN ({marcas})", ids)
         cur.execute(f"DELETE FROM bitacora_accesos WHERE usuario_id IN ({marcas})", ids)
         cur.execute(f"DELETE FROM usuarios WHERE id IN ({marcas})", ids)

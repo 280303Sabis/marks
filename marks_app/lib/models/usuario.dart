@@ -33,4 +33,14 @@ class Usuario {
       correoVerificado: verificado == true || verificado == 1,
     );
   }
+
+  /// Copia del usuario con otro saldo de puntos (por ejemplo, después de pagar).
+  Usuario copiarCon({int? puntos}) => Usuario(
+        id: id,
+        nombre: nombre,
+        correo: correo,
+        rol: rol,
+        puntos: puntos ?? this.puntos,
+        correoVerificado: correoVerificado,
+      );
 }

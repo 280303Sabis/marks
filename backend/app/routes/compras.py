@@ -1,5 +1,5 @@
 """
-COMPRAS (lado del cliente) - PASO 10
+COMPRAS (lado del cliente) - PASO 10 y PASO 11 (puntos)
 
   Solo clientes con sesión iniciada:
     POST /api/compras/pagar        paga el carrito y devuelve el ticket con su QR de salida
@@ -9,7 +9,8 @@ COMPRAS (lado del cliente) - PASO 10
     {
       "sucursal_id": 1,
       "lineas": [ ...igual que /carrito/cotizar... ],
-      "total_esperado": 187.50,                  <- el total que el cliente vio en pantalla
+      "usar_puntos": true,                       <- opcional: canjear puntos (PASO 11)
+      "total_esperado": 146.50,                  <- lo que el cliente vio que se cobraría
       "clave_pago": "1b4e28ba-2fa1-11d2-883f-0016d3cca427",   <- nueva en cada intento de pago
       "tarjeta": {"marca": "VISA", "ultimos4": "4242"}
     }
@@ -19,10 +20,12 @@ COMPRAS (lado del cliente) - PASO 10
     - El pago es SIMULADO: la API nunca recibe el número completo de la tarjeta.
     - El total lo vuelve a calcular la API (no se confía en la app).
       Si no coincide con total_esperado, NO se cobra y se pide revisar el carrito.
-    - Venta, detalle, descuento de stock y kárdex se guardan en UNA transacción:
+    - Venta, detalle, stock, kárdex y puntos se guardan en UNA transacción:
       si algo falla, no se guarda nada.
     - Si llega dos veces la misma clave_pago (el internet falló y la app reintentó),
       se devuelve la misma venta: nunca se cobra dos veces.
+    - Puntos (reglas en utils/puntos.py): se descuentan los usados y se suman
+      los ganados al pagar; cada movimiento queda en movimientos_puntos.
 """
 import re
 from datetime import datetime
@@ -32,6 +35,7 @@ import pymysql
 from flask import Blueprint, g, jsonify, request
 
 from ..db import get_db, query
+from ..utils.puntos import importe_local, puntos_a_ganar, puntos_canjeables
 from ..utils.qr import texto_qr
 from ..utils.seguridad import registrar_bitacora, requiere_rol
 from .carrito import CarritoInvalido, calcular_carrito
@@ -48,12 +52,17 @@ class SinExistencias(Exception):
     """Otro cliente se llevó el producto mientras este pagaba."""
 
 
+class PuntosInsuficientes(Exception):
+    """El saldo de puntos cambió mientras el cliente pagaba."""
+
+
 # ------------------------------------------------------------------
 # Ticket: lo que la app muestra después de pagar
 # ------------------------------------------------------------------
 def _ticket(venta_id):
     v = query("""SELECT v.id, v.folio, v.estado, v.sucursal_id, s.nombre AS sucursal,
-                        v.articulos, v.subtotal, v.ahorro, v.total,
+                        v.articulos, v.subtotal, v.ahorro, v.puntos_usados, v.descuento_puntos,
+                        v.total, v.puntos_ganados,
                         v.tarjeta_marca, v.tarjeta_ultimos4, v.pagada_en, v.validada_en
                  FROM ventas v JOIN sucursales s ON s.id = v.sucursal_id
                  WHERE v.id = %s""", (venta_id,), one=True)
@@ -74,7 +83,10 @@ def _ticket(venta_id):
         "articulos": v["articulos"],
         "subtotal": v["subtotal"],
         "ahorro": v["ahorro"],
+        "puntos_usados": v["puntos_usados"],
+        "descuento_puntos": v["descuento_puntos"],
         "total": v["total"],
+        "puntos_ganados": v["puntos_ganados"],
         "tarjeta": {"marca": v["tarjeta_marca"], "ultimos4": v["tarjeta_ultimos4"]},
         "lineas": lineas,
         # El QR solo sirve mientras la compra no ha salido de la tienda
@@ -86,6 +98,16 @@ def _venta_por_clave(clave):
     return query("SELECT id, usuario_id FROM ventas WHERE clave_pago = %s", (clave,), one=True)
 
 
+def _saldo_actual():
+    return query("SELECT puntos_saldo FROM usuarios WHERE id = %s",
+                 (g.usuario_id,), one=True)["puntos_saldo"]
+
+
+def _ya_pagada(venta_id):
+    return jsonify(mensaje="Esta compra ya estaba pagada", repetida=True,
+                   venta=_ticket(venta_id), puntos_saldo=_saldo_actual()), 200
+
+
 # ------------------------------------------------------------------
 # POST /api/compras/pagar
 # ------------------------------------------------------------------
@@ -95,7 +117,7 @@ def pagar():
     datos = request.get_json(silent=True) or {}
 
     # 1. Correo confirmado
-    u = query("SELECT correo, correo_verificado FROM usuarios WHERE id = %s",
+    u = query("SELECT correo, correo_verificado, puntos_saldo FROM usuarios WHERE id = %s",
               (g.usuario_id,), one=True)
     if not u["correo_verificado"]:
         return jsonify(error="Confirma tu correo para poder pagar",
@@ -123,8 +145,7 @@ def pagar():
     if previa:
         if previa["usuario_id"] != g.usuario_id:
             return jsonify(error="Solicitud de pago no válida"), 409
-        return jsonify(mensaje="Esta compra ya estaba pagada", repetida=True,
-                       venta=_ticket(previa["id"])), 200
+        return _ya_pagada(previa["id"])
 
     # 5. El total lo calcula la API
     try:
@@ -134,25 +155,46 @@ def pagar():
     if not carrito["se_puede_pagar"]:
         return jsonify(error="Revisa tu carrito: hay productos que no se pueden comprar",
                        codigo="CARRITO_CON_ERRORES", carrito=carrito), 409
+
+    # 6. Puntos: cuántos se usan y cuántos se ganan (PASO 11)
+    usar_puntos = datos.get("usar_puntos") is True
+    if usar_puntos:
+        puntos_usados, descuento = puntos_canjeables(u["puntos_saldo"], carrito["total"])
+        if puntos_usados == 0:
+            return jsonify(error="Tus puntos ya no alcanzan para un descuento. Revisa tu pago.",
+                           codigo="PUNTOS_CAMBIARON"), 409
+    else:
+        puntos_usados, descuento = 0, Decimal("0.00")
+    cobrado = carrito["total"] - descuento
+    puntos_ganados = puntos_a_ganar(carrito["total"], importe_local(carrito), cobrado)
+
     try:
         esperado = Decimal(str(datos.get("total_esperado"))).quantize(Decimal("0.01"))
     except (InvalidOperation, ValueError):
         return jsonify(error="Falta el total a pagar"), 400
-    if esperado != carrito["total"]:
+    if esperado != cobrado:
         return jsonify(error="El total de tu carrito cambió. Revísalo antes de pagar.",
                        codigo="TOTAL_CAMBIO", carrito=carrito), 409
 
-    # 6. Guardar todo en una sola transacción
+    # 7. Guardar todo en una sola transacción
     conn = get_db()
     try:
         with conn.cursor() as cur:
+            # Se bloquea el saldo del cliente hasta terminar (evita usar los mismos puntos dos veces)
+            cur.execute("SELECT puntos_saldo FROM usuarios WHERE id = %s FOR UPDATE",
+                        (g.usuario_id,))
+            saldo = cur.fetchone()["puntos_saldo"]
+            if saldo < puntos_usados:
+                raise PuntosInsuficientes()
+
             cur.execute("""INSERT INTO ventas
                              (clave_pago, usuario_id, sucursal_id, articulos,
-                              subtotal, ahorro, total, tarjeta_marca, tarjeta_ultimos4)
-                           VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+                              subtotal, ahorro, puntos_usados, descuento_puntos,
+                              total, puntos_ganados, tarjeta_marca, tarjeta_ultimos4)
+                           VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
                         (clave, g.usuario_id, carrito["sucursal_id"], carrito["articulos"],
-                         carrito["subtotal"], carrito["ahorro"], carrito["total"],
-                         marca, ultimos4))
+                         carrito["subtotal"], carrito["ahorro"], puntos_usados, descuento,
+                         cobrado, puntos_ganados, marca, ultimos4))
             venta_id = cur.lastrowid
             folio = f"MK-{datetime.now():%y%m%d}-{venta_id:06d}"
             cur.execute("UPDATE ventas SET folio = %s WHERE id = %s", (folio, venta_id))
@@ -188,26 +230,48 @@ def pagar():
                                VALUES (%s, %s, 'SALIDA_VENTA', %s, %s, %s, %s, %s)""",
                             (producto_id, carrito["sucursal_id"], -cantidad, stock_final,
                              g.usuario_id, venta_id, f"Venta {folio}"))
+
+            # Puntos: primero se restan los usados y luego se suman los ganados
+            if puntos_usados:
+                saldo -= puntos_usados
+                cur.execute("""INSERT INTO movimientos_puntos
+                                 (usuario_id, venta_id, tipo, puntos, saldo_final, nota)
+                               VALUES (%s, %s, 'CANJEADOS', %s, %s, %s)""",
+                            (g.usuario_id, venta_id, -puntos_usados, saldo,
+                             f"Descuento de ${descuento} en {folio}"))
+            if puntos_ganados:
+                saldo += puntos_ganados
+                cur.execute("""INSERT INTO movimientos_puntos
+                                 (usuario_id, venta_id, tipo, puntos, saldo_final, nota)
+                               VALUES (%s, %s, 'GANADOS', %s, %s, %s)""",
+                            (g.usuario_id, venta_id, puntos_ganados, saldo, f"Compra {folio}"))
+            cur.execute("UPDATE usuarios SET puntos_saldo = %s WHERE id = %s",
+                        (saldo, g.usuario_id))
         conn.commit()
     except SinExistencias as e:
         conn.rollback()
         return jsonify(error=f"{e} se agotó mientras pagabas. No se hizo ningún cobro.",
                        codigo="SIN_EXISTENCIAS"), 409
+    except PuntosInsuficientes:
+        conn.rollback()
+        return jsonify(error="Tu saldo de puntos cambió. Revisa tu pago. No se hizo ningún cobro.",
+                       codigo="PUNTOS_CAMBIARON"), 409
     except pymysql.err.IntegrityError:
         # Dos pagos con la misma clave al mismo tiempo: gana el primero
         conn.rollback()
         previa = _venta_por_clave(clave)
         if previa and previa["usuario_id"] == g.usuario_id:
-            return jsonify(mensaje="Esta compra ya estaba pagada", repetida=True,
-                           venta=_ticket(previa["id"])), 200
+            return _ya_pagada(previa["id"])
         raise
     except Exception:
         conn.rollback()
         raise
 
     registrar_bitacora("COMPRA_PAGADA", g.usuario_id, u["correo"],
-                       f"{folio} total ${carrito['total']} {marca} ****{ultimos4}")
-    return jsonify(mensaje="Pago aprobado", repetida=False, venta=_ticket(venta_id)), 201
+                       f"{folio} total ${cobrado} {marca} ****{ultimos4} "
+                       f"puntos -{puntos_usados} +{puntos_ganados}")
+    return jsonify(mensaje="Pago aprobado", repetida=False, venta=_ticket(venta_id),
+                   puntos_saldo=saldo), 201
 
 
 # ------------------------------------------------------------------

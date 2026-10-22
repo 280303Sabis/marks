@@ -172,6 +172,12 @@ class TicketScreen extends StatelessWidget {
                       valor: '-${Formato.precio(venta.ahorro)}',
                       color: MarksColores.verdeOscuro,
                     ),
+                    if (venta.puntosUsados > 0)
+                    _Fila(
+                      texto: 'Pagado con puntos (${venta.puntosUsados})',
+                      valor: '-${Formato.precio(venta.descuentoPuntos)}',
+                      color: MarksColores.verdeOscuro,
+                    ),
                   const SizedBox(height: 6),
                   Row(
                     children: [
@@ -197,6 +203,33 @@ class TicketScreen extends StatelessWidget {
                 ],
               ),
             ),
+            if (venta.puntosGanados > 0) ...[
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: MarksColores.verde,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: SombrasMarks.verde,
+                ),
+                child: Row(
+                  children: [
+                    const Icon(PhosphorIconsLight.star, color: MarksColores.blanco, size: 28),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Ganaste ${venta.puntosGanados} puntos con esta compra',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: MarksColores.blanco,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             const SizedBox(height: 24),
 
             BotonPrincipal(

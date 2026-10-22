@@ -52,8 +52,11 @@ class Venta {
   final DateTime? pagadaEn;
   final int articulos;
   final double subtotal;
-  final double ahorro;
-  final double total;
+  final double ahorro;          // por ofertas
+  final int puntosUsados;       // PASO 11
+  final double descuentoPuntos; // PASO 11: $ que descontaron los puntos
+  final double total;           // lo que se cobró a la tarjeta
+  final int puntosGanados;      // PASO 11
   final String marcaTarjeta; // VISA, MASTERCARD o AMEX
   final String ultimos4;
   final List<LineaVenta> lineas;
@@ -67,7 +70,10 @@ class Venta {
     required this.articulos,
     required this.subtotal,
     required this.ahorro,
+    required this.puntosUsados,
+    required this.descuentoPuntos,
     required this.total,
+    required this.puntosGanados,
     required this.marcaTarjeta,
     required this.ultimos4,
     required this.lineas,
@@ -87,7 +93,10 @@ class Venta {
       articulos: (j['articulos'] as num?)?.toInt() ?? 0,
       subtotal: _numero(j['subtotal']),
       ahorro: _numero(j['ahorro']),
+      puntosUsados: (j['puntos_usados'] as num?)?.toInt() ?? 0,
+      descuentoPuntos: _numero(j['descuento_puntos']),
       total: _numero(j['total']),
+      puntosGanados: (j['puntos_ganados'] as num?)?.toInt() ?? 0,
       marcaTarjeta: (tarjeta['marca'] ?? '') as String,
       ultimos4: (tarjeta['ultimos4'] ?? '') as String,
       lineas: ((j['lineas'] as List?) ?? const [])

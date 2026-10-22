@@ -12,10 +12,11 @@ import '../utils/tarjeta.dart';
 import '../widgets/soft_ui.dart';
 import 'ticket_screen.dart';
 
-/// Pantalla de pago (PASO 10). El pago es SIMULADO:
+/// Pantalla de pago (PASO 10 y 11). El pago es SIMULADO:
 /// - La tarjeta se valida aquí, en el celular.
 /// - A la API solo se envía la marca y los últimos 4 dígitos.
 /// - Nada de la tarjeta se guarda ni se imprime en la consola.
+/// - El cliente puede usar sus puntos como descuento (PASO 11).
 class PagoScreen extends StatefulWidget {
   final Sucursal sucursal;
   final CotizacionCarrito cotizacion;
@@ -38,7 +39,22 @@ class _PagoScreenState extends State<PagoScreen> {
 
   String? _marca;
   bool _pagando = false;
+  bool _usarPuntos = false;
   String? _error;
+
+  PuntosCotizacion? get _puntos => widget.cotizacion.puntos;
+
+  /// Lo que se cobrará a la tarjeta (con o sin descuento por puntos).
+  double get _totalACobrar => (_usarPuntos && _puntos != null)
+      ? _puntos!.totalConPuntos
+      : widget.cotizacion.total;
+
+  /// Puntos que ganará con esta compra.
+  int get _puntosAGanar {
+    final p = _puntos;
+    if (p == null) return 0;
+    return _usarPuntos ? p.ganariasConPuntos : p.ganarias;
+  }
 
   @override
   void initState() {
@@ -91,7 +107,8 @@ class _PagoScreenState extends State<PagoScreen> {
     try {
       final venta = await CarritoService.instancia.pagar(
         clavePago: _clavePago,
-        totalEsperado: widget.cotizacion.total,
+        totalEsperado: _totalACobrar,
+        usarPuntos: _usarPuntos,
         marca: _marca!,
         ultimos4: digitos.substring(digitos.length - 4),
       );
@@ -104,7 +121,7 @@ class _PagoScreenState extends State<PagoScreen> {
     } on ApiException catch (e) {
       if (!mounted) return;
       if (e.estado == 409) {
-        // El carrito cambió (precio, existencias, caducidad): no se cobró nada
+        // El carrito o los puntos cambiaron: no se cobró nada
         setState(() => _pagando = false);
         await _avisarYRegresar(e.mensaje);
         return;
@@ -139,6 +156,7 @@ class _PagoScreenState extends State<PagoScreen> {
   @override
   Widget build(BuildContext context) {
     final c = widget.cotizacion;
+    final p = _puntos;
 
     return PopScope(
       canPop: !_pagando, // no se puede salir mientras se procesa el pago
@@ -203,7 +221,7 @@ class _PagoScreenState extends State<PagoScreen> {
                                     style: TextStyle(fontSize: 13, color: MarksColores.textoSuave),
                                   ),
                                   Text(
-                                    Formato.precio(c.total),
+                                    Formato.precio(_totalACobrar),
                                     style: const TextStyle(
                                       fontSize: 26,
                                       fontWeight: FontWeight.w700,
@@ -216,6 +234,16 @@ class _PagoScreenState extends State<PagoScreen> {
                                         : '${c.articulos} artículos',
                                     style: const TextStyle(fontSize: 13, color: MarksColores.textoSuave),
                                   ),
+                                  if (_usarPuntos && p != null)
+                                    Text(
+                                      'Antes ${Formato.precio(c.total)} · '
+                                      'Puntos -${Formato.precio(p.descuento)}',
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: MarksColores.verdeOscuro,
+                                      ),
+                                    ),
                                 ],
                               ),
                             ),
@@ -223,6 +251,17 @@ class _PagoScreenState extends State<PagoScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
+
+                      // Puntos (PASO 11)
+                      if (p != null) ...[
+                        _TarjetaPuntos(
+                          puntos: p,
+                          usar: _usarPuntos,
+                          puntosAGanar: _puntosAGanar,
+                          alCambiar: _pagando ? null : (v) => setState(() => _usarPuntos = v),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
 
                       // Aviso de pago simulado
                       Container(
@@ -338,7 +377,7 @@ class _PagoScreenState extends State<PagoScreen> {
                       ],
 
                       BotonPrincipal(
-                        texto: 'Pagar ${Formato.precio(c.total)}',
+                        texto: 'Pagar ${Formato.precio(_totalACobrar)}',
                         icono: PhosphorIconsLight.lockSimple,
                         cargando: _pagando,
                         onPressed: _pagar,
@@ -350,6 +389,96 @@ class _PagoScreenState extends State<PagoScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Tarjeta de puntos en el pago: interruptor para canjear y puntos que ganará.
+class _TarjetaPuntos extends StatelessWidget {
+  final PuntosCotizacion puntos;
+  final bool usar;
+  final int puntosAGanar;
+  final ValueChanged<bool>? alCambiar;
+
+  const _TarjetaPuntos({
+    required this.puntos,
+    required this.usar,
+    required this.puntosAGanar,
+    required this.alCambiar,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TarjetaSuave(
+      padding: const EdgeInsets.fromLTRB(18, 14, 12, 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (puntos.puedeCanjear)
+            Row(
+              children: [
+                const IconoCirculo(icono: PhosphorIconsLight.star, tamano: 40),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Usar ${puntos.puntosUsables} puntos',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: MarksColores.azul,
+                        ),
+                      ),
+                      Text(
+                        '-${Formato.precio(puntos.descuento)} · Tienes ${puntos.saldo} puntos',
+                        style: const TextStyle(fontSize: 12.5, color: MarksColores.textoSuave),
+                      ),
+                    ],
+                  ),
+                ),
+                Switch.adaptive(value: usar, onChanged: alCambiar),
+              ],
+            )
+          else
+            Row(
+              children: [
+                const IconoCirculo(icono: PhosphorIconsLight.star, tamano: 40),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Tienes ${puntos.saldo} puntos. '
+                    'Con 100 puntos obtienes \$10 de descuento.',
+                    style: const TextStyle(fontSize: 13, height: 1.35, color: MarksColores.azul),
+                  ),
+                ),
+              ],
+            ),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 10),
+            child: Divider(height: 1, color: MarksColores.borde),
+          ),
+          Row(
+            children: [
+              const Icon(PhosphorIconsLight.plusCircle, size: 18, color: MarksColores.verdeOscuro),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  puntosAGanar > 0
+                      ? 'Con esta compra ganas $puntosAGanar puntos'
+                      : 'Esta compra no suma puntos (mínimo \$10)',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: MarksColores.verdeOscuro,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

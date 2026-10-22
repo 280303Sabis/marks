@@ -3,8 +3,10 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../models/sucursal.dart';
 import '../models/usuario.dart';
+import '../services/api_service.dart';
 import '../services/auth_service.dart';
 import '../services/carrito_service.dart';
+import '../services/compras_service.dart';
 import '../services/sucursal_service.dart';
 import '../theme/colores.dart';
 import '../utils/formato.dart';
@@ -12,7 +14,10 @@ import '../widgets/soft_ui.dart';
 import 'bienvenida_screen.dart';
 import 'carrito_screen.dart';
 import 'escaner_screen.dart';
+import 'mis_compras_screen.dart';
+import 'mis_puntos_screen.dart';
 import 'sucursal_screen.dart';
+import 'ticket_screen.dart';
 
 /// Pantalla de inicio del cliente (tablero).
 /// Solo se llega aquí con el correo ya confirmado.
@@ -29,6 +34,7 @@ class _InicioScreenState extends State<InicioScreen> {
   late Usuario _usuario;
   Sucursal? _sucursal;
   bool _cargandoSucursal = true;
+  List<String> _porSalir = const []; // compras pagadas que el guardia aún no valida (PASO 12)
 
   @override
   void initState() {
@@ -37,6 +43,7 @@ class _InicioScreenState extends State<InicioScreen> {
     _cargarSucursal();
     CarritoService.instancia.cargar(); // para mostrar el carrito guardado
     CarritoService.instancia.addListener(_alCambiarCarrito); // puntos nuevos al pagar
+    _cargarPorSalir();
   }
 
   @override
@@ -45,14 +52,29 @@ class _InicioScreenState extends State<InicioScreen> {
     super.dispose();
   }
 
-  /// Después de pagar, el carrito guarda el saldo nuevo de puntos (PASO 11).
+  /// Después de pagar, el carrito guarda el saldo nuevo de puntos (PASO 11)
+  /// y queda una compra por salir (PASO 12).
   void _alCambiarCarrito() {
-    final saldo = CarritoService.instancia.puntosSaldo;
-    if (mounted && saldo != null && saldo != _usuario.puntos) {
+    final carrito = CarritoService.instancia;
+    final saldo = carrito.puntosSaldo;
+    if (!mounted || saldo == null) return; // todavía no ha pagado en esta sesión
+    if (saldo != _usuario.puntos) {
       setState(() => _usuario = _usuario.copiarCon(puntos: saldo));
     }
+    if (carrito.vacio) _cargarPorSalir();
   }
-  
+
+  /// Revisa si hay compras pagadas que todavía no pasan por la salida.
+  Future<void> _cargarPorSalir() async {
+    try {
+      final lista = await ComprasService.listar();
+      if (!mounted) return;
+      setState(() => _porSalir = lista.porSalir);
+    } catch (_) {
+      // Sin conexión: el aviso simplemente no se muestra
+    }
+  }
+
   Future<void> _cargarSucursal() async {
     final guardada = await SucursalService.leerSeleccion();
     if (!mounted) return;
@@ -77,6 +99,38 @@ class _InicioScreenState extends State<InicioScreen> {
     } catch (_) {
       // Sin conexión: se quedan los datos que ya tenía
     }
+    await _cargarPorSalir();
+  }
+
+  /// Mis compras (PASO 12).
+  Future<void> _abrirMisCompras() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const MisComprasScreen()),
+    );
+    if (mounted) _cargarPorSalir();
+  }
+
+  /// Mis puntos (PASO 12). Al regresar se actualiza el saldo.
+  Future<void> _abrirMisPuntos() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const MisPuntosScreen()),
+    );
+    if (mounted) _recargarUsuario();
+  }
+
+  /// Abre el QR de la compra que falta pasar por la salida.
+  Future<void> _abrirCompraPorSalir() async {
+    if (_porSalir.isEmpty) return;
+    try {
+      final venta = await ComprasService.verCompra(_porSalir.first);
+      if (!mounted) return;
+      await Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => TicketScreen(venta: venta)),
+      );
+    } on ApiException catch (e) {
+      if (mounted) _mensaje(e.mensaje);
+    }
+    if (mounted) _cargarPorSalir();
   }
 
   /// Abre "Elige tu sucursal". Devuelve la sucursal elegida (o la actual).
@@ -213,8 +267,15 @@ class _InicioScreenState extends State<InicioScreen> {
                   // Carrito pendiente (solo si tiene productos)
                   _TarjetaCarrito(alTocar: _abrirCarrito),
 
-                  // Tarjeta de puntos destacada
-                  _TarjetaPuntos(puntos: _usuario.puntos),
+                  // Compra pagada que falta pasar por la salida (PASO 12)
+                  if (_porSalir.isNotEmpty)
+                    _AvisoPorSalir(
+                      cantidad: _porSalir.length,
+                      alTocar: _abrirCompraPorSalir,
+                    ),
+
+                  // Tarjeta de puntos destacada (al tocarla abre Mis puntos)
+                  _TarjetaPuntos(puntos: _usuario.puntos, alTocar: _abrirMisPuntos),
                   const SizedBox(height: 24),
 
                   // Accesos rápidos
@@ -249,7 +310,7 @@ class _InicioScreenState extends State<InicioScreen> {
                         color: MarksColores.azul,
                         titulo: 'Mis compras',
                         texto: 'Historial y tickets',
-                        onTap: () => _proximamente('Mis compras'),
+                        onTap: _abrirMisCompras,
                       ),
                       _Acceso(
                         icono: PhosphorIconsLight.mapPin,
@@ -474,67 +535,134 @@ class _TarjetaSucursalActual extends StatelessWidget {
   }
 }
 
-/// Tarjeta verde destacada con el saldo de puntos.
-class _TarjetaPuntos extends StatelessWidget {
-  final int puntos;
+/// Aviso naranja: hay compras pagadas que todavía no pasan por la salida.
+class _AvisoPorSalir extends StatelessWidget {
+  final int cantidad;
+  final VoidCallback alTocar;
 
-  const _TarjetaPuntos({required this.puntos});
+  const _AvisoPorSalir({required this.cantidad, required this.alTocar});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(22),
-      decoration: BoxDecoration(
-        color: MarksColores.verde,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: SombrasMarks.verde,
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Material(
+        color: MarksColores.alerta.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(22),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(22),
+          onTap: alTocar,
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: MarksColores.alerta.withValues(alpha: 0.45)),
+            ),
+            child: Row(
               children: [
-                const Text(
-                  'Tus puntos',
-                  style: TextStyle(
-                    color: MarksColores.blanco,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                const IconoCirculo(
+                  icono: PhosphorIconsLight.qrCode,
+                  color: MarksColores.alerta,
+                  tamano: 46,
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        cantidad == 1
+                            ? 'Tienes una compra por salir'
+                            : 'Tienes $cantidad compras por salir',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: MarksColores.azul,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      const Text(
+                        'Toca para mostrar tu QR al guardia',
+                        style: TextStyle(fontSize: 12.5, color: MarksColores.textoSuave),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  '$puntos',
-                  style: const TextStyle(
-                    color: MarksColores.blanco,
-                    fontSize: 36,
-                    fontWeight: FontWeight.w700,
-                    height: 1.1,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  '100 puntos = \$10 de descuento',
-                  style: TextStyle(color: MarksColores.blanco, fontSize: 13),
-                ),
+                const Icon(PhosphorIconsLight.caretRight, size: 18, color: MarksColores.azul),
               ],
             ),
           ),
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: MarksColores.blanco.withValues(alpha: 0.22),
-              shape: BoxShape.circle,
+        ),
+      ),
+    );
+  }
+}
+
+/// Tarjeta verde destacada con el saldo de puntos. Al tocarla abre Mis puntos.
+class _TarjetaPuntos extends StatelessWidget {
+  final int puntos;
+  final VoidCallback alTocar;
+
+  const _TarjetaPuntos({required this.puntos, required this.alTocar});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: alTocar,
+      child: Container(
+        padding: const EdgeInsets.all(22),
+        decoration: BoxDecoration(
+          color: MarksColores.verde,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: SombrasMarks.verde,
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Tus puntos',
+                    style: TextStyle(
+                      color: MarksColores.blanco,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '$puntos',
+                    style: const TextStyle(
+                      color: MarksColores.blanco,
+                      fontSize: 36,
+                      fontWeight: FontWeight.w700,
+                      height: 1.1,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    '100 puntos = \$10 de descuento · Ver movimientos',
+                    style: TextStyle(color: MarksColores.blanco, fontSize: 13),
+                  ),
+                ],
+              ),
             ),
-            child: const Icon(
-              PhosphorIconsLight.star,
-              color: MarksColores.blanco,
-              size: 30,
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: MarksColores.blanco.withValues(alpha: 0.22),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                PhosphorIconsLight.star,
+                color: MarksColores.blanco,
+                size: 30,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

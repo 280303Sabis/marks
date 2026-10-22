@@ -3,7 +3,9 @@ COMPRAS (lado del cliente) - PASO 10 y PASO 11 (puntos)
 
   Solo clientes con sesión iniciada:
     POST /api/compras/pagar        paga el carrito y devuelve el ticket con su QR de salida
+    GET  /api/compras              Mis compras: lista de compras del cliente (PASO 12)
     GET  /api/compras/<folio>      vuelve a mostrar una compra (ticket y QR)
+    GET  /api/puntos/movimientos   Mis puntos: saldo, reglas y estado de cuenta (PASO 12)
 
   Cuerpo de /compras/pagar:
     {
@@ -35,6 +37,7 @@ import pymysql
 from flask import Blueprint, g, jsonify, request
 
 from ..db import get_db, query
+from ..utils import puntos as reglas_puntos
 from ..utils.puntos import importe_local, puntos_a_ganar, puntos_canjeables
 from ..utils.qr import texto_qr
 from ..utils.seguridad import registrar_bitacora, requiere_rol
@@ -285,3 +288,56 @@ def ver_compra(folio):
     if not v:   # no existe o es de otro cliente: misma respuesta
         return jsonify(error="No encontramos esa compra"), 404
     return jsonify(venta=_ticket(v["id"]))
+
+
+
+# ------------------------------------------------------------------
+# GET /api/compras  (Mis compras - PASO 12)
+#   ?limite=50   cuántas compras devolver (1 a 100), de la más nueva a la más vieja
+# ------------------------------------------------------------------
+@bp.get("/compras")
+@requiere_rol("CLIENTE")
+def mis_compras():
+    limite = request.args.get("limite", default=50, type=int)
+    if limite is None or not 1 <= limite <= 100:
+        return jsonify(error="El límite debe ser de 1 a 100"), 400
+
+    compras = query("""SELECT v.folio, v.estado, s.nombre AS sucursal, v.pagada_en,
+                              v.articulos, v.total, v.puntos_usados, v.puntos_ganados
+                       FROM ventas v JOIN sucursales s ON s.id = v.sucursal_id
+                       WHERE v.usuario_id = %s
+                       ORDER BY v.pagada_en DESC, v.id DESC
+                       LIMIT %s""", (g.usuario_id, limite))
+    por_salir = [c["folio"] for c in compras if c["estado"] == "PAGADA"]
+    return jsonify(compras=compras, por_salir=por_salir)
+
+
+# ------------------------------------------------------------------
+# GET /api/puntos/movimientos  (Mis puntos - PASO 12)
+#   ?limite=50   cuántos movimientos devolver (1 a 100)
+# ------------------------------------------------------------------
+@bp.get("/puntos/movimientos")
+@requiere_rol("CLIENTE")
+def mis_puntos():
+    limite = request.args.get("limite", default=50, type=int)
+    if limite is None or not 1 <= limite <= 100:
+        return jsonify(error="El límite debe ser de 1 a 100"), 400
+
+    movimientos = query("""SELECT m.tipo, m.puntos, m.saldo_final, m.nota, m.fecha,
+                                  v.folio
+                           FROM movimientos_puntos m
+                           LEFT JOIN ventas v ON v.id = m.venta_id
+                           WHERE m.usuario_id = %s
+                           ORDER BY m.id DESC
+                           LIMIT %s""", (g.usuario_id, limite))
+    return jsonify(
+        saldo=_saldo_actual(),
+        reglas={
+            "pesos_por_punto": reglas_puntos.PESOS_POR_PUNTO,
+            "multiplicador_local": reglas_puntos.MULTIPLICADOR_LOCAL,
+            "puntos_por_bloque": reglas_puntos.PUNTOS_POR_BLOQUE,
+            "valor_bloque": reglas_puntos.VALOR_BLOQUE,
+            "max_porcentaje_canje": int(reglas_puntos.MAX_PORCENTAJE_CANJE * 100),
+        },
+        movimientos=movimientos,
+    )

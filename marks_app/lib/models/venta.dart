@@ -106,3 +106,56 @@ class Venta {
     );
   }
 }
+
+
+/// Una compra en la lista de "Mis compras" (resumen, sin productos).
+class ResumenCompra {
+  final String folio;
+  final String estado;       // PAGADA, VALIDADA o CANCELADA
+  final String sucursal;
+  final DateTime? pagadaEn;
+  final int articulos;
+  final double total;
+  final int puntosUsados;
+  final int puntosGanados;
+
+  const ResumenCompra({
+    required this.folio,
+    required this.estado,
+    required this.sucursal,
+    required this.pagadaEn,
+    required this.articulos,
+    required this.total,
+    required this.puntosUsados,
+    required this.puntosGanados,
+  });
+
+  /// Pagada pero el guardia todavía no escanea el QR.
+  bool get porSalir => estado == 'PAGADA';
+
+  factory ResumenCompra.fromJson(Map<String, dynamic> j) => ResumenCompra(
+        folio: (j['folio'] ?? '') as String,
+        estado: (j['estado'] ?? '') as String,
+        sucursal: (j['sucursal'] ?? '') as String,
+        pagadaEn: DateTime.tryParse((j['pagada_en'] ?? '').toString()),
+        articulos: (j['articulos'] as num?)?.toInt() ?? 0,
+        total: _numero(j['total']),
+        puntosUsados: (j['puntos_usados'] as num?)?.toInt() ?? 0,
+        puntosGanados: (j['puntos_ganados'] as num?)?.toInt() ?? 0,
+      );
+}
+
+/// Respuesta de GET /api/compras.
+class ListaCompras {
+  final List<ResumenCompra> compras;
+  final List<String> porSalir; // folios pagados que el guardia aún no valida
+
+  const ListaCompras({required this.compras, required this.porSalir});
+
+  factory ListaCompras.fromJson(Map<String, dynamic> j) => ListaCompras(
+        compras: ((j['compras'] as List?) ?? const [])
+            .map((c) => ResumenCompra.fromJson(c as Map<String, dynamic>))
+            .toList(),
+        porSalir: ((j['por_salir'] as List?) ?? const []).map((f) => f.toString()).toList(),
+      );
+}

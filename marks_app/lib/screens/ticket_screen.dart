@@ -3,18 +3,60 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../models/venta.dart';
+import '../services/api_service.dart';
+import '../services/compras_service.dart';
 import '../theme/colores.dart';
 import '../utils/formato.dart';
 import '../utils/tarjeta.dart';
 import '../widgets/soft_ui.dart';
+import 'opinar_screen.dart';
+import 'opiniones_producto_screen.dart';
 
 /// Ticket de una compra con su QR de salida (PASO 10).
 /// El guardia escanea el QR en la salida para validar la compra.
-class TicketScreen extends StatelessWidget {
+/// Desde aquí se califica cada producto (PASO 13), excepto justo al pagar.
+class TicketScreen extends StatefulWidget {
   final Venta venta;
   final bool recienPagada; // true: se acaba de pagar (muestra "Pago aprobado")
 
   const TicketScreen({super.key, required this.venta, this.recienPagada = false});
+
+  @override
+  State<TicketScreen> createState() => _TicketScreenState();
+}
+
+class _TicketScreenState extends State<TicketScreen> {
+  /// El ticket se vuelve a pedir después de opinar (para cambiar los botones).
+  late Venta venta = widget.venta;
+
+  bool get recienPagada => widget.recienPagada;
+
+  /// Calificar (si no ha opinado) o ver/editar mi opinión (si ya opinó).
+  Future<void> _opinar(LineaVenta linea) async {
+    final productoId = linea.productoId;
+    if (productoId == null) return;
+    if (linea.yaOpino) {
+      // Abre las opiniones del producto: ahí está "Editar o borrar"
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => OpinionesProductoScreen(productoId: productoId, nombre: linea.nombre),
+        ),
+      );
+    } else {
+      final cambio = await abrirOpinar(context, productoId: productoId, nombre: linea.nombre);
+      if (!cambio) return;
+    }
+    await _recargar();
+  }
+
+  Future<void> _recargar() async {
+    try {
+      final nueva = await ComprasService.verCompra(venta.folio);
+      if (mounted) setState(() => venta = nueva);
+    } on ApiException {
+      // Sin conexión: se queda el ticket que ya tenía
+    }
+  }
 
   static String _fecha(DateTime? f) {
     if (f == null) return '';
@@ -157,7 +199,14 @@ class TicketScreen extends StatelessWidget {
                     padding: EdgeInsets.symmetric(vertical: 10),
                     child: Divider(height: 1, color: MarksColores.borde),
                   ),
-                  for (final l in venta.lineas) _LineaTicket(linea: l),
+                  for (final l in venta.lineas)
+                    _LineaTicket(
+                      linea: l,
+                      // Al recién pagar no se muestra: primero hay que probar el producto
+                      alOpinar: (!recienPagada && venta.permiteOpinar && l.admiteOpinion)
+                          ? () => _opinar(l)
+                          : null,
+                    ),
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 10),
                     child: Divider(height: 1, color: MarksColores.borde),
@@ -172,7 +221,7 @@ class TicketScreen extends StatelessWidget {
                       valor: '-${Formato.precio(venta.ahorro)}',
                       color: MarksColores.verdeOscuro,
                     ),
-                    if (venta.puntosUsados > 0)
+                  if (venta.puntosUsados > 0)
                     _Fila(
                       texto: 'Pagado con puntos (${venta.puntosUsados})',
                       valor: '-${Formato.precio(venta.descuentoPuntos)}',
@@ -279,7 +328,10 @@ class _Fila extends StatelessWidget {
 class _LineaTicket extends StatelessWidget {
   final LineaVenta linea;
 
-  const _LineaTicket({required this.linea});
+  /// null: no se muestra el botón de opinar.
+  final VoidCallback? alOpinar;
+
+  const _LineaTicket({required this.linea, this.alOpinar});
 
   @override
   Widget build(BuildContext context) {
@@ -308,6 +360,22 @@ class _LineaTicket extends StatelessWidget {
                   linea.tieneOferta ? '$detalle  (oferta)' : detalle,
                   style: const TextStyle(fontSize: 12.5, color: MarksColores.textoSuave),
                 ),
+                if (alOpinar != null)
+                  TextButton.icon(
+                    onPressed: alOpinar,
+                    icon: Icon(
+                      linea.yaOpino ? PhosphorIconsFill.star : PhosphorIconsLight.star,
+                      size: 16,
+                      color: const Color(0xFFF2B01E),
+                    ),
+                    label: Text(linea.yaOpino ? 'Ver mi opinión' : 'Calificar'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: MarksColores.verdeOscuro,
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      minimumSize: const Size(0, 36),
+                      textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                    ),
+                  ),
               ],
             ),
           ),

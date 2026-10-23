@@ -396,7 +396,11 @@ class _VisorFotosState extends State<_VisorFotos> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
-        title: Text('${_actual + 1} de ${widget.fotos.length}'),
+        // Color blanco forzado: el tema de la app pinta los títulos de azul oscuro
+        title: Text(
+          '${_actual + 1} de ${widget.fotos.length}',
+          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+        ),
         leading: IconButton(
           tooltip: 'Cerrar',
           icon: const Icon(PhosphorIconsLight.x),

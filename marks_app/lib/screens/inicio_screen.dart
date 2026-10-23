@@ -7,6 +7,7 @@ import '../services/api_service.dart';
 import '../services/auth_service.dart';
 import '../services/carrito_service.dart';
 import '../services/compras_service.dart';
+import '../services/opiniones_service.dart';
 import '../services/sucursal_service.dart';
 import '../theme/colores.dart';
 import '../utils/formato.dart';
@@ -15,6 +16,7 @@ import 'bienvenida_screen.dart';
 import 'carrito_screen.dart';
 import 'escaner_screen.dart';
 import 'mis_compras_screen.dart';
+import 'mis_opiniones_screen.dart';
 import 'mis_puntos_screen.dart';
 import 'sucursal_screen.dart';
 import 'ticket_screen.dart';
@@ -35,6 +37,7 @@ class _InicioScreenState extends State<InicioScreen> {
   Sucursal? _sucursal;
   bool _cargandoSucursal = true;
   List<String> _porSalir = const []; // compras pagadas que el guardia aún no valida (PASO 12)
+  int _porCalificar = 0; // productos comprados sin opinión (PASO 13)
 
   @override
   void initState() {
@@ -44,6 +47,7 @@ class _InicioScreenState extends State<InicioScreen> {
     CarritoService.instancia.cargar(); // para mostrar el carrito guardado
     CarritoService.instancia.addListener(_alCambiarCarrito); // puntos nuevos al pagar
     _cargarPorSalir();
+    _cargarPorCalificar();
   }
 
   @override
@@ -75,6 +79,17 @@ class _InicioScreenState extends State<InicioScreen> {
     }
   }
 
+  /// Cuántos productos comprados faltan por calificar (PASO 13).
+  Future<void> _cargarPorCalificar() async {
+    try {
+      final mias = await OpinionesService.mias();
+      if (!mounted) return;
+      setState(() => _porCalificar = mias.pendientes.length);
+    } catch (_) {
+      // Sin conexión: la tarjeta dice el texto normal
+    }
+  }
+
   Future<void> _cargarSucursal() async {
     final guardada = await SucursalService.leerSeleccion();
     if (!mounted) return;
@@ -100,6 +115,7 @@ class _InicioScreenState extends State<InicioScreen> {
       // Sin conexión: se quedan los datos que ya tenía
     }
     await _cargarPorSalir();
+    await _cargarPorCalificar();
   }
 
   /// Mis compras (PASO 12).
@@ -107,7 +123,18 @@ class _InicioScreenState extends State<InicioScreen> {
     await Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => const MisComprasScreen()),
     );
-    if (mounted) _cargarPorSalir();
+    if (mounted) {
+      _cargarPorSalir();
+      _cargarPorCalificar(); // pudo calificar desde un ticket
+    }
+  }
+
+  /// Mis opiniones (PASO 13). Al regresar se actualiza "por calificar".
+  Future<void> _abrirMisOpiniones() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const MisOpinionesScreen()),
+    );
+    if (mounted) _cargarPorCalificar();
   }
 
   /// Mis puntos (PASO 12). Al regresar se actualiza el saldo.
@@ -311,6 +338,23 @@ class _InicioScreenState extends State<InicioScreen> {
                         titulo: 'Mis compras',
                         texto: 'Historial y tickets',
                         onTap: _abrirMisCompras,
+                      ),
+                      _Acceso(
+                        icono: PhosphorIconsLight.chatText,
+                        color: MarksColores.alerta,
+                        titulo: 'Mis opiniones',
+                        texto: _porCalificar > 0
+                            ? '$_porCalificar por calificar'
+                            : 'Califica tus productos',
+                        destacado: _porCalificar > 0,
+                        onTap: _abrirMisOpiniones,
+                      ),
+                      _Acceso(
+                        icono: PhosphorIconsLight.gift,
+                        color: MarksColores.verde,
+                        titulo: 'Mis puntos',
+                        texto: 'Saldo y movimientos',
+                        onTap: _abrirMisPuntos,
                       ),
                       _Acceso(
                         icono: PhosphorIconsLight.mapPin,
@@ -675,6 +719,7 @@ class _Acceso extends StatelessWidget {
   final String titulo;
   final String texto;
   final VoidCallback onTap;
+  final bool destacado; // texto en color (ej. "2 por calificar")
 
   const _Acceso({
     required this.icono,
@@ -682,6 +727,7 @@ class _Acceso extends StatelessWidget {
     required this.titulo,
     required this.texto,
     required this.onTap,
+    this.destacado = false,
   });
 
   @override
@@ -709,7 +755,11 @@ class _Acceso extends StatelessWidget {
             texto,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 12.5, color: MarksColores.textoSuave),
+            style: TextStyle(
+              fontSize: 12.5,
+              fontWeight: destacado ? FontWeight.w600 : FontWeight.w400,
+              color: destacado ? MarksColores.alerta : MarksColores.textoSuave,
+            ),
           ),
         ],
       ),

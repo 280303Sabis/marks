@@ -7,9 +7,11 @@ import '../services/opiniones_service.dart';
 import '../theme/colores.dart';
 import '../widgets/opiniones_ui.dart';
 import '../widgets/soft_ui.dart';
+import 'opinar_screen.dart';
 
 /// Opiniones de un producto (PASO 13): promedio, barritas por estrella,
 /// mi opinión y lo que dicen los demás clientes (con fotos y Reportar).
+/// Desde aquí se califica el producto o se edita mi opinión (PASO 13.5).
 class OpinionesProductoScreen extends StatefulWidget {
   final int productoId;
   final String nombre;
@@ -53,6 +55,17 @@ class _OpinionesProductoScreenState extends State<OpinionesProductoScreen> {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text(texto)));
+  }
+
+  /// Abre Calificar / Editar. Si se guardó o se borró algo, recarga.
+  Future<void> _abrirOpinar({Opinion? existente}) async {
+    final cambio = await abrirOpinar(
+      context,
+      productoId: widget.productoId,
+      nombre: widget.nombre,
+      existente: existente,
+    );
+    if (cambio && mounted) _cargar();
   }
 
   /// Pide el motivo y manda el reporte. La opinión sigue visible: solo se avisa al admin.
@@ -227,10 +240,53 @@ class _OpinionesProductoScreenState extends State<OpinionesProductoScreen> {
                 : ResumenEstrellas(resumen: d.resumen),
           ),
 
+          // Invitación a calificar (compró el producto y todavía no opina)
+          if (mia == null && d.puedeOpinar) ...[
+            const SizedBox(height: 16),
+            TarjetaSuave(
+              padding: const EdgeInsets.all(18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Text(
+                    '¿Ya lo probaste?',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: MarksColores.azul,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Compraste este producto. Tu opinión ayuda a otros clientes.',
+                    style: TextStyle(fontSize: 13, color: MarksColores.textoSuave),
+                  ),
+                  const SizedBox(height: 14),
+                  BotonPrincipal(
+                    texto: 'Calificar producto',
+                    icono: PhosphorIconsLight.star,
+                    onPressed: () => _abrirOpinar(),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
           // Mi opinión
           if (mia != null) ...[
             const _Titulo('Tu opinión'),
-            TarjetaOpinion(opinion: mia),
+            TarjetaOpinion(
+              opinion: mia,
+              pie: Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: () => _abrirOpinar(existente: mia),
+                  icon: const Icon(PhosphorIconsLight.pencilSimple, size: 18),
+                  label: const Text('Editar o borrar'),
+                  style: TextButton.styleFrom(foregroundColor: MarksColores.verdeOscuro),
+                ),
+              ),
+            ),
           ],
 
           // Las de los demás

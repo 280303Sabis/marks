@@ -15,6 +15,7 @@ import '../widgets/soft_ui.dart';
 import 'bienvenida_screen.dart';
 import 'carrito_screen.dart';
 import 'escaner_screen.dart';
+import 'mi_perfil_screen.dart';
 import 'mis_compras_screen.dart';
 import 'mis_opiniones_screen.dart';
 import 'mis_puntos_screen.dart';
@@ -103,7 +104,13 @@ class _InicioScreenState extends State<InicioScreen> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(texto)));
   }
 
-  void _proximamente(String opcion) => _mensaje('$opcion: disponible muy pronto');
+   /// Mi perfil (PASO 14). Al regresar se recarga el usuario (pudo cambiar su nombre).
+  Future<void> _abrirMiPerfil() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => MiPerfilScreen(usuario: _usuario)),
+    );
+    if (mounted) _recargarUsuario();
+  }
 
   /// Vuelve a leer los datos del usuario desde la API.
   Future<void> _recargarUsuario() async {
@@ -368,7 +375,7 @@ class _InicioScreenState extends State<InicioScreen> {
                         color: MarksColores.verdeOscuro,
                         titulo: 'Mi perfil',
                         texto: 'Cuenta y privacidad',
-                        onTap: () => _proximamente('Mi perfil'),
+                        onTap: _abrirMiPerfil,
                       ),
                     ],
                   ),

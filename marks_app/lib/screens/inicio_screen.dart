@@ -12,6 +12,7 @@ import '../services/sucursal_service.dart';
 import '../theme/colores.dart';
 import '../utils/formato.dart';
 import '../widgets/soft_ui.dart';
+import 'aviso_privacidad_screen.dart';
 import 'bienvenida_screen.dart';
 import 'carrito_screen.dart';
 import 'escaner_screen.dart';
@@ -39,6 +40,7 @@ class _InicioScreenState extends State<InicioScreen> {
   bool _cargandoSucursal = true;
   List<String> _porSalir = const []; // compras pagadas que el guardia aún no valida (PASO 12)
   int _porCalificar = 0; // productos comprados sin opinión (PASO 13)
+  bool _pidiendoAviso = false; // ya se está mostrando el aviso nuevo (PASO 14)
 
   @override
   void initState() {
@@ -49,6 +51,8 @@ class _InicioScreenState extends State<InicioScreen> {
     CarritoService.instancia.addListener(_alCambiarCarrito); // puntos nuevos al pagar
     _cargarPorSalir();
     _cargarPorCalificar();
+    // PASO 14: en cuanto se dibuje el Inicio, revisa si falta aceptar el aviso nuevo
+    WidgetsBinding.instance.addPostFrameCallback((_) => _revisarAviso());
   }
 
   @override
@@ -118,6 +122,7 @@ class _InicioScreenState extends State<InicioScreen> {
       final actualizado = await AuthService.usuarioActual();
       if (!mounted || actualizado == null) return;
       setState(() => _usuario = actualizado);
+      _revisarAviso(); // por si el aviso cambió con la app abierta
     } catch (_) {
       // Sin conexión: se quedan los datos que ya tenía
     }
@@ -215,10 +220,14 @@ class _InicioScreenState extends State<InicioScreen> {
       icono: PhosphorIconsLight.signOut,
       peligro: true,
     );
-    if (!confirmar) return;
+        if (!confirmar) return;
+    await _terminarSesion();
+  }
 
+  /// Borra el carrito y la sesión del celular y regresa a la bienvenida.
+  Future<void> _terminarSesion() async {
     // El carrito se borra del celular para que la siguiente persona no lo vea
-    await carrito.vaciar();
+    await CarritoService.instancia.vaciar();
     await AuthService.cerrarSesion();
     if (!mounted) return;
 
@@ -227,6 +236,27 @@ class _InicioScreenState extends State<InicioScreen> {
       MaterialPageRoute(builder: (_) => const BienvenidaScreen()),
       (_) => false,
     );
+  }
+
+  /// PASO 14: si el Aviso de Privacidad cambió desde que lo aceptó,
+  /// se le pide aceptarlo antes de seguir. Si no lo acepta, se cierra la sesión.
+  Future<void> _revisarAviso() async {
+    if (!mounted || _pidiendoAviso || !_usuario.avisoPendiente) return;
+    _pidiendoAviso = true;
+    final acepto = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (_) => const AvisoPrivacidadScreen(paraAceptar: true),
+      ),
+    );
+    _pidiendoAviso = false;
+    if (!mounted) return;
+    if (acepto == true) {
+      setState(() => _usuario = _usuario.copiarCon(avisoPendiente: false));
+      _mensaje('Gracias. Aceptaste el Aviso de Privacidad');
+    } else {
+      await _terminarSesion();
+    }
   }
 
   @override

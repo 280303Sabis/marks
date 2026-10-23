@@ -4,6 +4,7 @@ AUTENTICACIÓN de MARK'S
   POST /api/auth/registro   crear cuenta de CLIENTE (requiere aceptar Aviso de Privacidad)
   POST /api/auth/login      iniciar sesión (bloqueo tras 3 intentos fallidos)
   GET  /api/auth/yo         datos del usuario con sesión activa
+                            (incluye aviso_pendiente: debe aceptar el Aviso de Privacidad nuevo)
 """
 from datetime import date
 
@@ -191,4 +192,9 @@ def yo():
                         u.version_aviso_privacidad, r.nombre AS rol
                  FROM usuarios u JOIN roles r ON r.id = u.rol_id
                  WHERE u.id = %s""", (g.usuario_id,), one=True)
+    # PASO 14: si el Aviso de Privacidad cambió desde que lo aceptó, la app
+    # le muestra el nuevo y le pide aceptarlo (POST /api/cuenta/aceptar-aviso).
+    vigente = current_app.config["AVISO_PRIVACIDAD_VERSION"]
+    u["aviso_vigente"] = vigente
+    u["aviso_pendiente"] = u["version_aviso_privacidad"] != vigente
     return jsonify(u)

@@ -4,8 +4,9 @@ MI CUENTA (perfil del cliente) y DOCUMENTOS LEGALES
   Público:
     GET    /api/legal/aviso-privacidad        texto vigente del Aviso de Privacidad
 
-  Requieren sesión:
-    PUT    /api/cuenta/perfil                 editar mis datos (solo CLIENTE, Rectificación)
+    Requieren sesión:
+    POST   /api/cuenta/aceptar-aviso          {"version": "1.2"}  aceptar el Aviso de Privacidad nuevo
+    PUT    /api/cuenta/perfil                editar mis datos (solo CLIENTE, Rectificación)
     POST   /api/cuenta/cambiar-password       {"password_actual", "password_nueva"}
     POST   /api/cuenta/cerrar-sesiones        cierra la sesión en todos los dispositivos
     GET    /api/cuenta/exportar               copia de mis datos: perfil, compras, puntos y opiniones (Acceso)
@@ -41,6 +42,34 @@ def _usuario_actual():
 @bp.get("/legal/aviso-privacidad")
 def ver_aviso():
     return jsonify(aviso_privacidad.como_diccionario())
+
+
+# ------------------------------------------------------------------
+# ACEPTAR EL AVISO DE PRIVACIDAD NUEVO (PASO 14)
+# ------------------------------------------------------------------
+@bp.post("/cuenta/aceptar-aviso")
+@requiere_rol()
+def aceptar_aviso():
+    """
+    Body JSON: {"version": "1.2"}
+    La app manda la versión que el usuario LEYÓ. Si no es la vigente
+    (el aviso cambió mientras lo leía), se rechaza para que lea el nuevo.
+    """
+    d = request.get_json(silent=True) or {}
+    leida = str(d.get("version") or "").strip()
+    vigente = current_app.config["AVISO_PRIVACIDAD_VERSION"]
+    if leida != vigente:
+        return jsonify(error="El Aviso de Privacidad cambió. Vuelve a leerlo",
+                       codigo="AVISO_CAMBIO", vigente=vigente), 409
+
+    conn = get_db()
+    with conn.cursor() as cur:
+        cur.execute("""UPDATE usuarios
+                       SET acepto_privacidad_en = NOW(), version_aviso_privacidad = %s
+                       WHERE id = %s""", (vigente, g.usuario_id))
+    conn.commit()
+    registrar_bitacora("AVISO_ACEPTADO", g.usuario_id, None, f"Aviso de privacidad v{vigente}")
+    return jsonify(mensaje="Gracias. Aceptaste el Aviso de Privacidad", version=vigente)
 
 
 # ------------------------------------------------------------------

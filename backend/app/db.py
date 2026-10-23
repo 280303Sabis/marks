@@ -1,10 +1,26 @@
-"""Conexión a MySQL con PyMySQL.
+"""Conexión a MySQL con PyMySQL (local o Aiven con SSL).
 
 Se abre UNA conexión por cada petición que llega a la API
 y se cierra automáticamente al terminar la petición.
 """
+import os
+
 import pymysql
 from flask import current_app, g
+
+
+def _ssl_config(cfg):
+    """Devuelve la configuración SSL si hay certificado CA en el .env."""
+    ca = cfg.get("DB_SSL_CA", "")
+    if not ca:
+        return None  # MySQL local, sin SSL
+    if not os.path.isabs(ca):
+        # ruta relativa -> se busca dentro de la carpeta backend
+        backend = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        ca = os.path.join(backend, ca)
+    if not os.path.isfile(ca):
+        raise RuntimeError(f"No se encontró el certificado CA en: {ca}")
+    return {"ca": ca}
 
 
 def get_db():
@@ -20,6 +36,7 @@ def get_db():
             charset="utf8mb4",
             cursorclass=pymysql.cursors.DictCursor,  # filas como diccionarios
             autocommit=False,
+            ssl=_ssl_config(cfg),
         )
     return g.db
 

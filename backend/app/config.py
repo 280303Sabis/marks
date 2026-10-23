@@ -14,6 +14,9 @@ class Config:
     DB_USER = os.getenv("DB_USER", "root")
     DB_PASSWORD = os.getenv("DB_PASSWORD", "")
     DB_NAME = os.getenv("DB_NAME", "marks_db")
+    # Certificado CA para conectarse con SSL (Aiven lo exige).
+    # Vacío = sin SSL (MySQL local). Ruta relativa = dentro de la carpeta backend.
+    DB_SSL_CA = os.getenv("DB_SSL_CA", "")
 
     # ---------- Sesión (token JWT) ----------
     JWT_SECRET = os.getenv("JWT_SECRET", "")

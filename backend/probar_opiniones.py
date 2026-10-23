@@ -143,10 +143,16 @@ with app.app_context():
         url = f"/api/productos/{CAFE}/opiniones"
 
         # ---------- Ver opiniones de un producto ----------
+        # El producto puede tener opiniones reales de antes: se guardan como "base"
+        # y las pruebas comparan contra ella (así no importa lo que ya haya en la base).
         r = cliente.get(url, headers=A)
         d = r.get_json()
-        revisar("Producto sin opiniones: total 0", r.status_code == 200
-                and d["resumen"]["total"] == 0 and d["opiniones"] == [], d)
+        base = d["resumen"]["por_estrellas"]
+        base_total = d["resumen"]["total"]
+        base_suma = sum(int(e) * n for e, n in base.items())
+        revisar("Ver opiniones: 200 con resumen (total, promedio y por estrellas)",
+                r.status_code == 200 and set(base) == {"5", "4", "3", "2", "1"}
+                and base_total == sum(base.values()), d)
         revisar("Quien compró puede opinar", d["puede_opinar"] is True, d)
         revisar("Quien no compró no puede opinar",
                 cliente.get(url, headers=C).get_json()["puede_opinar"] is False)
@@ -185,7 +191,7 @@ with app.app_context():
                       (op.get("id"),))
         revisar("2 fotos guardadas en la base y en la carpeta",
                 len(fotos) == 2 and all(os.path.isfile(os.path.join(CARPETA, f["archivo"])) for f in fotos))
-         # "with" cierra el archivo al terminar (en Windows, un archivo abierto no se puede borrar)
+        # "with" cierra el archivo al terminar (en Windows, un archivo abierto no se puede borrar)
         with Image.open(os.path.join(CARPETA, fotos[0]["archivo"])) as f1:
             tamano, exif, formato = (f1.width, f1.height), dict(f1.getexif()), f1.format
         revisar("Foto reducida a máx. 1280 px y girada (960x1280)", tamano == (960, 1280), tamano)
@@ -204,13 +210,17 @@ with app.app_context():
                 and cliente.get("/api/opiniones/fotos/" + "0" * 32 + ".jpg").status_code == 404)
 
         # ---------- Promedio con dos opiniones ----------
-        cliente.post(url, headers=B, data=formulario(3, "Está bien"))
+        op_b = cliente.post(url, headers=B, data=formulario(3, "Está bien")).get_json()["opinion"]
         d = cliente.get(url, headers=B).get_json()
-        revisar("Promedio 4.0 con 5 y 3 estrellas",
-                d["resumen"]["total"] == 2 and d["resumen"]["promedio"] == 4.0
-                and d["resumen"]["por_estrellas"] == {"5": 1, "4": 0, "3": 1, "2": 0, "1": 0}, d["resumen"])
+        esperado = dict(base, **{"5": base["5"] + 1, "3": base["3"] + 1})
+        revisar("Promedio y conteo suman el 5 y el 3 nuevos",
+                d["resumen"]["total"] == base_total + 2
+                and d["resumen"]["por_estrellas"] == esperado
+                and d["resumen"]["promedio"] == round((base_suma + 8) / (base_total + 2), 1),
+                d["resumen"])
         revisar("es_mia solo en la opinión propia",
-                [o["es_mia"] for o in d["opiniones"]] == [True, False], d["opiniones"])
+                {o["id"]: o["es_mia"] for o in d["opiniones"] if o["id"] in (op["id"], op_b["id"])}
+                == {op["id"]: False, op_b["id"]: True}, d["opiniones"])
 
         # ---------- Reportar ----------
         rid = f"/api/opiniones/{op['id']}/reportar"
@@ -267,8 +277,9 @@ with app.app_context():
         # ---------- El admin oculta una opinión ----------
         ejecutar("UPDATE opiniones SET estado = 'OCULTA' WHERE id = %s", (op["id"],))
         d = cliente.get(url, headers=B).get_json()
-        revisar("Oculta: los demás no la ven y el promedio cambia",
-                d["resumen"]["total"] == 1 and d["resumen"]["promedio"] == 3.0
+        revisar("Oculta: los demás no la ven y ya no cuenta en el promedio",
+                d["resumen"]["total"] == base_total + 1
+                and d["resumen"]["por_estrellas"] == dict(base, **{"3": base["3"] + 1})
                 and all(o["id"] != op["id"] for o in d["opiniones"]), d["resumen"])
         d = cliente.get(url, headers=A).get_json()
         revisar("Su autor sí la ve (como OCULTA)",

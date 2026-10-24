@@ -1,0 +1,47 @@
+# =====================================================
+#  MARK'S - Publicar la API en Render (plan gratuito)
+#
+#  Render lee este archivo al crear un "Blueprint" desde el repo.
+#  La API queda en https://<nombre>.onrender.com y usa la base de Aiven.
+#
+#  Lo que se llena a mano en el panel de Render (NUNCA en GitHub):
+#    - DB_PASSWORD           contraseña de Aiven (avnadmin)
+#    - MAIL_USUARIO / MAIL_PASSWORD   solo si MAIL_MODO=gmail
+#    - Secret File "ca.pem"  el certificado CA de Aiven
+#      (Render lo guarda en /etc/secrets/ca.pem)
+# =====================================================
+services:
+  - type: web
+    name: marks-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    # run.py crea la app Flask; gunicorn la sirve en el puerto que da Render
+    startCommand: gunicorn run:app --bind 0.0.0.0:$PORT --workers 2 --timeout 60
+    healthCheckPath: /api/sucursales
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.9
+      - key: DB_HOST
+        value: mysql-2cbc0f08-marks-dbase.b.aivencloud.com
+      - key: DB_PORT
+        value: "15060"
+      - key: DB_USER
+        value: avnadmin
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        value: marks_db
+      - key: DB_SSL_CA
+        value: /etc/secrets/ca.pem
+      - key: JWT_SECRET
+        generateValue: true
+      - key: MAIL_MODO
+        value: consola
+      - key: MAIL_USUARIO
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: MAIL_PUERTO
+        value: "465"

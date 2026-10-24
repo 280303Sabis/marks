@@ -15,5 +15,7 @@ class ApiConfig {
   );
 
   /// Tiempo máximo de espera por una respuesta de la API.
-  static const Duration tiempoEspera = Duration(seconds: 10);
+  /// En Render (plan gratuito) la API se duerme y tarda hasta ~50 s
+  /// en despertar con la primera petición, por eso se espera 60 s.
+  static const Duration tiempoEspera = Duration(seconds: 60);
 }

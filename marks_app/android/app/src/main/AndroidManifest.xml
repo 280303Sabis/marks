@@ -1,9 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Internet para hablar con la API (sin esto el APK final no se conecta) -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <!-- Cámara para escanear códigos de barras (PASO 7) -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <application
-        android:label="marks_app"
+        android:label="MARK'S"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

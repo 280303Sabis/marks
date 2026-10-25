@@ -2,21 +2,27 @@
 Envío de correos de MARK'S.
 
   MAIL_MODO=gmail   -> usa el servidor SMTP de Gmail con una contraseña de aplicación
+  MAIL_MODO=brevo   -> usa la API de Brevo por HTTPS (para Render gratis, que
+                       bloquea los puertos SMTP). Requiere BREVO_API_KEY.
   MAIL_MODO=consola -> no envía nada, imprime el correo en la terminal de Flask
 
   MAIL_PUERTO=465   -> conexión cifrada desde el inicio (SSL). Recomendado.
   MAIL_PUERTO=587   -> conexión que se cifra después (STARTTLS).
 
-Seguridad: este módulo NUNCA imprime la contraseña ni la conversación con Gmail.
+Seguridad: este módulo NUNCA imprime la contraseña, la API key ni la conversación con Gmail.
 """
+import json
 import smtplib
 import ssl
+import urllib.error
+import urllib.request
 from email.message import EmailMessage
 from email.utils import formataddr
 
 from flask import current_app
 
 GMAIL_SERVIDOR = "smtp.gmail.com"
+BREVO_URL = "https://api.brevo.com/v3/smtp/email"
 
 
 def conectar(puerto):
@@ -54,9 +60,51 @@ def crear_mensaje(destinatario, asunto, texto, html=None):
     return msg
 
 
+def enviar_con_brevo(destinatario, asunto, texto, html=None):
+    """
+    Manda el correo con la API de Brevo (HTTPS, puerto 443).
+    El remitente (MAIL_USUARIO) debe estar verificado en Brevo como "sender".
+    """
+    cfg = current_app.config
+    datos = {
+        "sender": {"name": cfg["MAIL_NOMBRE_REMITENTE"], "email": cfg["MAIL_USUARIO"]},
+        "to": [{"email": destinatario}],
+        "subject": asunto,
+        "textContent": texto,
+    }
+    if html:
+        datos["htmlContent"] = html
+
+    peticion = urllib.request.Request(
+        BREVO_URL,
+        data=json.dumps(datos).encode("utf-8"),
+        headers={
+            "api-key": cfg["BREVO_API_KEY"],
+            "accept": "application/json",
+            "content-type": "application/json",
+        },
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(peticion, timeout=20):
+            return True
+    except urllib.error.HTTPError as e:
+        # Brevo explica el problema en el cuerpo (API key mala, remitente sin verificar...)
+        detalle = e.read().decode("utf-8", errors="replace")[:300]
+        current_app.logger.error(f"Brevo rechazó el correo a {destinatario} "
+                                 f"(HTTP {e.code}): {detalle}")
+        return False
+    except Exception as e:
+        current_app.logger.error(f"No se pudo enviar el correo a {destinatario} con Brevo: {e}")
+        return False
+
+
 def enviar_correo(destinatario, asunto, texto, html=None):
     """Devuelve True si se envió (o se imprimió) y False si hubo un error."""
     cfg = current_app.config
+
+    if cfg["MAIL_MODO"] == "brevo":
+        return enviar_con_brevo(destinatario, asunto, texto, html)
 
     if cfg["MAIL_MODO"] != "gmail":
         print("\n" + "=" * 60)

@@ -71,7 +71,8 @@ def confirmar_correo():
     with conn.cursor() as cur:
         cur.execute("UPDATE usuarios SET correo_verificado = TRUE WHERE id = %s", (g.usuario_id,))
     conn.commit()
-    registrar_bitacora("CORREO_CONFIRMADO", g.usuario_id)
+    u = query("SELECT correo FROM usuarios WHERE id = %s", (g.usuario_id,), one=True)
+    registrar_bitacora("CORREO_CONFIRMADO", g.usuario_id, u["correo"])
     return jsonify(mensaje="Correo confirmado correctamente")
 
 

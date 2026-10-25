@@ -1,0 +1,217 @@
+/*
+  admin.css - Vistas del administrador (dashboard, más vendidos, historial)
+  -------------------------------------------------------------------------
+  Las páginas arrancan sin datos. El JavaScript llenará cada elemento
+  marcado con id cuando existan las rutas de la API para el administrador.
+*/
+
+.admin-container {
+    width: 90%;
+    max-width: 1150px;
+    margin: 30px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.admin-header {
+    background: white;
+    padding: 28px 32px;
+    border-radius: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.admin-header h1 {
+    font-size: 26px;
+    color: #2b581b;
+    margin: 8px 0 5px 0;
+}
+
+.admin-header p {
+    font-size: 14.5px;
+    color: #666;
+}
+
+.admin-badge {
+    background-color: #e2fbe0;
+    color: #2e7d32;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Barra de filtros */
+.filter-bar {
+    background: white;
+    padding: 20px 30px;
+    border-radius: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filter-group label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2b581b;
+}
+
+.filter-select, .search-input {
+    padding: 10px 14px;
+    border: 1px solid #c8e6c9;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    background: #f8faf7;
+}
+
+.filter-select:focus, .search-input:focus {
+    border-color: #72db51;
+    box-shadow: 0 0 5px rgba(114, 219, 81, 0.4);
+}
+
+/* Tarjetas de indicadores */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.kpi-card {
+    background: white;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    border-left: 5px solid #72db51;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.kpi-card span {
+    font-size: 13px;
+    color: #666;
+    font-weight: 600;
+}
+
+.kpi-card h3 {
+    font-size: 24px;
+    color: #2b581b;
+}
+
+.kpi-card small {
+    font-size: 12px;
+    color: #888;
+}
+
+/* Tarjetas de contenido */
+.admin-card {
+    background: white;
+    padding: 28px 30px;
+    border-radius: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+}
+
+.admin-card h2 {
+    color: #2b581b;
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+
+.admin-card > p {
+    color: #666;
+    font-size: 14px;
+}
+
+.admin-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 25px;
+}
+
+.admin-side {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* Tablas */
+.table-wrap {
+    overflow-x: auto;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 14px;
+    margin-top: 15px;
+}
+
+.admin-table th {
+    background-color: #eafbe3;
+    color: #2b581b;
+    padding: 14px;
+    border-bottom: 2px solid #c8e6c9;
+    white-space: nowrap;
+}
+
+.admin-table td {
+    padding: 14px;
+    border-bottom: 1px solid #eee;
+}
+
+/* Estado vacío: se muestra mientras no haya registros */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #888;
+}
+
+.empty-state .empty-icon {
+    font-size: 32px;
+    display: block;
+    margin-bottom: 10px;
+    opacity: 0.6;
+}
+
+.empty-state strong {
+    display: block;
+    color: #555;
+    font-size: 15px;
+    margin-bottom: 4px;
+}
+
+.empty-state p {
+    font-size: 13.5px;
+}
+
+.admin-table td.empty-state {
+    border-bottom: none;
+}
+
+@media (max-width: 900px) {
+    .admin-grid {
+        grid-template-columns: 1fr;
+    }
+    .admin-header, .filter-bar, .admin-card {
+        padding: 20px;
+    }
+}

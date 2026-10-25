@@ -34,11 +34,13 @@ class Config:
 
     # ---------- Envío de correos ----------
     # MAIL_MODO = "gmail"   -> envía correos reales por Gmail
+    # MAIL_MODO = "brevo"   -> envía correos reales con la API de Brevo (Render gratis)
     # MAIL_MODO = "consola" -> solo imprime el correo en la terminal (pruebas)
     MAIL_MODO = os.getenv("MAIL_MODO", "consola").lower()
-    MAIL_USUARIO = os.getenv("MAIL_USUARIO", "")
+    MAIL_USUARIO = os.getenv("MAIL_USUARIO", "")       # en brevo: el remitente verificado
     MAIL_PASSWORD = os.getenv("MAIL_PASSWORD", "").replace(" ", "")
     MAIL_PUERTO = int(os.getenv("MAIL_PUERTO", 465))   # 465 = SSL (recomendado) | 587 = STARTTLS
+    BREVO_API_KEY = os.getenv("BREVO_API_KEY", "").strip()
     MAIL_NOMBRE_REMITENTE = "MARK'S"
 
 

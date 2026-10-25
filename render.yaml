@@ -6,7 +6,9 @@
 #
 #  Lo que se llena a mano en el panel de Render (NUNCA en GitHub):
 #    - DB_PASSWORD           contraseña de Aiven (avnadmin)
-#    - MAIL_USUARIO / MAIL_PASSWORD   correo de Gmail y su contraseña de aplicación
+#    - MAIL_USUARIO          correo remitente (verificado en Brevo)
+#    - BREVO_API_KEY         API key de Brevo (Render gratis bloquea SMTP,
+#                            por eso no se usa MAIL_MODO=gmail aquí)
 #    - Secret File "ca.pem"  el certificado CA de Aiven
 #      (Render lo guarda en /etc/secrets/ca.pem)
 # =====================================================
@@ -38,8 +40,10 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: MAIL_MODO
-        value: gmail
+        value: brevo
       - key: MAIL_USUARIO
+        sync: false
+      - key: BREVO_API_KEY
         sync: false
       - key: MAIL_PASSWORD
         sync: false

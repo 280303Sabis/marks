@@ -6,7 +6,7 @@
 #
 #  Lo que se llena a mano en el panel de Render (NUNCA en GitHub):
 #    - DB_PASSWORD           contraseña de Aiven (avnadmin)
-#    - MAIL_USUARIO / MAIL_PASSWORD   solo si MAIL_MODO=gmail
+#    - MAIL_USUARIO / MAIL_PASSWORD   correo de Gmail y su contraseña de aplicación
 #    - Secret File "ca.pem"  el certificado CA de Aiven
 #      (Render lo guarda en /etc/secrets/ca.pem)
 # =====================================================
@@ -38,7 +38,7 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: MAIL_MODO
-        value: consola
+        value: gmail
       - key: MAIL_USUARIO
         sync: false
       - key: MAIL_PASSWORD

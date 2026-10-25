@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MARK'S - Panel de Administración y Ventas</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
 
@@ -15,14 +16,14 @@
         <nav>
             <ul class="nav-buttons">
                 <li><a href="dashboard.html" class="nav-btn active">Inicio</a></li>
-                
+                <li><a href="productos-vendidos.html" class="nav-btn">Más vendidos</a></li>
+                <li><a href="recuperar.html" class="nav-btn">Historial de compras</a></li>
                 <li class="dropdown">
                     <a href="#" class="nav-btn">Secciones ▾</a>
                     <div class="dropdown-content">
                         <a href="como-funciona.html">¿Cómo funciona?</a>
                         <a href="comercio-local.html">Comercio Local</a>
                         <a href="ahorros.html">Ahorros y Alertas</a>
-                        <a href="recuperar.html">Historial de compras</a>
                     </div>
                 </li>
 
@@ -32,116 +33,98 @@
         </nav>
     </header>
 
-    <section class="main-section" style="max-width: 1100px; padding: 40px 45px;">
-        
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; border-bottom: 2px solid #e2fbe0; padding-bottom: 20px;">
+    <div class="admin-container">
+
+        <div class="admin-header">
             <div>
-                <span style="background-color: #e2fbe0; color: #2e7d32; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Sucursal Activa - Nuevo León</span>
-                <h1 style="font-size: 28px; color: #2b581b; margin-top: 8px; margin-bottom: 5px;">Supermercado La Puerta (Santa Catarina)</h1>
-                <p style="font-size: 14.5px; color: #666;">Panel de control en tiempo real, supervisión de inventarios y flujo de cajas sin filas.</p>
+                <span class="admin-badge">Sucursal activa</span>
+                <h1 id="sucursal-nombre">Sin sucursal seleccionada</h1>
+                <p id="sucursal-direccion">Panel de control de ventas, inventario y salidas sin filas.</p>
             </div>
-            <div style="background: #e2fbe0; padding: 15px 25px; border-radius: 14px; text-align: center;">
-                <span style="font-size: 12px; color: #2e7d32; font-weight: bold; display: block;">Ventas Totales Hoy</span>
-                <span style="font-size: 24px; font-weight: bold; color: #2b581b;">$34,850.00 MXN</span>
+            <div class="kpi-card" style="min-width: 220px;">
+                <span>Ventas totales hoy</span>
+                <h3 id="ventas-hoy">$0.00 MXN</h3>
+                <small id="ventas-hoy-detalle">Sin ventas registradas</small>
             </div>
         </div>
 
-        <div class="dashboard-grid">
-            
-            <div class="dashboard-card">
-                <h3 style="color: #2b581b; font-size: 18px; margin-bottom: 5px;">🛍️ Productos Locales y Ventas en Tienda</h3>
-                <p style="font-size: 13.5px; color: #666; margin-bottom: 15px;">Listado de artículos en anaquel y registro de salida mediante escaneo de cliente.</p>
-                
-                <table class="sales-table">
-                    <thead>
-                        <tr>
-                            <th>Producto Local (NL)</th>
-                            <th>Categoría</th>
-                            <th>Precio</th>
-                            <th>Unidades Vendidas</th>
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <span>Compras de hoy</span>
+                <h3 id="kpi-compras">0</h3>
+                <small>Tickets pagados en la app</small>
+            </div>
+            <div class="kpi-card">
+                <span>Unidades vendidas hoy</span>
+                <h3 id="kpi-unidades">0</h3>
+                <small>Piezas y kilos escaneados</small>
+            </div>
+            <div class="kpi-card">
+                <span>Productos por caducar</span>
+                <h3 id="kpi-caducar">0</h3>
+                <small>En los próximos días</small>
+            </div>
+            <div class="kpi-card">
+                <span>Productos sin stock</span>
+                <h3 id="kpi-sin-stock">0</h3>
+                <small>Requieren resurtido</small>
+            </div>
+        </div>
+
+        <div class="admin-grid">
+
+            <div class="admin-card">
+                <h2>🛍️ Productos y ventas en tienda</h2>
+                <p>Artículos en anaquel y unidades vendidas mediante escaneo del cliente.</p>
+                <div class="table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Categoría</th>
+                                <th>Precio</th>
+                                <th>Unidades vendidas</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-productos">
+                        <tr id="productos-vacio">
+                            <td colspan="4" class="empty-state">
+                                <span class="empty-icon">📦</span>
+                                <strong>Aún no hay ventas</strong>
+                                <p>Los productos aparecerán aquí cuando se registren compras.</p>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Tortillas de Maíz</strong></td>
-                            <td>Tortillería</td>
-                            <td>$28.00</td>
-                            <td><span style="color: #2e7d32; font-weight: bold;">510 pzas</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Salsa Artesanal Doña María</strong></td>
-                            <td>Abarrotes</td>
-                            <td>$45.00</td>
-                            <td><span style="color: #2e7d32; font-weight: bold;">420 pzas</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Queso Panela Regio</strong></td>
-                            <td>Lácteos</td>
-                            <td>$85.00</td>
-                            <td><span style="color: #2e7d32; font-weight: bold;">315 pzas</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Pan de Elote Tradicional</strong></td>
-                            <td>Panadería</td>
-                            <td>$60.00</td>
-                            <td><span style="color: #2e7d32; font-weight: bold;">280 pzas</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Café Orgánico</strong></td>
-                            <td>Bebidas</td>
-                            <td>$120.00</td>
-                            <td><span style="color: #2e7d32; font-weight: bold;">195 pzas</span></td>
-                        </tr>
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <div style="display: flex; flex-direction: column; gap: 25px;">
-                
-                <div class="dashboard-card" style="background: linear-gradient(135deg, #f4fbf0, #e2fbe0); text-align: center; border: 1px solid #b8e2b2;">
-                    <span style="font-size: 28px;">🔥</span>
-                    <h4 style="color: #2b581b; font-size: 16px; margin: 8px 0 5px 0;">Producto Más Vendido</h4>
-                    <p style="font-size: 15px; font-weight: bold; color: #1e3a12; margin-bottom: 5px;">Tortillas de Maíz</p>
-                    <span style="font-size: 13px; color: #444; background: white; padding: 4px 12px; border-radius: 10px; display: inline-block;">510 unidades este mes</span>
-                </div>
-
-                <div class="dashboard-card">
-                    <h3 style="color: #2b581b; font-size: 17px; margin-bottom: 12px;">📈 Gráfica de Demanda</h3>
-                    <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: #555;">
-                        <div>
-                            <span>Tortillas de Maíz (510)</span>
-                            <div style="background: #e2e8f0; border-radius: 6px; height: 10px; margin-top: 4px; overflow: hidden;">
-                                <div style="background: #72db51; width: 100%; height: 100%;"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <span>Salsa Artesanal (420)</span>
-                            <div style="background: #e2e8f0; border-radius: 6px; height: 10px; margin-top: 4px; overflow: hidden;">
-                                <div style="background: #72db51; width: 82%; height: 100%;"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <span>Queso Panela (315)</span>
-                            <div style="background: #e2e8f0; border-radius: 6px; height: 10px; margin-top: 4px; overflow: hidden;">
-                                <div style="background: #72db51; width: 62%; height: 100%;"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <span>Pan de Elote (280)</span>
-                            <div style="background: #e2e8f0; border-radius: 6px; height: 10px; margin-top: 4px; overflow: hidden;">
-                                <div style="background: #72db51; width: 55%; height: 100%;"></div>
-                            </div>
-                        </div>
+            <div class="admin-side">
+                <div class="admin-card" style="text-align: center;">
+                    <h2>🔥 Producto más vendido</h2>
+                    <div class="empty-state" id="mas-vendido">
+                        <strong>Sin datos</strong>
+                        <p>Se calculará con las ventas reales.</p>
                     </div>
                 </div>
 
+                <div class="admin-card">
+                    <h2>📈 Gráfica de demanda</h2>
+                    <div id="grafica-demanda">
+                        <div class="empty-state">
+                            <span class="empty-icon">📊</span>
+                            <strong>Sin datos para graficar</strong>
+                            <p>La demanda se mostrará cuando existan ventas.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>
 
-    </section>
+    </div>
 
-    <!-- Conexión con la API: protege la página y hace funcionar "Cerrar Sesión". -->
+    <!-- Conexión con la API: protege la página (solo ADMIN) y hace funcionar "Cerrar Sesión". -->
     <script src="js/api.js"></script>
     <script src="js/sesion.js"></script>
     <script src="js/dashboard.js"></script>

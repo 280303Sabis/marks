@@ -29,7 +29,7 @@ def create_app():
     app.json.ensure_ascii = False  # muestra acentos y ñ correctamente
     app.json.sort_keys = False     # respeta el orden en que se escriben los datos
 
-    CORS(app)          # permite peticiones desde la app Flutter
+    CORS(app)          # permite peticiones desde la app Flutter y la página web
     db.init_app(app)   # registra el cierre automático de la conexión
 
     # Rutas (blueprints)
@@ -40,6 +40,7 @@ def create_app():
     from .routes.cuenta import bp as cuenta_bp
     from .routes.compras import bp as compras_bp
     from .routes.opiniones import bp as opiniones_bp          # PASO 13
+    from .routes.admin import bp as admin_bp                  # portal web del administrador
     app.register_blueprint(productos_bp, url_prefix="/api")
     app.register_blueprint(carrito_bp, url_prefix="/api")
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
@@ -47,6 +48,7 @@ def create_app():
     app.register_blueprint(cuenta_bp, url_prefix="/api")
     app.register_blueprint(compras_bp, url_prefix="/api")
     app.register_blueprint(opiniones_bp, url_prefix="/api")    # PASO 13
+    app.register_blueprint(admin_bp, url_prefix="/api/admin")
 
     @app.get("/")
     def inicio():

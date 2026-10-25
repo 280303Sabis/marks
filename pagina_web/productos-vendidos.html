@@ -5,336 +5,107 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MARK'S - Productos Más Vendidos</title>
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        /* Estilos específicos para la vista de métricas y productos */
-        .analytics-container {
-            width: 85%;
-            margin: 30px auto;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-
-        .filter-bar {
-            background: white;
-            padding: 20px 30px;
-            border-radius: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .filter-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .filter-group label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #2b581b;
-        }
-
-        .filter-select, .search-input {
-            padding: 10px 14px;
-            border: 1px solid #c8e6c9;
-            border-radius: 10px;
-            font-size: 14px;
-            outline: none;
-            background: #f8faf7;
-        }
-
-        .filter-select:focus, .search-input:focus {
-            border-color: #72db51;
-            box-shadow: 0 0 5px rgba(114, 219, 81, 0.4);
-        }
-
-        /* Tarjetas de Métricas KPI */
-        .kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-        }
-
-        .kpi-card {
-            background: white;
-            padding: 20px;
-            border-radius: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-            border-left: 5px solid #72db51;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .kpi-card span {
-            font-size: 13px;
-            color: #666;
-            font-weight: 600;
-        }
-
-        .kpi-card h3 {
-            font-size: 24px;
-            color: #2b581b;
-        }
-
-        .kpi-card small {
-            font-size: 12px;
-            color: #2e7d32;
-            font-weight: bold;
-        }
-
-        /* Tabla de Productos */
-        .table-card {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-        }
-
-        .products-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 14px;
-            margin-top: 15px;
-        }
-
-        .products-table th {
-            background-color: #eafbe3;
-            color: #2b581b;
-            padding: 14px;
-            border-bottom: 2px solid #c8e6c9;
-        }
-
-        .products-table td {
-            padding: 14px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .rank-badge {
-            background: #72db51;
-            color: white;
-            width: 28px;
-            height: 28px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            font-weight: bold;
-            font-size: 13px;
-        }
-
-        .rank-badge.top3 {
-            background: #2b581b;
-        }
-
-        .progress-bar-container {
-            width: 100%;
-            background-color: #eee;
-            border-radius: 10px;
-            height: 8px;
-            overflow: hidden;
-            margin-top: 5px;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background-color: #72db51;
-            border-radius: 10px;
-        }
-
-        .tag-local {
-            background: #e8f5e9;
-            color: #2e7d32;
-            padding: 3px 8px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-    </style>
+    <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
 
-    <!-- MENÚ DE NAVEGACIÓN SUPERIOR -->
     <header class="navbar">
         <div class="logo">
             <img src="img/logo_marks.png" alt="MARK'S Logo" class="logo-img">
         </div>
         <nav>
             <ul class="nav-buttons">
-                <li><a href="panel.html" class="nav-btn">Dashboard Admin</a></li>
-                <li><a href="panel.html#historial-compras" class="nav-btn">Historial Compras</a></li>
-                <li><a href="productos-vendidos.html" class="nav-btn active">Más Vendidos</a></li>
-                <li><a href="#" class="nav-btn">Inventario</a></li>
-                <li><a href="#" class="nav-btn">Alertas y Ofertas</a></li>
-                <li><a href="index.html" class="nav-btn" style="background-color: rgba(229, 57, 53, 0.4);">Cerrar Sesión</a></li>
+                <li><a href="dashboard.html" class="nav-btn">Inicio</a></li>
+                <li><a href="productos-vendidos.html" class="nav-btn active">Más vendidos</a></li>
+                <li><a href="recuperar.html" class="nav-btn">Historial de compras</a></li>
+                <li class="dropdown">
+                    <a href="#" class="nav-btn">Secciones ▾</a>
+                    <div class="dropdown-content">
+                        <a href="como-funciona.html">¿Cómo funciona?</a>
+                        <a href="comercio-local.html">Comercio Local</a>
+                        <a href="ahorros.html">Ahorros y Alertas</a>
+                    </div>
+                </li>
+
+                <!-- El JavaScript (js/dashboard.js) usa este id para cerrar la sesión. No cambiarlo. -->
+                <li><a href="index.html" id="btn-cerrar-sesion" class="nav-btn logout-btn">Cerrar Sesión</a></li>
             </ul>
         </nav>
     </header>
 
-    <!-- CONTENEDOR PRINCIPAL DE MÉTRICAS Y FILTROS -->
-    <div class="analytics-container">
-        
-        <!-- BARRA DE FILTROS Y BÚSQUEDA -->
+    <div class="admin-container">
+
         <div class="filter-bar">
             <div class="filter-group">
                 <label for="periodo">Periodo:</label>
                 <select id="periodo" class="filter-select">
                     <option value="hoy">Hoy</option>
-                    <option value="semana" selected>Esta Semana</option>
-                    <option value="mes">Este Mes</option>
-                    <option value="anio">Año en Curso</option>
+                    <option value="semana" selected>Esta semana</option>
+                    <option value="mes">Este mes</option>
+                    <option value="anio">Año en curso</option>
                 </select>
             </div>
 
             <div class="filter-group">
                 <label for="categoria">Categoría:</label>
+                <!-- Las categorías se cargarán desde la base de datos. -->
                 <select id="categoria" class="filter-select">
                     <option value="todas">Todas las categorías</option>
-                    <option value="locales">🌱 Comercio Local NL</option>
-                    <option value="lacteos">Lácteos y Huevo</option>
-                    <option value="carnes">Carnes y Embutidos</option>
-                    <option value="bebidas">Bebidas</option>
                 </select>
             </div>
 
             <div class="filter-group">
-                <input type="text" placeholder="Buscar producto o SKU..." class="search-input">
+                <input type="text" id="buscar" placeholder="Buscar producto o código..." class="search-input">
             </div>
         </div>
 
-        <!-- TARJETAS DE RÉCORD / KPIS -->
         <div class="kpi-grid">
             <div class="kpi-card">
-                <span>Total Unidades Vendidas</span>
-                <h3>1,842 pzs</h3>
-                <small>↑ +14% vs semana anterior</small>
+                <span>Total unidades vendidas</span>
+                <h3 id="kpi-unidades">0</h3>
+                <small>En el periodo seleccionado</small>
             </div>
             <div class="kpi-card">
-                <span>Producto Más Vendido</span>
-                <h3>Leche LALA 1L</h3>
-                <small>320 unidades vendidas</small>
+                <span>Producto más vendido</span>
+                <h3 id="kpi-top-producto">—</h3>
+                <small id="kpi-top-unidades">Sin ventas registradas</small>
             </div>
             <div class="kpi-card">
-                <span>Categoría Líder</span>
-                <h3>🌱 Comercio Local</h3>
-                <small>38% de las ventas totales</small>
+                <span>Categoría líder</span>
+                <h3 id="kpi-top-categoria">—</h3>
+                <small id="kpi-top-categoria-pct">Sin ventas registradas</small>
             </div>
             <div class="kpi-card">
-                <span>Ingreso Total por Top 10</span>
-                <h3>$48,920.00 MXN</h3>
-                <small>↑ +8% en margen de ganancia</small>
+                <span>Ingreso total del top 10</span>
+                <h3 id="kpi-ingreso-top">$0.00 MXN</h3>
+                <small>En el periodo seleccionado</small>
             </div>
         </div>
 
-        <!-- TABLA DE RANKING DE PRODUCTOS MÁS VENDIDOS -->
-        <div class="table-card">
-            <h2 style="color: #2b581b; font-size: 22px; margin-bottom: 5px;">🔥 Ranking de Productos Más Vendidos</h2>
-            <p style="color: #666; font-size: 14px; margin-bottom: 20px;">Métricas detalladas de volumen de venta y demanda en tienda express.</p>
+        <div class="admin-card">
+            <h2>🔥 Ranking de productos más vendidos</h2>
+            <p>Volumen de venta y demanda por producto.</p>
 
-            <div style="overflow-x: auto;">
-                <table class="products-table">
+            <div class="table-wrap">
+                <table class="admin-table">
                     <thead>
                         <tr>
                             <th style="text-align: center;">#</th>
-                            <th>Producto / Descripción</th>
+                            <th>Producto</th>
                             <th>Categoría</th>
-                            <th>Precio Unit.</th>
-                            <th>Unidades Vendidas</th>
+                            <th>Precio unit.</th>
+                            <th>Unidades vendidas</th>
                             <th>Participación</th>
-                            <th>Total Generado</th>
+                            <th>Total generado</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td style="text-align: center;"><span class="rank-badge top3">1</span></td>
-                            <td>
-                                <strong>Leche Entera LALA 1L</strong><br>
-                                <small style="color: #777;">SKU: #LA-1092</small>
+                    <tbody id="tabla-ranking">
+                        <tr id="ranking-vacio">
+                            <td colspan="7" class="empty-state">
+                                <span class="empty-icon">🏆</span>
+                                <strong>Aún no hay productos vendidos</strong>
+                                <p>El ranking se llenará con las compras reales de la sucursal.</p>
                             </td>
-                            <td>Lácteos</td>
-                            <td>$28.50 MXN</td>
-                            <td><strong>320 pzs</strong></td>
-                            <td style="width: 150px;">
-                                <div style="font-size: 12px; font-weight: bold;">17.3%</div>
-                                <div class="progress-bar-container">
-                                    <div class="progress-bar" style="width: 85%;"></div>
-                                </div>
-                            </td>
-                            <td style="font-weight: bold; color: #2b581b;">$9,120.00 MXN</td>
-                        </tr>
-                        <tr>
-                            <td style="text-align: center;"><span class="rank-badge top3">2</span></td>
-                            <td>
-                                <strong>Queso Fresco Regional <span class="tag-local">Local NL</span></strong><br>
-                                <small style="color: #777;">SKU: #NL-4012</small>
-                            </td>
-                            <td>🌱 Comercio Local</td>
-                            <td>$65.00 MXN</td>
-                            <td><strong>245 pzs</strong></td>
-                            <td>
-                                <div style="font-size: 12px; font-weight: bold;">13.2%</div>
-                                <div class="progress-bar-container">
-                                    <div class="progress-bar" style="width: 65%;"></div>
-                                </div>
-                            </td>
-                            <td style="font-weight: bold; color: #2b581b;">$15,925.00 MXN</td>
-                        </tr>
-                        <tr>
-                            <td style="text-align: center;"><span class="rank-badge top3">3</span></td>
-                            <td>
-                                <strong>Carne Rib Eye para Asar (1kg)</strong><br>
-                                <small style="color: #777;">SKU: #CN-8801</small>
-                            </td>
-                            <td>Carnes</td>
-                            <td>$220.00 MXN</td>
-                            <td><strong>180 pzs</strong></td>
-                            <td>
-                                <div style="font-size: 12px; font-weight: bold;">9.7%</div>
-                                <div class="progress-bar-container">
-                                    <div class="progress-bar" style="width: 48%;"></div>
-                                </div>
-                            </td>
-                            <td style="font-weight: bold; color: #2b581b;">$39,600.00 MXN</td>
-                        </tr>
-                        <tr>
-                            <td style="text-align: center;"><span class="rank-badge">4</span></td>
-                            <td>
-                                <strong>Machacado Artesanal <span class="tag-local">Local NL</span></strong><br>
-                                <small style="color: #777;">SKU: #NL-2209</small>
-                            </td>
-                            <td>🌱 Comercio Local</td>
-                            <td>$115.00 MXN</td>
-                            <td><strong>165 pzs</strong></td>
-                            <td>
-                                <div style="font-size: 12px; font-weight: bold;">8.9%</div>
-                                <div class="progress-bar-container">
-                                    <div class="progress-bar" style="width: 42%;"></div>
-                                </div>
-                            </td>
-                            <td style="font-weight: bold; color: #2b581b;">$18,975.00 MXN</td>
-                        </tr>
-                        <tr>
-                            <td style="text-align: center;"><span class="rank-badge">5</span></td>
-                            <td>
-                                <strong>Agua Purificada Ciel 1.5L</strong><br>
-                                <small style="color: #777;">SKU: #BE-1102</small>
-                            </td>
-                            <td>Bebidas</td>
-                            <td>$16.00 MXN</td>
-                            <td><strong>140 pzs</strong></td>
-                            <td>
-                                <div style="font-size: 12px; font-weight: bold;">7.5%</div>
-                                <div class="progress-bar-container">
-                                    <div class="progress-bar" style="width: 35%;"></div>
-                                </div>
-                            </td>
-                            <td style="font-weight: bold; color: #2b581b;">$2,240.00 MXN</td>
                         </tr>
                     </tbody>
                 </table>
@@ -343,5 +114,9 @@
 
     </div>
 
+    <!-- Conexión con la API: protege la página (solo ADMIN) y hace funcionar "Cerrar Sesión". -->
+    <script src="js/api.js"></script>
+    <script src="js/sesion.js"></script>
+    <script src="js/dashboard.js"></script>
 </body>
 </html>

@@ -12,8 +12,9 @@
     const datos = await api("/auth/login", { metodo: "POST", datos: {...}, conToken: false });
 */
 
-// Dirección de la API. Si la API se publica en internet, solo se cambia aquí.
-const API_URL = "http://127.0.0.1:5000/api";
+// Dirección de la API publicada en Render (la misma que usa la app).
+// Para probar con la API en tu compu, cámbiala a "http://127.0.0.1:5000/api".
+const API_URL = "https://marks-api.onrender.com/api";
 
 // Error con información extra: el código de estado (401, 423...) y la respuesta completa.
 class ErrorApi extends Error {
@@ -48,7 +49,7 @@ async function api(ruta, opciones = {}) {
       body: datos !== null ? JSON.stringify(datos) : undefined,
     });
   } catch (e) {
-    throw new ErrorApi("No se pudo conectar con el servidor. Revisa que la API esté encendida.", 0);
+    throw new ErrorApi("No se pudo conectar con el servidor. Si la API estaba dormida, espera un minuto y recarga la página.", 0);
   }
 
   // 3. Leer la respuesta (si no es JSON, queda vacía)

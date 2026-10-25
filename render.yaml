@@ -49,3 +49,11 @@ services:
         sync: false
       - key: MAIL_PUERTO
         value: "465"
+
+  # Página web (portal del administrador y de clientes).
+  # Son archivos HTML/CSS/JS; hablan con marks-api (dirección en pagina_web/js/api.js).
+  - type: web
+    name: marks-web
+    runtime: static
+    buildCommand: ""
+    staticPublishPath: ./pagina_web

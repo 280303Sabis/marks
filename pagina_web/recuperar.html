@@ -3,118 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MARK'S - Historial de Compras</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>MARK'S - Historial de compras</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+    <link rel="stylesheet" href="css/clientes.css">
     <link rel="stylesheet" href="css/admin.css">
 </head>
-<body>
+<body class="cl adm">
 
-    <header class="navbar">
-        <div class="logo">
-            <img src="img/logo_marks.png" alt="MARK'S Logo" class="logo-img">
+    <header class="cl-encabezado">
+        <div class="cl-encabezado-interior">
+            <a href="dashboard.html" class="cl-logo"><img src="img/logo_marks.png" alt="MARK'S"></a>
+            <nav aria-label="Menú del panel">
+                <ul class="cl-menu">
+                    <li><a href="dashboard.html"><i class="ph ph-squares-four" aria-hidden="true"></i><span class="adm-menu-texto">Inicio</span></a></li>
+                    <li><a href="productos-vendidos.html"><i class="ph ph-trophy" aria-hidden="true"></i><span class="adm-menu-texto">Más vendidos</span></a></li>
+                    <li><a href="recuperar.html" aria-current="page"><i class="ph ph-receipt" aria-hidden="true"></i><span class="adm-menu-texto">Historial</span></a></li>
+                    <!-- El JavaScript (js/dashboard.js) usa este id para cerrar la sesión. No cambiarlo. -->
+                    <li><a href="index.html" id="btn-cerrar-sesion"><i class="ph ph-sign-out" aria-hidden="true"></i><span class="adm-menu-texto">Cerrar sesión</span></a></li>
+                </ul>
+            </nav>
         </div>
-        <nav>
-            <ul class="nav-buttons">
-                <li><a href="dashboard.html" class="nav-btn">Inicio</a></li>
-                <li><a href="productos-vendidos.html" class="nav-btn">Más vendidos</a></li>
-                <li><a href="recuperar.html" class="nav-btn active">Historial de compras</a></li>
-                <li class="dropdown">
-                    <a href="#" class="nav-btn">Secciones ▾</a>
-                    <div class="dropdown-content">
-                        <a href="como-funciona.html">¿Cómo funciona?</a>
-                        <a href="comercio-local.html">Comercio Local</a>
-                        <a href="ahorros.html">Ahorros y Alertas</a>
-                    </div>
-                </li>
-
-                <!-- El JavaScript (js/dashboard.js) usa este id para cerrar la sesión. No cambiarlo. -->
-                <li><a href="index.html" id="btn-cerrar-sesion" class="nav-btn logout-btn">Cerrar Sesión</a></li>
-            </ul>
-        </nav>
     </header>
 
-    <div class="admin-container">
+    <!--
+        Todo arranca en blanco. Los elementos con id los llena js/dashboard.js
+        con los datos reales de la API (las mismas ventas e inventario de la app).
+        Se pueden cambiar estilos y acomodo, pero NO los id.
+    -->
+    <main class="cl-contenido">
 
-        <div class="filter-bar">
-            <div class="filter-group">
-                <label for="periodo">Periodo:</label>
-                <select id="periodo" class="filter-select">
+        <section class="adm-portada">
+            <div class="adm-saludo">
+                <span id="alianza-iniciales" class="adm-avatar" aria-hidden="true"></span>
+                <div>
+                    <span class="adm-etiqueta">Historial de compras</span>
+                    <h1 id="alianza-nombre">&nbsp;</h1>
+                    <div class="adm-sucursal">
+                        <i class="ph ph-storefront" aria-hidden="true"></i>
+                        <label for="sucursal" class="cl-texto-sec">Sucursal</label>
+                        <select id="sucursal" class="adm-select"></select>
+                        <span id="sucursal-direccion"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="adm-ticket cl-ticket">
+                <span class="adm-ticket-etiqueta">Ingreso del periodo</span>
+                <span class="adm-ticket-valor" id="kpi-ingreso">$0.00</span>
+                <span class="adm-ticket-nota" id="kpi-ingreso-nota">Compras pagadas y validadas</span>
+            </div>
+        </section>
+
+        <p id="aviso-api" class="mensaje mensaje-error adm-aviso" role="alert" hidden></p>
+
+        <section class="cl-tarjeta adm-filtros" aria-label="Filtros">
+            <div class="cl-campo">
+                <label for="periodo">Periodo</label>
+                <select id="periodo">
                     <option value="hoy">Hoy</option>
                     <option value="semana" selected>Esta semana</option>
                     <option value="mes">Este mes</option>
-                    <option value="anio">Año en curso</option>
+                    <option value="anio">Este año</option>
                 </select>
             </div>
-
-            <div class="filter-group">
-                <label for="estado">Estado:</label>
-                <select id="estado" class="filter-select">
+            <div class="cl-campo">
+                <label for="estado">Estado</label>
+                <select id="estado">
                     <option value="todos">Todos</option>
-                    <option value="pagada">Pagada</option>
+                    <option value="pagada">Pagada (sin salir)</option>
                     <option value="validada">Validada en salida</option>
                 </select>
             </div>
+            <div class="cl-campo adm-buscar">
+                <label for="buscar">Buscar</label>
+                <div class="adm-buscar-caja">
+                    <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
+                    <input type="search" id="buscar" placeholder="Folio, nombre o correo del cliente" autocomplete="off">
+                </div>
+            </div>
+        </section>
 
-            <div class="filter-group">
-                <input type="text" id="buscar" placeholder="Buscar por folio o cliente..." class="search-input">
+        <section class="adm-kpis" aria-label="Indicadores del periodo">
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono"><i class="ph ph-receipt" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">Compras</span>
+                    <span class="adm-kpi-valor" id="kpi-compras">0</span>
+                    <span class="adm-kpi-nota">En el periodo elegido</span>
+                </div>
             </div>
-        </div>
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono"><i class="ph ph-calculator" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">Ticket promedio</span>
+                    <span class="adm-kpi-valor" id="kpi-ticket-promedio">0</span>
+                    <span class="adm-kpi-nota">Por compra</span>
+                </div>
+            </div>
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono"><i class="ph ph-users" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">Clientes distintos</span>
+                    <span class="adm-kpi-valor" id="kpi-clientes">0</span>
+                    <span class="adm-kpi-nota">Que compraron en la app</span>
+                </div>
+            </div>
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono"><i class="ph ph-qr-code" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">Validadas en salida</span>
+                    <span class="adm-kpi-valor" id="kpi-validadas">0</span>
+                    <span class="adm-kpi-nota">QR escaneado por el guardia</span>
+                </div>
+            </div>
+        </section>
 
-        <div class="kpi-grid">
-            <div class="kpi-card">
-                <span>Compras</span>
-                <h3 id="kpi-compras">0</h3>
-                <small>En el periodo seleccionado</small>
+        <section class="cl-tarjeta" aria-labelledby="titulo-historial">
+            <div class="adm-tarjeta-encabezado">
+                <div>
+                    <h2 id="titulo-historial">Compras</h2>
+                    <p class="cl-texto-sec">Las más recientes primero. Se muestran hasta 500.</p>
+                </div>
             </div>
-            <div class="kpi-card">
-                <span>Ingreso total</span>
-                <h3 id="kpi-ingreso">$0.00 MXN</h3>
-                <small>En el periodo seleccionado</small>
-            </div>
-            <div class="kpi-card">
-                <span>Ticket promedio</span>
-                <h3 id="kpi-ticket-promedio">$0.00 MXN</h3>
-                <small>Por compra</small>
-            </div>
-            <div class="kpi-card">
-                <span>Clientes distintos</span>
-                <h3 id="kpi-clientes">0</h3>
-                <small>En el periodo seleccionado</small>
-            </div>
-        </div>
-
-        <div class="admin-card">
-            <h2>🧾 Historial de compras</h2>
-            <p>Compras pagadas desde la app en esta sucursal.</p>
-
-            <div class="table-wrap">
-                <table class="admin-table">
+            <div class="adm-tabla-caja">
+                <table class="adm-tabla">
                     <thead>
                         <tr>
                             <th>Folio</th>
                             <th>Fecha y hora</th>
                             <th>Cliente</th>
-                            <th>Artículos</th>
-                            <th>Total</th>
+                            <th class="num">Artículos</th>
+                            <th class="num">Total</th>
                             <th>Estado</th>
                         </tr>
                     </thead>
                     <tbody id="tabla-historial">
-                        <tr id="historial-vacio">
-                            <td colspan="6" class="empty-state">
-                                <span class="empty-icon">🧾</span>
-                                <strong>Aún no hay compras registradas</strong>
-                                <p>Las compras aparecerán aquí en cuanto los clientes paguen desde la app.</p>
-                            </td>
-                        </tr>
+                            <tr class="adm-cargando"><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td></tr>
+                            <tr class="adm-cargando"><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td></tr>
+                            <tr class="adm-cargando"><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td></tr>
                     </tbody>
                 </table>
             </div>
-        </div>
+        </section>
 
-    </div>
+    </main>
 
-    <!-- Conexión con la API: protege la página (solo ADMIN) y hace funcionar "Cerrar Sesión". -->
+    <footer class="cl-pie">MARK'S - Compra sin filas. Proyecto Integrador, Universidad Tecnológica Santa Catarina.</footer>
+
     <script src="js/api.js"></script>
     <script src="js/sesion.js"></script>
     <script src="js/dashboard.js"></script>

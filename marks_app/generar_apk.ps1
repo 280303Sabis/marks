@@ -2,7 +2,7 @@
 # La app queda apuntando a la API publicada en Render.
 #
 # Uso (desde la carpeta marks_app):
-#   .\generar_apk.ps1 https://marks-api.onrender.com
+#   .\generar_apk.ps1 https://marks-api-xw78.onrender.com
 #
 # El archivo queda en: build\app\outputs\flutter-apk\MARKS.apk
 

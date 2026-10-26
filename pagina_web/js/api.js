@@ -14,7 +14,7 @@
 
 // Dirección de la API publicada en Render (la misma que usa la app).
 // Para probar con la API en tu compu, cámbiala a "http://127.0.0.1:5000/api".
-const API_URL = "https://marks-api.onrender.com/api";
+const API_URL = "https://marks-api-xw78.onrender.com/api";
 
 // Error con información extra: el código de estado (401, 423...) y la respuesta completa.
 class ErrorApi extends Error {

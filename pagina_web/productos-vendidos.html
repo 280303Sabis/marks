@@ -3,118 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MARK'S - Productos Más Vendidos</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>MARK'S - Más vendidos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+    <link rel="stylesheet" href="css/clientes.css">
     <link rel="stylesheet" href="css/admin.css">
 </head>
-<body>
+<body class="cl adm">
 
-    <header class="navbar">
-        <div class="logo">
-            <img src="img/logo_marks.png" alt="MARK'S Logo" class="logo-img">
+    <header class="cl-encabezado">
+        <div class="cl-encabezado-interior">
+            <a href="dashboard.html" class="cl-logo"><img src="img/logo_marks.png" alt="MARK'S"></a>
+            <nav aria-label="Menú del panel">
+                <ul class="cl-menu">
+                    <li><a href="dashboard.html"><i class="ph ph-squares-four" aria-hidden="true"></i><span class="adm-menu-texto">Inicio</span></a></li>
+                    <li><a href="productos-vendidos.html" aria-current="page"><i class="ph ph-trophy" aria-hidden="true"></i><span class="adm-menu-texto">Más vendidos</span></a></li>
+                    <li><a href="recuperar.html"><i class="ph ph-receipt" aria-hidden="true"></i><span class="adm-menu-texto">Historial</span></a></li>
+                    <!-- El JavaScript (js/dashboard.js) usa este id para cerrar la sesión. No cambiarlo. -->
+                    <li><a href="index.html" id="btn-cerrar-sesion"><i class="ph ph-sign-out" aria-hidden="true"></i><span class="adm-menu-texto">Cerrar sesión</span></a></li>
+                </ul>
+            </nav>
         </div>
-        <nav>
-            <ul class="nav-buttons">
-                <li><a href="dashboard.html" class="nav-btn">Inicio</a></li>
-                <li><a href="productos-vendidos.html" class="nav-btn active">Más vendidos</a></li>
-                <li><a href="recuperar.html" class="nav-btn">Historial de compras</a></li>
-                <li class="dropdown">
-                    <a href="#" class="nav-btn">Secciones ▾</a>
-                    <div class="dropdown-content">
-                        <a href="como-funciona.html">¿Cómo funciona?</a>
-                        <a href="comercio-local.html">Comercio Local</a>
-                        <a href="ahorros.html">Ahorros y Alertas</a>
-                    </div>
-                </li>
-
-                <!-- El JavaScript (js/dashboard.js) usa este id para cerrar la sesión. No cambiarlo. -->
-                <li><a href="index.html" id="btn-cerrar-sesion" class="nav-btn logout-btn">Cerrar Sesión</a></li>
-            </ul>
-        </nav>
     </header>
 
-    <div class="admin-container">
+    <!--
+        Todo arranca en blanco. Los elementos con id los llena js/dashboard.js
+        con los datos reales de la API (las mismas ventas e inventario de la app).
+        Se pueden cambiar estilos y acomodo, pero NO los id.
+    -->
+    <main class="cl-contenido">
 
-        <div class="filter-bar">
-            <div class="filter-group">
-                <label for="periodo">Periodo:</label>
-                <select id="periodo" class="filter-select">
+        <section class="adm-portada">
+            <div class="adm-saludo">
+                <span id="alianza-iniciales" class="adm-avatar" aria-hidden="true"></span>
+                <div>
+                    <span class="adm-etiqueta">Más vendidos</span>
+                    <h1 id="alianza-nombre">&nbsp;</h1>
+                    <div class="adm-sucursal">
+                        <i class="ph ph-storefront" aria-hidden="true"></i>
+                        <label for="sucursal" class="cl-texto-sec">Sucursal</label>
+                        <select id="sucursal" class="adm-select"></select>
+                        <span id="sucursal-direccion"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="adm-ticket cl-ticket">
+                <span class="adm-ticket-etiqueta">Ingreso de estos productos</span>
+                <span class="adm-ticket-valor" id="kpi-ingreso-total">$0.00</span>
+                <span class="adm-ticket-nota" id="kpi-ingreso-nota">En el periodo elegido</span>
+            </div>
+        </section>
+
+        <p id="aviso-api" class="mensaje mensaje-error adm-aviso" role="alert" hidden></p>
+
+        <section class="cl-tarjeta adm-filtros" aria-label="Filtros">
+            <div class="cl-campo">
+                <label for="periodo">Periodo</label>
+                <select id="periodo">
                     <option value="hoy">Hoy</option>
                     <option value="semana" selected>Esta semana</option>
                     <option value="mes">Este mes</option>
-                    <option value="anio">Año en curso</option>
+                    <option value="anio">Este año</option>
                 </select>
             </div>
-
-            <div class="filter-group">
-                <label for="categoria">Categoría:</label>
-                <!-- Las categorías se cargarán desde la base de datos. -->
-                <select id="categoria" class="filter-select">
+            <div class="cl-campo">
+                <label for="categoria">Categoría</label>
+                <select id="categoria">
                     <option value="todas">Todas las categorías</option>
                 </select>
             </div>
+            <div class="cl-campo adm-buscar">
+                <label for="buscar">Buscar</label>
+                <div class="adm-buscar-caja">
+                    <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
+                    <input type="search" id="buscar" placeholder="Producto, código de barras o PLU" autocomplete="off">
+                </div>
+            </div>
+        </section>
 
-            <div class="filter-group">
-                <input type="text" id="buscar" placeholder="Buscar producto o código..." class="search-input">
+        <section class="adm-kpis" aria-label="Indicadores del periodo">
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono"><i class="ph ph-barcode" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">Unidades vendidas</span>
+                    <span class="adm-kpi-valor" id="kpi-unidades">0</span>
+                    <span class="adm-kpi-nota">Piezas y kilos en el periodo</span>
+                </div>
             </div>
-        </div>
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono"><i class="ph ph-trophy" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">Producto líder</span>
+                    <span class="adm-kpi-valor" id="kpi-top-producto">0</span>
+                    <span class="adm-kpi-nota" id="kpi-top-unidades">Sin ventas registradas</span>
+                </div>
+            </div>
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono"><i class="ph ph-tag" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">Categoría líder</span>
+                    <span class="adm-kpi-valor" id="kpi-top-categoria">0</span>
+                    <span class="adm-kpi-nota" id="kpi-top-categoria-pct">Sin ventas registradas</span>
+                </div>
+            </div>
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono"><i class="ph ph-currency-circle-dollar" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">Ingreso del líder</span>
+                    <span class="adm-kpi-valor" id="kpi-ingreso-top">0</span>
+                    <span class="adm-kpi-nota">Lo cobrado por el producto líder</span>
+                </div>
+            </div>
+        </section>
 
-        <div class="kpi-grid">
-            <div class="kpi-card">
-                <span>Total unidades vendidas</span>
-                <h3 id="kpi-unidades">0</h3>
-                <small>En el periodo seleccionado</small>
+        <section class="cl-tarjeta" aria-labelledby="titulo-ranking">
+            <div class="adm-tarjeta-encabezado">
+                <div>
+                    <h2 id="titulo-ranking">Ranking de productos</h2>
+                    <p class="cl-texto-sec">Ordenado por unidades vendidas en la sucursal.</p>
+                </div>
             </div>
-            <div class="kpi-card">
-                <span>Producto más vendido</span>
-                <h3 id="kpi-top-producto">—</h3>
-                <small id="kpi-top-unidades">Sin ventas registradas</small>
-            </div>
-            <div class="kpi-card">
-                <span>Categoría líder</span>
-                <h3 id="kpi-top-categoria">—</h3>
-                <small id="kpi-top-categoria-pct">Sin ventas registradas</small>
-            </div>
-            <div class="kpi-card">
-                <span>Ingreso total del top 10</span>
-                <h3 id="kpi-ingreso-top">$0.00 MXN</h3>
-                <small>En el periodo seleccionado</small>
-            </div>
-        </div>
-
-        <div class="admin-card">
-            <h2>🔥 Ranking de productos más vendidos</h2>
-            <p>Volumen de venta y demanda por producto.</p>
-
-            <div class="table-wrap">
-                <table class="admin-table">
+            <div class="adm-tabla-caja">
+                <table class="adm-tabla">
                     <thead>
                         <tr>
-                            <th style="text-align: center;">#</th>
+                            <th class="centro">#</th>
                             <th>Producto</th>
-                            <th>Categoría</th>
-                            <th>Precio unit.</th>
-                            <th>Unidades vendidas</th>
+                            <th class="num">Precio</th>
+                            <th class="num">Unidades</th>
                             <th>Participación</th>
-                            <th>Total generado</th>
+                            <th class="num">Total</th>
                         </tr>
                     </thead>
                     <tbody id="tabla-ranking">
-                        <tr id="ranking-vacio">
-                            <td colspan="7" class="empty-state">
-                                <span class="empty-icon">🏆</span>
-                                <strong>Aún no hay productos vendidos</strong>
-                                <p>El ranking se llenará con las compras reales de la sucursal.</p>
-                            </td>
-                        </tr>
+                            <tr class="adm-cargando"><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td></tr>
+                            <tr class="adm-cargando"><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td></tr>
+                            <tr class="adm-cargando"><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td></tr>
                     </tbody>
                 </table>
             </div>
-        </div>
+        </section>
 
-    </div>
+    </main>
 
-    <!-- Conexión con la API: protege la página (solo ADMIN) y hace funcionar "Cerrar Sesión". -->
+    <footer class="cl-pie">MARK'S - Compra sin filas. Proyecto Integrador, Universidad Tecnológica Santa Catarina.</footer>
+
     <script src="js/api.js"></script>
     <script src="js/sesion.js"></script>
     <script src="js/dashboard.js"></script>

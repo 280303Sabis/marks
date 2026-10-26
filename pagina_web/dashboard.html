@@ -3,128 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MARK'S - Panel de Administración y Ventas</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>MARK'S - Panel de la alianza</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+    <link rel="stylesheet" href="css/clientes.css">
     <link rel="stylesheet" href="css/admin.css">
 </head>
-<body>
+<body class="cl adm">
 
-    <header class="navbar">
-        <div class="logo">
-            <img src="img/logo_marks.png" alt="MARK'S Logo" class="logo-img">
+    <header class="cl-encabezado">
+        <div class="cl-encabezado-interior">
+            <a href="dashboard.html" class="cl-logo"><img src="img/logo_marks.png" alt="MARK'S"></a>
+            <nav aria-label="Menú del panel">
+                <ul class="cl-menu">
+                    <li><a href="dashboard.html" aria-current="page"><i class="ph ph-squares-four" aria-hidden="true"></i><span class="adm-menu-texto">Inicio</span></a></li>
+                    <li><a href="productos-vendidos.html"><i class="ph ph-trophy" aria-hidden="true"></i><span class="adm-menu-texto">Más vendidos</span></a></li>
+                    <li><a href="recuperar.html"><i class="ph ph-receipt" aria-hidden="true"></i><span class="adm-menu-texto">Historial</span></a></li>
+                    <!-- El JavaScript (js/dashboard.js) usa este id para cerrar la sesión. No cambiarlo. -->
+                    <li><a href="index.html" id="btn-cerrar-sesion"><i class="ph ph-sign-out" aria-hidden="true"></i><span class="adm-menu-texto">Cerrar sesión</span></a></li>
+                </ul>
+            </nav>
         </div>
-        <nav>
-            <ul class="nav-buttons">
-                <li><a href="dashboard.html" class="nav-btn active">Inicio</a></li>
-                <li><a href="productos-vendidos.html" class="nav-btn">Más vendidos</a></li>
-                <li><a href="recuperar.html" class="nav-btn">Historial de compras</a></li>
-                <li class="dropdown">
-                    <a href="#" class="nav-btn">Secciones ▾</a>
-                    <div class="dropdown-content">
-                        <a href="como-funciona.html">¿Cómo funciona?</a>
-                        <a href="comercio-local.html">Comercio Local</a>
-                        <a href="ahorros.html">Ahorros y Alertas</a>
-                    </div>
-                </li>
-
-                <!-- El JavaScript (js/dashboard.js) usa este id para cerrar la sesión. No cambiarlo. -->
-                <li><a href="index.html" id="btn-cerrar-sesion" class="nav-btn logout-btn">Cerrar Sesión</a></li>
-            </ul>
-        </nav>
     </header>
 
-    <div class="admin-container">
+    <!--
+        Todo arranca en blanco. Los elementos con id los llena js/dashboard.js
+        con los datos reales de la API (las mismas ventas e inventario de la app).
+        Se pueden cambiar estilos y acomodo, pero NO los id.
+    -->
+    <main class="cl-contenido">
 
-        <div class="admin-header">
-            <div>
-                <span class="admin-badge">Sucursal activa</span>
-                <h1 id="sucursal-nombre">Sin sucursal seleccionada</h1>
-                <p id="sucursal-direccion">Panel de control de ventas, inventario y salidas sin filas.</p>
+        <section class="adm-portada">
+            <div class="adm-saludo">
+                <span id="alianza-iniciales" class="adm-avatar" aria-hidden="true"></span>
+                <div>
+                    <span class="adm-etiqueta">Panel de alianza</span>
+                    <h1 id="alianza-nombre">&nbsp;</h1>
+                    <div class="adm-sucursal">
+                        <i class="ph ph-storefront" aria-hidden="true"></i>
+                        <label for="sucursal" class="cl-texto-sec">Sucursal</label>
+                        <select id="sucursal" class="adm-select"></select>
+                        <span id="sucursal-direccion"></span>
+                    </div>
+                </div>
             </div>
-            <div class="kpi-card" style="min-width: 220px;">
-                <span>Ventas totales hoy</span>
-                <h3 id="ventas-hoy">$0.00 MXN</h3>
-                <small id="ventas-hoy-detalle">Sin ventas registradas</small>
-            </div>
-        </div>
 
-        <div class="kpi-grid">
-            <div class="kpi-card">
-                <span>Compras de hoy</span>
-                <h3 id="kpi-compras">0</h3>
-                <small>Tickets pagados en la app</small>
+            <div class="adm-ticket cl-ticket">
+                <span class="adm-ticket-etiqueta">Ventas de hoy</span>
+                <span class="adm-ticket-valor" id="ventas-hoy">$0.00</span>
+                <span class="adm-ticket-nota" id="ventas-hoy-detalle">Sin ventas registradas</span>
             </div>
-            <div class="kpi-card">
-                <span>Unidades vendidas hoy</span>
-                <h3 id="kpi-unidades">0</h3>
-                <small>Piezas y kilos escaneados</small>
-            </div>
-            <div class="kpi-card">
-                <span>Productos por caducar</span>
-                <h3 id="kpi-caducar">0</h3>
-                <small>En los próximos días</small>
-            </div>
-            <div class="kpi-card">
-                <span>Productos sin stock</span>
-                <h3 id="kpi-sin-stock">0</h3>
-                <small>Requieren resurtido</small>
-            </div>
-        </div>
+        </section>
 
-        <div class="admin-grid">
+        <p id="aviso-api" class="mensaje mensaje-error adm-aviso" role="alert" hidden></p>
 
-            <div class="admin-card">
-                <h2>🛍️ Productos y ventas en tienda</h2>
-                <p>Artículos en anaquel y unidades vendidas mediante escaneo del cliente.</p>
-                <div class="table-wrap">
-                    <table class="admin-table">
+        <section class="adm-kpis" aria-label="Indicadores de hoy">
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono"><i class="ph ph-shopping-cart-simple" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">Compras de hoy</span>
+                    <span class="adm-kpi-valor" id="kpi-compras">0</span>
+                    <span class="adm-kpi-nota">Tickets pagados en la app</span>
+                </div>
+            </div>
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono"><i class="ph ph-barcode" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">Unidades vendidas hoy</span>
+                    <span class="adm-kpi-valor" id="kpi-unidades">0</span>
+                    <span class="adm-kpi-nota">Piezas y kilos escaneados</span>
+                </div>
+            </div>
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono aviso"><i class="ph ph-clock-countdown" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">Por caducar</span>
+                    <span class="adm-kpi-valor" id="kpi-caducar">0</span>
+                    <span class="adm-kpi-nota">En los próximos 3 días</span>
+                </div>
+            </div>
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono error"><i class="ph ph-package" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">Sin existencias</span>
+                    <span class="adm-kpi-valor" id="kpi-sin-stock">0</span>
+                    <span class="adm-kpi-nota">Requieren resurtido</span>
+                </div>
+            </div>
+        </section>
+
+        <div class="adm-rejilla">
+
+            <section class="cl-tarjeta" aria-labelledby="titulo-productos">
+                <div class="adm-tarjeta-encabezado">
+                    <div>
+                        <h2 id="titulo-productos">Vendido hoy por producto</h2>
+                        <p class="cl-texto-sec">Lo que los clientes escanearon y pagaron en la app.</p>
+                    </div>
+                    <a href="productos-vendidos.html" class="cl-boton-sec">Ver ranking <i class="ph ph-arrow-right" aria-hidden="true"></i></a>
+                </div>
+                <div class="adm-tabla-caja">
+                    <table class="adm-tabla">
                         <thead>
                             <tr>
                                 <th>Producto</th>
-                                <th>Categoría</th>
-                                <th>Precio</th>
-                                <th>Unidades vendidas</th>
+                                <th class="num">Precio</th>
+                                <th class="num">Vendido</th>
+                                <th class="num">Existencia</th>
                             </tr>
                         </thead>
                         <tbody id="tabla-productos">
-                        <tr id="productos-vacio">
-                            <td colspan="4" class="empty-state">
-                                <span class="empty-icon">📦</span>
-                                <strong>Aún no hay ventas</strong>
-                                <p>Los productos aparecerán aquí cuando se registren compras.</p>
-                            </td>
-                        </tr>
+                            <tr class="adm-cargando"><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td></tr>
+                            <tr class="adm-cargando"><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td></tr>
+                            <tr class="adm-cargando"><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td></tr>
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </section>
 
-            <div class="admin-side">
-                <div class="admin-card" style="text-align: center;">
-                    <h2>🔥 Producto más vendido</h2>
-                    <div class="empty-state" id="mas-vendido">
-                        <strong>Sin datos</strong>
-                        <p>Se calculará con las ventas reales.</p>
-                    </div>
-                </div>
+            <div class="adm-columna">
+                <section class="cl-tarjeta" aria-labelledby="titulo-top">
+                    <h2 id="titulo-top" style="margin-bottom: 16px;">Producto más vendido hoy</h2>
+                    <div id="mas-vendido" class="adm-vacio-corto">Cargando…</div>
+                </section>
 
-                <div class="admin-card">
-                    <h2>📈 Gráfica de demanda</h2>
-                    <div id="grafica-demanda">
-                        <div class="empty-state">
-                            <span class="empty-icon">📊</span>
-                            <strong>Sin datos para graficar</strong>
-                            <p>La demanda se mostrará cuando existan ventas.</p>
-                        </div>
-                    </div>
-                </div>
+                <section class="cl-tarjeta" aria-labelledby="titulo-demanda">
+                    <h2 id="titulo-demanda">Demanda de los últimos 7 días</h2>
+                    <div id="grafica-demanda"></div>
+                </section>
             </div>
 
         </div>
 
-    </div>
+    </main>
 
-    <!-- Conexión con la API: protege la página (solo ADMIN) y hace funcionar "Cerrar Sesión". -->
+    <footer class="cl-pie">MARK'S - Compra sin filas. Proyecto Integrador, Universidad Tecnológica Santa Catarina.</footer>
+
     <script src="js/api.js"></script>
     <script src="js/sesion.js"></script>
     <script src="js/dashboard.js"></script>

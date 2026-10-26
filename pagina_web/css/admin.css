@@ -1,217 +1,646 @@
 /*
-  admin.css - Vistas del administrador (dashboard, más vendidos, historial)
-  -------------------------------------------------------------------------
-  Las páginas arrancan sin datos. El JavaScript llenará cada elemento
-  marcado con id cuando existan las rutas de la API para el administrador.
+  admin.css - Panel de la alianza (dashboard, más vendidos, historial)
+  ---------------------------------------------------------------------
+  Usa la base de clientes.css (colores, tarjetas, botones) para que el
+  panel se vea igual que "Mi cuenta". Todo arranca en blanco: el
+  JavaScript (js/dashboard.js) llena cada elemento con id.
 */
 
-.admin-container {
-    width: 90%;
-    max-width: 1150px;
-    margin: 30px auto;
+.adm .cl-encabezado-interior,
+.adm .cl-contenido {
+    max-width: 1160px;
+}
+
+/* Menú: el de clientes, con íconos */
+.adm .cl-menu a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.adm .cl-menu i {
+    font-size: 17px;
+}
+
+/* ------------------------------------------------------------------
+   Portada: nombre de la alianza + sucursal | tarjeta ticket
+   ------------------------------------------------------------------ */
+.adm-portada {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 28px;
+    margin-bottom: 28px;
+}
+
+.adm-saludo {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    min-width: 0;
+}
+
+.adm-avatar {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 72px;
+    height: 72px;
+    border-radius: 24px;
+    background: var(--brote);
+    color: var(--verde-hoja);
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.adm-etiqueta {
+    display: inline-block;
+    margin-bottom: 6px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: var(--brote);
+    color: var(--verde-hoja);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.adm-sucursal {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    margin-top: 6px;
+    color: var(--salvia);
+}
+
+.adm-sucursal i {
+    font-size: 17px;
+    color: var(--verde-hoja);
+}
+
+/* Tarjeta destacada (verde oscuro, borde de ticket) */
+.adm-ticket {
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    min-width: 260px;
+    padding: 22px 28px 20px;
+    border-radius: var(--radio-g);
+    background: var(--verde-bosque);
+    color: var(--blanco);
 }
 
-.admin-header {
-    background: white;
-    padding: 28px 32px;
-    border-radius: 20px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+.adm-ticket-etiqueta {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--verde-marca);
+}
+
+.adm-ticket-valor {
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+.adm-ticket-nota {
+    margin-top: 6px;
+    font-size: 12.5px;
+    color: rgba(255, 255, 255, 0.72);
+}
+
+/* ------------------------------------------------------------------
+   Filtros
+   ------------------------------------------------------------------ */
+.adm-filtros {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
     flex-wrap: wrap;
-    gap: 20px;
+    align-items: flex-end;
+    gap: 14px 18px;
+    margin-bottom: 24px;
+    padding: 18px 22px;
 }
 
-.admin-header h1 {
-    font-size: 26px;
-    color: #2b581b;
-    margin: 8px 0 5px 0;
+.adm-filtros .cl-campo {
+    min-width: 170px;
 }
 
-.admin-header p {
-    font-size: 14.5px;
-    color: #666;
+.adm-filtros .adm-buscar {
+    flex: 1;
+    min-width: 220px;
 }
 
-.admin-badge {
-    background-color: #e2fbe0;
-    color: #2e7d32;
-    padding: 6px 14px;
-    border-radius: 20px;
+.adm-buscar-caja {
+    position: relative;
+}
+
+.adm-buscar-caja i {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 17px;
+    color: var(--salvia);
+    pointer-events: none;
+}
+
+.adm-buscar-caja input {
+    padding-left: 38px !important;
+}
+
+a.cl-boton-sec {
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.adm-select:empty {
+    display: none;
+}
+
+/* Selector de sucursal dentro de la portada */
+.adm-select {
+    height: 34px;
+    padding: 0 30px 0 12px;
+    border: 1.5px solid var(--brote-borde);
+    border-radius: 999px;
+    background: var(--blanco);
+    font: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--verde-bosque);
+    cursor: pointer;
+}
+
+.adm-select:focus {
+    outline: none;
+    border-color: var(--verde-hoja);
+    box-shadow: var(--anillo);
+}
+
+/* Aviso cuando la API no responde */
+.adm-aviso {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 24px;
+}
+
+.adm-aviso i {
+    flex: none;
+    margin-top: 1px;
+    font-size: 18px;
+}
+
+/* ------------------------------------------------------------------
+   Indicadores (KPI)
+   ------------------------------------------------------------------ */
+.adm-kpis {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 28px;
+}
+
+.adm-kpi {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 20px;
+}
+
+.adm-kpi-icono {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: var(--brote);
+    color: var(--verde-hoja);
+    font-size: 22px;
+}
+
+.adm-kpi-icono.aviso {
+    background: var(--aviso-fondo);
+    color: var(--aviso);
+}
+
+.adm-kpi-icono.error {
+    background: var(--error-fondo);
+    color: var(--error);
+}
+
+.adm-kpi-texto {
+    min-width: 0;
+}
+
+.adm-kpi-etiqueta {
+    display: block;
+    font-size: 13px;
+    color: var(--salvia);
+}
+
+.adm-kpi-valor {
+    display: block;
+    margin: 2px 0;
+    color: var(--verde-bosque);
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+}
+
+.adm-kpi-nota {
+    display: block;
     font-size: 12px;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    color: var(--salvia);
 }
 
-/* Barra de filtros */
-.filter-bar {
-    background: white;
-    padding: 20px 30px;
-    border-radius: 20px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+/* ------------------------------------------------------------------
+   Rejilla principal: tabla | columna lateral
+   ------------------------------------------------------------------ */
+.adm-rejilla {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 28px;
+    align-items: start;
+}
+
+.adm-columna {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.adm-tarjeta-encabezado {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 15px;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 18px;
 }
 
-.filter-group {
+.adm-tarjeta-encabezado p {
+    margin-top: 4px;
+    font-size: 13.5px;
+}
+
+/* ------------------------------------------------------------------
+   Tablas
+   ------------------------------------------------------------------ */
+.adm-tabla-caja {
+    overflow-x: auto;
+    margin: 0 -8px;
+}
+
+.adm-tabla {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.adm-tabla th {
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--linea);
+    color: var(--salvia);
+    font-size: 12px;
+    font-weight: 600;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.adm-tabla td {
+    padding: 13px 8px;
+    border-bottom: 1px solid var(--linea);
+    vertical-align: middle;
+}
+
+.adm-tabla tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.adm-tabla tbody tr:hover td {
+    background: #FAFCF8;
+}
+
+.adm-tabla .num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.adm-tabla .centro {
+    text-align: center;
+}
+
+.adm-producto {
+    font-weight: 600;
+    color: var(--tinta);
+}
+
+.adm-sub {
+    display: block;
+    font-size: 12px;
+    color: var(--salvia);
+}
+
+.adm-folio {
+    font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--verde-bosque);
+}
+
+.adm-posicion {
+    display: inline-grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 9px;
+    background: var(--papel);
+    color: var(--salvia);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.adm-posicion.top {
+    background: var(--brote);
+    color: var(--verde-hoja);
+}
+
+/* Barra de participación dentro de la tabla */
+.adm-barra {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 130px;
+}
+
+.adm-barra-fondo {
+    flex: 1;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--linea);
+    overflow: hidden;
+}
+
+.adm-barra-relleno {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--verde-hoja);
+}
+
+.adm-barra span {
+    width: 44px;
+    text-align: right;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    color: var(--salvia);
+}
+
+/* Estado de la compra */
+.adm-estado {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.adm-estado.pagada {
+    background: var(--aviso-fondo);
+    color: var(--aviso);
+}
+
+.adm-estado.validada {
+    background: var(--brote);
+    color: var(--verde-hoja);
+}
+
+.adm-estado.cancelada {
+    background: var(--error-fondo);
+    color: var(--error);
+}
+
+/* Fila vacía (sin datos todavía) */
+.adm-vacio {
+    padding: 36px 16px !important;
+    text-align: center;
+    color: var(--salvia);
+}
+
+.adm-vacio i {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 34px;
+    color: var(--brote-borde);
+}
+
+.adm-vacio strong {
+    display: block;
+    margin-bottom: 2px;
+    color: var(--verde-bosque);
+    font-size: 15px;
+}
+
+/* Fila de carga */
+.adm-cargando td {
+    padding: 13px 8px;
+}
+
+.adm-cargando span {
+    display: block;
+    height: 12px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, var(--papel) 25%, var(--linea) 50%, var(--papel) 75%) 0 0 / 200% 100%;
+    animation: adm-brillo 1.2s infinite;
+}
+
+@keyframes adm-brillo {
+    to { background-position: -200% 0; }
+}
+
+/* ------------------------------------------------------------------
+   Tarjetas laterales del inicio
+   ------------------------------------------------------------------ */
+.adm-destacado {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.adm-destacado-icono {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    background: var(--brote);
+    color: var(--verde-hoja);
+    font-size: 28px;
+}
+
+.adm-destacado strong {
+    display: block;
+    color: var(--verde-bosque);
+    font-size: 17px;
+    line-height: 1.3;
+}
+
+.adm-vacio-corto {
+    color: var(--salvia);
+    font-size: 13.5px;
+}
+
+/* Gráfica de barras de 7 días */
+.adm-grafica {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 170px;
+    padding-top: 18px;
+}
+
+.adm-grafica-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+    gap: 6px;
+    min-width: 0;
+}
+
+.adm-grafica-valor {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--verde-bosque);
+    font-variant-numeric: tabular-nums;
+}
+
+.adm-grafica-barra {
+    width: 100%;
+    max-width: 34px;
+    border-radius: 8px 8px 3px 3px;
+    background: var(--brote-borde);
+}
+
+.adm-grafica-col.hoy .adm-grafica-barra {
+    background: var(--verde-hoja);
+}
+
+.adm-grafica-dia {
+    font-size: 12px;
+    color: var(--salvia);
+    text-transform: capitalize;
+}
+
+.adm-grafica-col.hoy .adm-grafica-dia {
+    color: var(--verde-bosque);
+    font-weight: 600;
+}
+
+.adm-nota-grafica {
+    margin-top: 12px !important;
+    font-size: 12px;
+    color: var(--salvia);
+}
+
+/* Lista de alertas de inventario */
+.adm-alertas {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.adm-alertas li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: var(--radio-m);
+    background: var(--papel);
+}
+
+.adm-alertas li span {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-.filter-group label {
-    font-size: 14px;
-    font-weight: 600;
-    color: #2b581b;
+.adm-alertas li i {
+    font-size: 18px;
 }
 
-.filter-select, .search-input {
-    padding: 10px 14px;
-    border: 1px solid #c8e6c9;
-    border-radius: 10px;
-    font-size: 14px;
-    outline: none;
-    background: #f8faf7;
+.adm-alertas strong {
+    color: var(--verde-bosque);
+    font-size: 18px;
+    font-variant-numeric: tabular-nums;
 }
 
-.filter-select:focus, .search-input:focus {
-    border-color: #72db51;
-    box-shadow: 0 0 5px rgba(114, 219, 81, 0.4);
-}
-
-/* Tarjetas de indicadores */
-.kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
-}
-
-.kpi-card {
-    background: white;
-    padding: 20px;
-    border-radius: 20px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-    border-left: 5px solid #72db51;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.kpi-card span {
-    font-size: 13px;
-    color: #666;
-    font-weight: 600;
-}
-
-.kpi-card h3 {
-    font-size: 24px;
-    color: #2b581b;
-}
-
-.kpi-card small {
-    font-size: 12px;
-    color: #888;
-}
-
-/* Tarjetas de contenido */
-.admin-card {
-    background: white;
-    padding: 28px 30px;
-    border-radius: 20px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-}
-
-.admin-card h2 {
-    color: #2b581b;
-    font-size: 20px;
-    margin-bottom: 5px;
-}
-
-.admin-card > p {
-    color: #666;
-    font-size: 14px;
-}
-
-.admin-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 25px;
-}
-
-.admin-side {
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-}
-
-/* Tablas */
-.table-wrap {
-    overflow-x: auto;
-}
-
-.admin-table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: left;
-    font-size: 14px;
-    margin-top: 15px;
-}
-
-.admin-table th {
-    background-color: #eafbe3;
-    color: #2b581b;
-    padding: 14px;
-    border-bottom: 2px solid #c8e6c9;
-    white-space: nowrap;
-}
-
-.admin-table td {
-    padding: 14px;
-    border-bottom: 1px solid #eee;
-}
-
-/* Estado vacío: se muestra mientras no haya registros */
-.empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: #888;
-}
-
-.empty-state .empty-icon {
-    font-size: 32px;
-    display: block;
-    margin-bottom: 10px;
-    opacity: 0.6;
-}
-
-.empty-state strong {
-    display: block;
-    color: #555;
-    font-size: 15px;
-    margin-bottom: 4px;
-}
-
-.empty-state p {
-    font-size: 13.5px;
-}
-
-.admin-table td.empty-state {
-    border-bottom: none;
-}
-
-@media (max-width: 900px) {
-    .admin-grid {
+/* ------------------------------------------------------------------
+   Tablet y celular
+   ------------------------------------------------------------------ */
+@media (max-width: 980px) {
+    .adm-kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .adm-rejilla {
         grid-template-columns: 1fr;
     }
-    .admin-header, .filter-bar, .admin-card {
-        padding: 20px;
+}
+
+@media (max-width: 760px) {
+    .adm .cl-encabezado-interior {
+        flex-wrap: wrap;
+    }
+    .adm .cl-menu {
+        flex-wrap: wrap;
+    }
+    .adm .cl-menu a {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 640px) {
+    .adm-kpis {
+        grid-template-columns: 1fr;
+    }
+    .adm-ticket {
+        width: 100%;
+        min-width: 0;
+    }
+    .adm-avatar {
+        width: 56px;
+        height: 56px;
+        border-radius: 18px;
+        font-size: 20px;
+    }
+    .adm-filtros .cl-campo {
+        min-width: 0;
+        flex: 1 1 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .adm-cargando span {
+        animation: none;
     }
 }

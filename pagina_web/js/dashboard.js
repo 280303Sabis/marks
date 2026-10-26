@@ -1,9 +1,9 @@
 /*
-  dashboard.js - Vistas del administrador
-  ----------------------------------------
+  dashboard.js - Panel de la alianza
+  -----------------------------------
   Lo usan dashboard.html, productos-vendidos.html y recuperar.html.
   1. Protege la página: sin sesión de ADMIN regresa a index.html.
-  2. Hace funcionar el botón "Cerrar Sesión".
+  2. Hace funcionar el botón "Cerrar sesión".
   3. Llena la página con los datos reales de la API (las mismas ventas
      e inventario que usa la app). Si no hay ventas, se queda en blanco.
 */
@@ -12,12 +12,16 @@
 const $ = (id) => document.getElementById(id);
 
 function dinero(n) {
-  return "$" + Number(n || 0).toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " MXN";
+  return "$" + Number(n || 0).toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 // Piezas sin decimales; kilos con hasta 3 decimales.
 function cantidad(n) {
   return Number(n || 0).toLocaleString("es-MX", { maximumFractionDigits: 3 });
+}
+
+function unidad(p) {
+  return p.tipo_venta === "GRANEL" ? " kg" : "";
 }
 
 // Evita que un nombre con < o > se interprete como HTML.
@@ -27,10 +31,35 @@ function texto(t) {
   return d.innerHTML;
 }
 
+// Iniciales para el cuadro de la portada: "Supermercados del Norte" -> "SN"
+function iniciales(nombre) {
+  const cortas = ["de", "del", "la", "las", "los", "y"];
+  const palabras = String(nombre || "").split(/\s+/).filter((p) => p && !cortas.includes(p.toLowerCase()));
+  return palabras.slice(0, 2).map((p) => p[0].toUpperCase()).join("") || "M";
+}
+
 function filaVacia(columnas, icono, titulo, detalle) {
-  return `<tr><td colspan="${columnas}" class="empty-state">
-            <span class="empty-icon">${icono}</span>
-            <strong>${titulo}</strong><p>${detalle}</p></td></tr>`;
+  return `<tr><td colspan="${columnas}" class="adm-vacio">
+            <i class="ph ph-${icono}" aria-hidden="true"></i>
+            <strong>${titulo}</strong>${detalle}</td></tr>`;
+}
+
+// ---------- Aviso cuando la API falla ----------
+function mostrarError(e) {
+  const aviso = $("aviso-api");
+  let mensaje = e.message || "No se pudieron cargar los datos.";
+  if (e.estado === 404) {
+    mensaje = "El servidor todavía no tiene la versión con el panel de alianzas. Hay que desplegar la API nueva en Render.";
+  }
+  aviso.innerHTML = '<i class="ph ph-warning-circle" aria-hidden="true"></i><span>' + texto(mensaje) + "</span>";
+  aviso.hidden = false;
+  // Quitar las filas de "cargando" para que no se queden parpadeando
+  document.querySelectorAll(".adm-cargando").forEach((fila) => fila.remove());
+  if ($("mas-vendido")) $("mas-vendido").textContent = "Sin datos por ahora.";
+}
+
+function ocultarError() {
+  $("aviso-api").hidden = true;
 }
 
 // ---------- Sucursal elegida (se recuerda mientras la pestaña esté abierta) ----------
@@ -40,79 +69,68 @@ function sucursalElegida() {
   return sessionStorage.getItem(SUCURSAL_KEY) || "";
 }
 
-// Crea (una sola vez) el selector de sucursal y lo llena con las de la API.
-function pintarSelectorSucursal(contenedor, sucursales, actual, alCambiar) {
-  let select = $("sucursal");
-  if (!select) {
-    const grupo = document.createElement("div");
-    grupo.className = "filter-group";
-    grupo.innerHTML = '<label for="sucursal">Sucursal:</label><select id="sucursal" class="filter-select"></select>';
-    contenedor.prepend(grupo);
-    select = $("sucursal");
-    select.addEventListener("change", () => {
-      sessionStorage.setItem(SUCURSAL_KEY, select.value);
-      alCambiar();
-    });
-  }
+function pintarSucursal(sucursales, actual) {
+  const select = $("sucursal");
   select.innerHTML = sucursales
     .map((s) => `<option value="${s.id}">${texto(s.nombre)}</option>`)
     .join("");
-  select.value = String(actual);
-}
-
-function mostrarError(e) {
-  alert(e.message || "No se pudieron cargar los datos");
+  select.value = String(actual.id);
+  $("sucursal-direccion").textContent = [actual.direccion, actual.municipio].filter(Boolean).join(", ");
 }
 
 // ---------- dashboard.html ----------
 async function cargarInicio() {
   const r = await api("/admin/resumen?sucursal_id=" + sucursalElegida());
-
-  pintarSelectorSucursal(document.querySelector(".admin-header > div"), r.sucursales, r.sucursal.id, cargarInicio);
-  $("sucursal-nombre").textContent = r.sucursal.nombre;
-  $("sucursal-direccion").textContent = [r.sucursal.direccion, r.sucursal.municipio].filter(Boolean).join(", ");
+  pintarSucursal(r.sucursales, r.sucursal);
 
   $("ventas-hoy").textContent = dinero(r.hoy.total);
   $("ventas-hoy-detalle").textContent = r.hoy.compras
-    ? `${r.hoy.compras} compra(s) · ahorro a clientes ${dinero(r.hoy.ahorro)}`
-    : "Sin ventas registradas";
+    ? `${r.hoy.compras} compra(s) · los clientes ahorraron ${dinero(r.hoy.ahorro)}`
+    : "Sin ventas registradas hoy";
   $("kpi-compras").textContent = r.hoy.compras;
   $("kpi-unidades").textContent = cantidad(r.hoy.unidades);
   $("kpi-caducar").textContent = r.por_caducar;
   $("kpi-sin-stock").textContent = r.sin_stock;
 
-  // Tabla: productos de la sucursal (solo si ya hubo ventas hoy se muestran unidades)
   const vendidos = r.productos.filter((p) => p.vendidas > 0);
   $("tabla-productos").innerHTML = vendidos.length
     ? vendidos.map((p) => `<tr>
-          <td>${texto(p.nombre)}</td>
-          <td>${texto(p.categoria || "Sin categoría")}</td>
-          <td>${dinero(p.precio)}${p.tipo_venta === "GRANEL" ? " / kg" : ""}</td>
-          <td>${cantidad(p.vendidas)}${p.tipo_venta === "GRANEL" ? " kg" : ""}</td>
+          <td><span class="adm-producto">${texto(p.nombre)}</span>
+              <span class="adm-sub">${texto(p.categoria || "Sin categoría")}</span></td>
+          <td class="num">${dinero(p.precio)}${p.tipo_venta === "GRANEL" ? " / kg" : ""}</td>
+          <td class="num"><strong>${cantidad(p.vendidas)}${unidad(p)}</strong></td>
+          <td class="num">${cantidad(p.stock)}${unidad(p)}</td>
         </tr>`).join("")
-    : filaVacia(4, "📦", "Aún no hay ventas hoy", "Los productos aparecerán aquí cuando se registren compras en la app.");
+    : filaVacia(4, "shopping-bag", "Aún no hay ventas hoy", "Los productos aparecerán aquí cuando los clientes paguen en la app.");
 
+  $("mas-vendido").className = "";
   $("mas-vendido").innerHTML = r.mas_vendido
-    ? `<strong>${texto(r.mas_vendido.nombre)}</strong>
-       <p>${cantidad(r.mas_vendido.vendidas)}${r.mas_vendido.tipo_venta === "GRANEL" ? " kg" : " unidades"} vendidas hoy</p>`
-    : "<strong>Sin datos</strong><p>Se calculará con las ventas reales.</p>";
+    ? `<div class="adm-destacado">
+         <span class="adm-destacado-icono"><i class="ph ph-fire" aria-hidden="true"></i></span>
+         <div>
+           <strong>${texto(r.mas_vendido.nombre)}</strong>
+           <span class="cl-texto-sec">${cantidad(r.mas_vendido.vendidas)}${r.mas_vendido.tipo_venta === "GRANEL" ? " kg" : " unidades"} vendidas hoy</span>
+         </div>
+       </div>`
+    : '<p class="adm-vacio-corto">Se calcula con las ventas reales de hoy.</p>';
 
-  // Gráfica de barras de los últimos 7 días
+  // Gráfica de barras de los últimos 7 días (el último es hoy)
   const maximo = Math.max(...r.demanda.map((d) => d.unidades));
   if (maximo > 0) {
-    $("grafica-demanda").innerHTML = `<div style="display:flex;align-items:flex-end;gap:8px;height:150px;">
-      ${r.demanda.map((d) => {
-        const alto = Math.max(4, Math.round((d.unidades / maximo) * 120));
-        const dia = new Date(d.dia + "T12:00:00").toLocaleDateString("es-MX", { weekday: "short" });
-        return `<div style="flex:1;text-align:center;font-size:12px;color:#555;">
-                  <div>${cantidad(d.unidades)}</div>
-                  <div title="${d.dia}" style="height:${alto}px;background:#2b581b;border-radius:6px 6px 0 0;margin:4px 0;"></div>
-                  <div>${dia}</div></div>`;
+    $("grafica-demanda").innerHTML = `<div class="adm-grafica">
+      ${r.demanda.map((d, i) => {
+        const alto = d.unidades > 0 ? Math.max(6, Math.round((d.unidades / maximo) * 120)) : 3;
+        const dia = new Date(d.dia + "T12:00:00").toLocaleDateString("es-MX", { weekday: "short" }).replace(".", "");
+        const hoy = i === r.demanda.length - 1 ? " hoy" : "";
+        return `<div class="adm-grafica-col${hoy}" title="${d.dia}: ${cantidad(d.unidades)} unidades">
+                  <span class="adm-grafica-valor">${d.unidades > 0 ? cantidad(d.unidades) : ""}</span>
+                  <span class="adm-grafica-barra" style="height:${alto}px"></span>
+                  <span class="adm-grafica-dia">${hoy ? "Hoy" : dia}</span>
+                </div>`;
       }).join("")}</div>
-      <p style="font-size:12px;color:#777;margin-top:8px;">Unidades vendidas por día (últimos 7 días)</p>`;
+      <p class="adm-nota-grafica">Unidades vendidas por día (piezas y kilos).</p>`;
   } else {
-    $("grafica-demanda").innerHTML = `<div class="empty-state"><span class="empty-icon">📊</span>
-      <strong>Sin datos para graficar</strong><p>La demanda se mostrará cuando existan ventas.</p></div>`;
+    $("grafica-demanda").innerHTML = '<p class="adm-vacio-corto" style="margin-top:12px">Sin ventas en los últimos 7 días.</p>';
   }
 }
 
@@ -128,12 +146,18 @@ async function cargarMasVendidos() {
   if ($("categoria").value !== "todas") filtros.set("categoria", $("categoria").value);
   const r = await api("/admin/mas-vendidos?" + filtros);
 
-  pintarSelectorSucursal(document.querySelector(".filter-bar"), r.sucursales, r.sucursal.id, cargarMasVendidos);
+  pintarSucursal(r.sucursales, r.sucursal);
   if (!categoriasCargadas) {
     $("categoria").innerHTML = '<option value="todas">Todas las categorías</option>' +
       r.categorias.map((c) => `<option value="${c.id}">${texto(c.nombre)}</option>`).join("");
     categoriasCargadas = true;
   }
+
+  const ingreso = r.ranking.reduce((suma, p) => suma + Number(p.total), 0);
+  $("kpi-ingreso-total").textContent = dinero(ingreso);
+  $("kpi-ingreso-nota").textContent = r.ranking.length
+    ? `${r.ranking.length} producto(s) vendidos en el periodo`
+    : "Sin ventas en el periodo";
 
   $("kpi-unidades").textContent = cantidad(r.unidades);
   $("kpi-top-producto").textContent = r.top_producto ? r.top_producto.nombre : "—";
@@ -148,19 +172,34 @@ async function cargarMasVendidos() {
 
   $("tabla-ranking").innerHTML = r.ranking.length
     ? r.ranking.map((p, i) => `<tr>
-          <td style="text-align:center;">${i + 1}</td>
-          <td>${texto(p.nombre)}</td>
-          <td>${texto(p.categoria || "Sin categoría")}</td>
-          <td>${dinero(p.precio)}${p.tipo_venta === "GRANEL" ? " / kg" : ""}</td>
-          <td>${cantidad(p.unidades)}${p.tipo_venta === "GRANEL" ? " kg" : ""}</td>
-          <td>${p.participacion}%</td>
-          <td>${dinero(p.total)}</td>
+          <td class="centro"><span class="adm-posicion${i < 3 ? " top" : ""}">${i + 1}</span></td>
+          <td><span class="adm-producto">${texto(p.nombre)}</span>
+              <span class="adm-sub">${texto(p.categoria || "Sin categoría")}</span></td>
+          <td class="num">${dinero(p.precio)}${p.tipo_venta === "GRANEL" ? " / kg" : ""}</td>
+          <td class="num"><strong>${cantidad(p.unidades)}${unidad(p)}</strong></td>
+          <td><div class="adm-barra">
+                <div class="adm-barra-fondo"><div class="adm-barra-relleno" style="width:${p.participacion}%"></div></div>
+                <span>${p.participacion}%</span>
+              </div></td>
+          <td class="num"><strong>${dinero(p.total)}</strong></td>
         </tr>`).join("")
-    : filaVacia(7, "🏆", "Aún no hay productos vendidos", "El ranking se llenará con las compras reales de la sucursal.");
+    : filaVacia(6, "trophy", "Aún no hay productos vendidos", "El ranking se llena con las compras reales de la sucursal.");
 }
 
 // ---------- recuperar.html (historial de compras) ----------
-const ESTADOS = { PAGADA: "Pagada", VALIDADA: "Validada en salida", CANCELADA: "Cancelada" };
+const ESTADOS = {
+  PAGADA: ["pagada", "clock", "Pagada"],
+  VALIDADA: ["validada", "check-circle", "Validada"],
+  CANCELADA: ["cancelada", "x-circle", "Cancelada"],
+};
+
+function fechaCorta(texto) {
+  // "2026-10-25 14:32" -> "25 oct 2026, 14:32"
+  if (!texto) return "";
+  const [dia, hora] = texto.split(" ");
+  const f = new Date(dia + "T12:00:00").toLocaleDateString("es-MX", { day: "numeric", month: "short", year: "numeric" });
+  return f.replace(".", "") + (hora ? ", " + hora : "");
+}
 
 async function cargarHistorial() {
   const filtros = new URLSearchParams({
@@ -171,22 +210,28 @@ async function cargarHistorial() {
   });
   const r = await api("/admin/ventas?" + filtros);
 
-  pintarSelectorSucursal(document.querySelector(".filter-bar"), r.sucursales, r.sucursal.id, cargarHistorial);
-  $("kpi-compras").textContent = r.compras;
+  pintarSucursal(r.sucursales, r.sucursal);
   $("kpi-ingreso").textContent = dinero(r.ingreso);
+  $("kpi-ingreso-nota").textContent = r.compras ? `${r.compras} compra(s) en el periodo` : "Sin compras en el periodo";
+  $("kpi-compras").textContent = r.compras;
   $("kpi-ticket-promedio").textContent = dinero(r.ticket_promedio);
   $("kpi-clientes").textContent = r.clientes;
+  $("kpi-validadas").textContent = r.ventas.filter((v) => v.estado === "VALIDADA").length;
 
   $("tabla-historial").innerHTML = r.ventas.length
-    ? r.ventas.map((v) => `<tr>
-          <td>${texto(v.folio)}</td>
-          <td>${texto(v.fecha)}</td>
-          <td>${texto(v.cliente)}<br><small style="color:#777;">${texto(v.correo)}</small></td>
-          <td>${v.articulos}</td>
-          <td>${dinero(v.total)}</td>
-          <td>${ESTADOS[v.estado] || texto(v.estado)}</td>
-        </tr>`).join("")
-    : filaVacia(6, "🧾", "Aún no hay compras", "Las compras pagadas en la app aparecerán aquí.");
+    ? r.ventas.map((v) => {
+        const [clase, icono, nombre] = ESTADOS[v.estado] || ["", "circle", v.estado];
+        return `<tr>
+          <td><span class="adm-folio">${texto(v.folio)}</span></td>
+          <td>${texto(fechaCorta(v.fecha))}</td>
+          <td><span class="adm-producto">${texto(v.cliente)}</span>
+              <span class="adm-sub">${texto(v.correo)}</span></td>
+          <td class="num">${v.articulos}</td>
+          <td class="num"><strong>${dinero(v.total)}</strong></td>
+          <td><span class="adm-estado ${clase}"><i class="ph ph-${icono}" aria-hidden="true"></i>${texto(nombre)}</span></td>
+        </tr>`;
+      }).join("")
+    : filaVacia(6, "receipt", "Aún no hay compras", "Las compras pagadas en la app aparecerán aquí.");
 }
 
 // ---------- Arranque ----------
@@ -199,6 +244,11 @@ async function cargarHistorial() {
     Sesion.salir();
   });
 
+  // Nombre de la alianza (es el nombre de la cuenta con la que entró)
+  const nombre = [usuario.nombre, usuario.apellidos].filter(Boolean).join(" ");
+  $("alianza-nombre").textContent = nombre || "Mi alianza";
+  $("alianza-iniciales").textContent = iniciales(nombre);
+
   // Cada página tiene su propia tabla; según cuál exista se cargan sus datos.
   let cargar = null;
   if ($("tabla-productos")) cargar = cargarInicio;
@@ -206,7 +256,12 @@ async function cargarHistorial() {
   else if ($("tabla-historial")) cargar = cargarHistorial;
   if (!cargar) return;
 
-  const recargar = () => cargar().catch(mostrarError);
+  const recargar = () => cargar().then(ocultarError).catch(mostrarError);
+
+  $("sucursal").addEventListener("change", () => {
+    sessionStorage.setItem(SUCURSAL_KEY, $("sucursal").value);
+    recargar();
+  });
 
   // Filtros: recargar al cambiar; el buscador espera a que dejes de escribir.
   ["periodo", "categoria", "estado"].forEach((id) => $(id) && $(id).addEventListener("change", recargar));

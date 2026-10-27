@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARK'S - Productos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+    <link rel="stylesheet" href="css/clientes.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/productos.css">
+</head>
+<body class="cl adm">
+
+    <header class="cl-encabezado">
+        <div class="cl-encabezado-interior">
+            <a href="dashboard.html" class="cl-logo"><img src="img/logo_marks.png" alt="MARK'S"></a>
+            <nav aria-label="Menú del panel">
+                <ul class="cl-menu">
+                    <li><a href="dashboard.html"><i class="ph ph-squares-four" aria-hidden="true"></i><span class="adm-menu-texto">Inicio</span></a></li>
+                    <li><a href="inventario.html"><i class="ph ph-package" aria-hidden="true"></i><span class="adm-menu-texto">Inventario</span></a></li>
+                    <li><a href="productos.html" aria-current="page"><i class="ph ph-tag" aria-hidden="true"></i><span class="adm-menu-texto">Productos</span></a></li>
+                    <li><a href="opiniones.html"><i class="ph ph-chat-circle-text" aria-hidden="true"></i><span class="adm-menu-texto">Opiniones</span></a></li>
+                    <li><a href="puntos.html"><i class="ph ph-coins" aria-hidden="true"></i><span class="adm-menu-texto">Puntos</span></a></li>
+                    <li><a href="productos-vendidos.html"><i class="ph ph-trophy" aria-hidden="true"></i><span class="adm-menu-texto">Más vendidos</span></a></li>
+                    <li><a href="recuperar.html"><i class="ph ph-receipt" aria-hidden="true"></i><span class="adm-menu-texto">Historial</span></a></li>
+                    <!-- El JavaScript (js/productos.js) usa este id para cerrar la sesión. No cambiarlo. -->
+                    <li><a href="index.html" id="btn-cerrar-sesion"><i class="ph ph-sign-out" aria-hidden="true"></i><span class="adm-menu-texto">Cerrar sesión</span></a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!--
+        PASO W10 - Productos.
+        Los elementos con id los llena js/productos.js con los datos reales de la API.
+        Se pueden cambiar estilos y acomodo, pero NO los id.
+    -->
+    <main class="cl-contenido">
+
+        <section class="adm-portada">
+            <div class="adm-saludo">
+                <span id="alianza-iniciales" class="adm-avatar" aria-hidden="true"></span>
+                <div>
+                    <span class="adm-etiqueta">Catálogo de productos</span>
+                    <h1 id="alianza-nombre">&nbsp;</h1>
+                    <p class="cl-texto-sec prd-nota-catalogo">
+                        <i class="ph ph-info" aria-hidden="true"></i>
+                        El catálogo es el mismo en todas las sucursales: un precio nuevo aplica en todas.
+                    </p>
+                </div>
+            </div>
+
+            <div class="adm-ticket cl-ticket">
+                <span class="adm-ticket-etiqueta">Productos a la venta</span>
+                <span class="adm-ticket-valor" id="prd-activos">0</span>
+                <span class="adm-ticket-nota" id="prd-activos-nota">Cargando…</span>
+            </div>
+        </section>
+
+        <p id="aviso-api" class="mensaje mensaje-error adm-aviso" role="alert" hidden></p>
+        <p id="aviso-ok" class="mensaje mensaje-info adm-aviso" role="status" hidden></p>
+
+        <section class="adm-kpis" aria-label="Resumen del catálogo">
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono"><i class="ph ph-percent" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">En oferta</span>
+                    <span class="adm-kpi-valor" id="kpi-oferta">0</span>
+                    <span class="adm-kpi-nota">Con precio rebajado</span>
+                </div>
+            </div>
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono"><i class="ph ph-map-pin" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">Locales de NL</span>
+                    <span class="adm-kpi-valor" id="kpi-locales">0</span>
+                    <span class="adm-kpi-nota">Dan puntos dobles</span>
+                </div>
+            </div>
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono aviso"><i class="ph ph-chat-slash" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">Opiniones apagadas</span>
+                    <span class="adm-kpi-valor" id="kpi-sin-opiniones">0</span>
+                    <span class="adm-kpi-nota">Nadie puede calificarlos</span>
+                </div>
+            </div>
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono error"><i class="ph ph-flag" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">Reportes sin revisar</span>
+                    <span class="adm-kpi-valor" id="kpi-reportes">0</span>
+                    <span class="adm-kpi-nota">Opiniones reportadas por clientes</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="cl-tarjeta adm-filtros" aria-label="Filtros">
+            <div class="cl-campo adm-buscar">
+                <label for="buscar">Buscar</label>
+                <div class="adm-buscar-caja">
+                    <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
+                    <input type="search" id="buscar" placeholder="Nombre, código de barras o PLU" autocomplete="off">
+                </div>
+            </div>
+            <div class="cl-campo">
+                <label for="filtro-categoria">Categoría</label>
+                <select id="filtro-categoria"><option value="">Todas</option></select>
+            </div>
+            <div class="cl-campo">
+                <label for="filtro-estado">Mostrar</label>
+                <select id="filtro-estado">
+                    <option value="todos">Todos</option>
+                    <option value="activos">A la venta</option>
+                    <option value="inactivos">Desactivados</option>
+                    <option value="oferta">En oferta</option>
+                    <option value="locales">Locales de NL</option>
+                    <option value="reportes">Con reportes</option>
+                </select>
+            </div>
+        </section>
+
+        <section class="cl-tarjeta" aria-labelledby="titulo-productos">
+            <div class="adm-tarjeta-encabezado">
+                <div>
+                    <h2 id="titulo-productos">Productos</h2>
+                    <p class="cl-texto-sec">Usa el lápiz para cambiar precio, oferta o productor local. Los interruptores se guardan al momento.</p>
+                </div>
+            </div>
+            <div class="adm-tabla-caja">
+                <table class="adm-tabla">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th class="num">Precio</th>
+                            <th>Calificación</th>
+                            <th class="num">Existencia</th>
+                            <th class="centro">Opiniones</th>
+                            <th class="centro">A la venta</th>
+                            <th class="num">Editar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-productos-admin">
+                        <tr class="adm-cargando"><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td></tr>
+                        <tr class="adm-cargando"><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td></tr>
+                        <tr class="adm-cargando"><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="cl-pie">MARK'S - Compra sin filas. Proyecto Integrador, Universidad Tecnológica Santa Catarina.</footer>
+
+    <!-- Ventana: editar producto -->
+    <dialog id="dlg-producto" class="prd-dialogo" aria-labelledby="ed-titulo">
+        <form id="form-producto" class="prd-form" novalidate>
+            <h2 id="ed-titulo">Editar producto</h2>
+            <p id="ed-codigo" class="cl-texto-sec"></p>
+
+            <div class="cl-campo">
+                <label for="ed-nombre">Nombre</label>
+                <input type="text" id="ed-nombre" maxlength="120" autocomplete="off" required>
+            </div>
+
+            <div class="cl-campo">
+                <label for="ed-descripcion">Descripción <span class="cl-opcional">(opcional)</span></label>
+                <input type="text" id="ed-descripcion" maxlength="255" autocomplete="off">
+            </div>
+
+            <div class="cl-campo">
+                <label for="ed-categoria">Categoría</label>
+                <select id="ed-categoria"></select>
+            </div>
+
+            <div class="prd-dos">
+                <div class="cl-campo">
+                    <label for="ed-precio" id="ed-precio-label">Precio normal</label>
+                    <div class="prd-con-prefijo">
+                        <span>$</span>
+                        <input type="number" id="ed-precio" min="0.01" step="0.01" inputmode="decimal" required>
+                    </div>
+                </div>
+                <div class="cl-campo">
+                    <label for="ed-oferta">Precio de oferta <span class="cl-opcional">(opcional)</span></label>
+                    <div class="prd-con-prefijo">
+                        <span>$</span>
+                        <input type="number" id="ed-oferta" min="0.01" step="0.01" inputmode="decimal" placeholder="Sin oferta">
+                    </div>
+                </div>
+            </div>
+            <p id="ed-resumen-precio" class="prd-resumen"></p>
+
+            <div class="cl-campo">
+                <label for="ed-productor">Producto local de Nuevo León</label>
+                <select id="ed-productor"></select>
+                <span class="prd-ayuda">Los productos locales dan el doble de puntos a los clientes.</span>
+            </div>
+
+            <p id="ed-error" class="mensaje mensaje-error" role="alert" hidden></p>
+
+            <div class="prd-botones">
+                <button type="button" class="cl-boton-sec" id="ed-cancelar">Cancelar</button>
+                <button type="submit" class="cl-boton" id="ed-guardar">Guardar cambios</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- Ventana: confirmar desactivar -->
+    <dialog id="dlg-confirmar" class="prd-dialogo" aria-labelledby="conf-titulo">
+        <div class="prd-form">
+            <h2 id="conf-titulo">¿Desactivar producto?</h2>
+            <p id="conf-texto" class="cl-texto-sec"></p>
+            <div class="prd-botones">
+                <button type="button" class="cl-boton-sec" id="conf-cancelar">Cancelar</button>
+                <button type="button" class="cl-boton prd-boton-peligro" id="conf-aceptar">Sí, desactivar</button>
+            </div>
+        </div>
+    </dialog>
+
+    <script src="js/api.js"></script>
+    <script src="js/sesion.js"></script>
+    <script src="js/productos.js"></script>
+</body>
+</html>

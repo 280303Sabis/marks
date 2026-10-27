@@ -1,0 +1,360 @@
+/*
+  opiniones-admin.css - Página de Opiniones del panel (PASO W11)
+  ---------------------------------------------------------------
+  Solo la usa opiniones.html. Se apoya en clientes.css (colores, botones,
+  campos) y admin.css (portada, tarjetas y filtros).
+  (Se llama "opiniones-admin" para no confundirse con la app.)
+
+  Contenido:
+    1. Portada
+    2. Lista de opiniones
+    3. Estrellas, insignias y reportes
+    4. Fotos y visor
+    5. Botones de cada opinión
+    6. Ventana ocultar
+    7. Celular
+*/
+
+/* ------------------------------------------------------------------
+   1. Portada
+   ------------------------------------------------------------------ */
+.opa-nota {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    font-size: 13px;
+}
+
+/* ------------------------------------------------------------------
+   2. Lista de opiniones
+   ------------------------------------------------------------------ */
+.opa-lista {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.opa-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 14px 20px;
+    padding: 16px 4px;
+    border-bottom: 1px solid var(--linea);
+}
+
+.opa-item:last-child {
+    border-bottom: none;
+}
+
+.opa-item.oculta .opa-cuerpo {
+    opacity: 0.6;
+}
+
+.opa-cabeza {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    margin-bottom: 4px;
+}
+
+.opa-producto {
+    font-weight: 700;
+    color: var(--verde-bosque);
+}
+
+.opa-meta {
+    font-size: 12.5px;
+    color: var(--salvia);
+}
+
+.opa-comentario {
+    margin: 6px 0 0;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--tinta);
+    overflow-wrap: anywhere;
+}
+
+.opa-comentario.vacio {
+    font-style: italic;
+    color: var(--salvia);
+}
+
+.opa-motivo-oculta {
+    margin-top: 8px;
+    padding: 8px 12px;
+    border-radius: var(--radio-m);
+    background: var(--aviso-fondo);
+    color: var(--aviso);
+    font-size: 12.5px;
+}
+
+.opa-cargando {
+    height: 70px;
+    margin: 10px 0;
+    border-radius: var(--radio-m);
+    background: linear-gradient(90deg, #EEF2EB 25%, #F6F8F4 50%, #EEF2EB 75%);
+    background-size: 200% 100%;
+    animation: opa-brillo 1.2s infinite;
+}
+
+@keyframes opa-brillo {
+    to { background-position: -200% 0; }
+}
+
+.opa-vacio {
+    padding: 36px 16px;
+    text-align: center;
+    color: var(--salvia);
+}
+
+.opa-vacio i {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 34px;
+    color: var(--verde-hoja);
+}
+
+.opa-vacio strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--verde-bosque);
+}
+
+/* ------------------------------------------------------------------
+   3. Estrellas, insignias y reportes
+   ------------------------------------------------------------------ */
+.opa-estrellas {
+    display: inline-flex;
+    gap: 1px;
+    color: #E0A21B;
+    font-size: 15px;
+}
+
+.opa-estrellas .apagada {
+    color: #D9DED5;
+}
+
+.opa-insignia {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.opa-insignia.publicada {
+    background: var(--brote);
+    color: var(--verde-hoja);
+}
+
+.opa-insignia.oculta {
+    background: var(--aviso-fondo);
+    color: var(--aviso);
+}
+
+.opa-insignia.editada {
+    background: #EEF1EC;
+    color: var(--salvia);
+}
+
+.opa-reportes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.opa-reporte {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--error-fondo);
+    color: var(--error);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* ------------------------------------------------------------------
+   4. Fotos y visor
+   ------------------------------------------------------------------ */
+.opa-fotos {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.opa-foto {
+    width: 64px;
+    height: 64px;
+    padding: 0;
+    border: 1px solid var(--linea);
+    border-radius: 10px;
+    background: #EEF2EB;
+    overflow: hidden;
+    cursor: zoom-in;
+}
+
+.opa-foto img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.opa-visor {
+    max-width: 92vw;
+    max-height: 92vh;
+    padding: 0;
+    border: none;
+    border-radius: var(--radio-g);
+    background: #111;
+    overflow: hidden;
+}
+
+.opa-visor::backdrop {
+    background: rgba(0, 0, 0, 0.75);
+}
+
+.opa-visor img {
+    display: block;
+    max-width: 92vw;
+    max-height: 92vh;
+    object-fit: contain;
+}
+
+.opa-visor-cerrar {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--tinta);
+    font-size: 18px;
+    cursor: pointer;
+}
+
+/* ------------------------------------------------------------------
+   5. Botones de cada opinión
+   ------------------------------------------------------------------ */
+.opa-acciones {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    min-width: 170px;
+}
+
+.opa-acciones button {
+    justify-content: flex-start;
+    height: 36px;
+    white-space: nowrap;
+}
+
+.opa-boton-ocultar {
+    border-color: var(--error-borde) !important;
+    color: var(--error) !important;
+}
+
+.opa-boton-ocultar:hover {
+    background: var(--error-fondo) !important;
+}
+
+/* ------------------------------------------------------------------
+   6. Ventana ocultar
+   ------------------------------------------------------------------ */
+.opa-dialogo {
+    width: min(480px, 92vw);
+    padding: 24px;
+    border: none;
+    border-radius: var(--radio-g);
+    box-shadow: 0 24px 60px rgba(31, 68, 22, 0.25);
+    font-family: 'Poppins', system-ui, sans-serif;
+    font-size: 14px;
+    color: var(--tinta);
+}
+
+.opa-dialogo::backdrop {
+    background: rgba(31, 68, 22, 0.35);
+}
+
+.opa-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.opa-form [hidden] {
+    display: none !important;
+}
+
+.opa-form h2 {
+    margin: 0;
+    font-size: 20px;
+    color: var(--error);
+}
+
+.opa-form > .cl-texto-sec {
+    margin: -8px 0 0;
+    font-size: 13.5px;
+}
+
+.opa-ayuda {
+    margin: 0;
+    font-size: 12px;
+    color: var(--salvia);
+}
+
+.opa-botones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.opa-botones .cl-boton-sec {
+    height: 44px;
+}
+
+.opa-boton-peligro {
+    background: var(--error);
+}
+
+.opa-boton-peligro:hover {
+    background: #93201A;
+}
+
+/* ------------------------------------------------------------------
+   7. Celular
+   ------------------------------------------------------------------ */
+@media (max-width: 640px) {
+    .opa-item {
+        grid-template-columns: 1fr;
+    }
+    .opa-acciones {
+        flex-direction: row;
+        flex-wrap: wrap;
+        min-width: 0;
+    }
+    .opa-acciones button {
+        flex: 1 1 auto;
+        justify-content: center;
+    }
+    .opa-botones {
+        flex-direction: column-reverse;
+    }
+    .opa-botones button {
+        width: 100%;
+    }
+}

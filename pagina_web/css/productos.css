@@ -1,0 +1,308 @@
+/*
+  productos.css - Página de Productos del panel (PASO W10)
+  ---------------------------------------------------------
+  Solo la usa productos.html. Se apoya en clientes.css (colores, botones,
+  campos) y admin.css (portada, tarjetas, filtros y tablas).
+
+  Contenido:
+    1. Portada y tabla
+    2. Precio, oferta y calificación
+    3. Interruptores (opiniones y a la venta)
+    4. Ventanas (editar y confirmar)
+    5. Celular
+*/
+
+/* ------------------------------------------------------------------
+   1. Portada y tabla
+   ------------------------------------------------------------------ */
+.prd-nota-catalogo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    font-size: 13px;
+}
+
+.adm-tabla td.prd-producto {
+    min-width: 220px;
+}
+
+.prd-local {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: var(--brote);
+    color: var(--verde-hoja);
+    font-size: 11px;
+    font-weight: 600;
+    vertical-align: 2px;
+}
+
+.prd-productor {
+    display: block;
+    font-size: 12px;
+    color: var(--verde-hoja);
+}
+
+.adm-tabla tr.prd-inactivo td:not(.prd-fijo) {
+    opacity: 0.5;
+}
+
+/* ------------------------------------------------------------------
+   2. Precio, oferta y calificación
+   ------------------------------------------------------------------ */
+.prd-precio {
+    font-weight: 700;
+    color: var(--verde-bosque);
+    white-space: nowrap;
+}
+
+.prd-precio-antes {
+    display: block;
+    font-size: 12px;
+    color: var(--salvia);
+    text-decoration: line-through;
+}
+
+.prd-descuento {
+    display: inline-block;
+    margin-left: 4px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: var(--aviso-fondo);
+    color: var(--aviso);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.prd-estrellas {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.prd-estrellas i {
+    color: #E0A21B;
+}
+
+.prd-estrellas small {
+    font-weight: 400;
+    color: var(--salvia);
+}
+
+.prd-reportes {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: var(--error-fondo);
+    color: var(--error);
+    font-size: 11.5px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------
+   3. Interruptores (opiniones y a la venta)
+   ------------------------------------------------------------------ */
+.prd-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    vertical-align: middle;
+}
+
+.prd-switch input {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.prd-switch span {
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: #CBD3C6;
+    transition: background 0.15s;
+}
+
+.prd-switch span::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--blanco);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: transform 0.15s;
+}
+
+.prd-switch input:checked + span {
+    background: var(--verde-hoja);
+}
+
+.prd-switch input:checked + span::after {
+    transform: translateX(20px);
+}
+
+.prd-switch input:focus-visible + span {
+    outline: 2px solid var(--verde-hoja);
+    outline-offset: 2px;
+}
+
+.prd-switch input:disabled {
+    cursor: wait;
+}
+
+.prd-switch input:disabled + span {
+    opacity: 0.6;
+}
+
+.prd-editar {
+    display: inline-grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border: 1.5px solid var(--linea);
+    border-radius: 10px;
+    background: var(--blanco);
+    color: var(--verde-hoja);
+    font-size: 17px;
+    cursor: pointer;
+}
+
+.prd-editar:hover {
+    background: var(--brote);
+    border-color: var(--brote-borde);
+}
+
+/* ------------------------------------------------------------------
+   4. Ventanas (editar y confirmar)
+   ------------------------------------------------------------------ */
+.prd-dialogo {
+    width: min(500px, 92vw);
+    padding: 26px;
+    border: none;
+    border-radius: var(--radio-g);
+    box-shadow: 0 24px 60px rgba(31, 68, 22, 0.25);
+    font-family: 'Poppins', system-ui, sans-serif;
+    font-size: 14px;
+    color: var(--tinta);
+}
+
+.prd-dialogo::backdrop {
+    background: rgba(31, 68, 22, 0.35);
+}
+
+.prd-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.prd-form [hidden] {
+    display: none !important;
+}
+
+.prd-form h2 {
+    margin: 0;
+    font-size: 20px;
+    color: var(--verde-bosque);
+}
+
+.prd-form > .cl-texto-sec {
+    margin: -10px 0 0;
+    font-size: 13.5px;
+}
+
+.prd-dos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.prd-con-prefijo {
+    position: relative;
+}
+
+.prd-con-prefijo span {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: 600;
+    color: var(--salvia);
+    pointer-events: none;
+}
+
+.prd-con-prefijo input {
+    padding-left: 28px !important;
+}
+
+.prd-ayuda {
+    font-size: 12px;
+    color: var(--salvia);
+}
+
+.prd-resumen {
+    margin: -6px 0 0;
+    padding: 10px 14px;
+    border-radius: var(--radio-m);
+    background: var(--papel);
+    font-size: 13.5px;
+}
+
+.prd-resumen:empty {
+    display: none;
+}
+
+.prd-resumen.error {
+    background: var(--error-fondo);
+    color: var(--error);
+}
+
+.prd-botones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.prd-botones .cl-boton-sec {
+    height: 44px;
+}
+
+.prd-boton-peligro {
+    background: var(--error);
+}
+
+.prd-boton-peligro:hover {
+    background: #93201A;
+}
+
+/* ------------------------------------------------------------------
+   5. Celular
+   ------------------------------------------------------------------ */
+@media (max-width: 480px) {
+    .prd-dos {
+        grid-template-columns: 1fr;
+    }
+    .prd-botones {
+        flex-direction: column-reverse;
+    }
+    .prd-botones button {
+        width: 100%;
+    }
+}

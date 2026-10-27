@@ -5,6 +5,7 @@
     data-roles="ADMIN"              roles que pueden entrar (separados por coma)
     data-destino="dashboard.html"   página que se abre al entrar
     data-mensaje-rol="..."          mensaje si la cuenta es de otro tipo
+    data-destino-guardia="..."      (opcional) página para ese rol; si no hay, usa data-destino
 
   1. Si ya hay una sesión con un rol permitido, entra directo al destino.
   2. Al enviar, manda correo y contraseña a POST /api/auth/login.
@@ -22,6 +23,11 @@ const cajaMensaje = document.getElementById("login-mensaje");
 const ROLES_PERMITIDOS = (formulario.dataset.roles || "")
   .split(",").map((r) => r.trim()).filter(Boolean);
 const DESTINO = formulario.dataset.destino;
+// Destino según el rol: data-destino-guardia="guardia.html" -> dataset.destinoGuardia
+function destinoPara(rol) {
+  const clave = "destino" + rol.charAt(0).toUpperCase() + rol.slice(1).toLowerCase();
+  return formulario.dataset[clave] || DESTINO;
+}
 const MENSAJE_ROL = formulario.dataset.mensajeRol
   || "Esta cuenta no tiene acceso a esta sección.";
 // Nombre de esta página (index.html o acceso-clientes.html): aquí se regresa al salir.
@@ -49,7 +55,7 @@ function cargando(activo) {
 // 1. Si ya hay sesión con un rol permitido, no tiene caso volver a iniciar sesión.
 const usuarioActual = Sesion.usuario();
 if (Sesion.token() && usuarioActual && ROLES_PERMITIDOS.includes(usuarioActual.rol)) {
-  location.replace(DESTINO);
+  location.replace(destinoPara(usuarioActual.rol));
 }
 
 // Aviso cuando la sesión se cerró porque el token ya no era válido.
@@ -86,7 +92,7 @@ formulario.addEventListener("submit", async (evento) => {
     }
 
     Sesion.guardar(respuesta.token, respuesta.usuario, PAGINA_ACCESO);
-    location.replace(DESTINO);
+    location.replace(destinoPara(respuesta.usuario.rol));
 
   } catch (e) {
     // 4. Errores de la API

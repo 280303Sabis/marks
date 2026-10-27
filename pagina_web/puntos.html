@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARK'S - Puntos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+    <link rel="stylesheet" href="css/clientes.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/puntos.css">
+</head>
+<body class="cl adm">
+
+    <header class="cl-encabezado">
+        <div class="cl-encabezado-interior">
+            <a href="dashboard.html" class="cl-logo"><img src="img/logo_marks.png" alt="MARK'S"></a>
+            <nav aria-label="Menú del panel">
+                <ul class="cl-menu">
+                    <li><a href="dashboard.html"><i class="ph ph-squares-four" aria-hidden="true"></i><span class="adm-menu-texto">Inicio</span></a></li>
+                    <li><a href="inventario.html"><i class="ph ph-package" aria-hidden="true"></i><span class="adm-menu-texto">Inventario</span></a></li>
+                    <li><a href="productos.html"><i class="ph ph-tag" aria-hidden="true"></i><span class="adm-menu-texto">Productos</span></a></li>
+                    <li><a href="opiniones.html"><i class="ph ph-chat-circle-text" aria-hidden="true"></i><span class="adm-menu-texto">Opiniones</span></a></li>
+                    <li><a href="puntos.html" aria-current="page"><i class="ph ph-coins" aria-hidden="true"></i><span class="adm-menu-texto">Puntos</span></a></li>
+                    <li><a href="productos-vendidos.html"><i class="ph ph-trophy" aria-hidden="true"></i><span class="adm-menu-texto">Más vendidos</span></a></li>
+                    <li><a href="recuperar.html"><i class="ph ph-receipt" aria-hidden="true"></i><span class="adm-menu-texto">Historial</span></a></li>
+                    <!-- El JavaScript (js/puntos.js) usa este id para cerrar la sesión. No cambiarlo. -->
+                    <li><a href="index.html" id="btn-cerrar-sesion"><i class="ph ph-sign-out" aria-hidden="true"></i><span class="adm-menu-texto">Cerrar sesión</span></a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!--
+        PASO W13 - Puntos de los clientes (programa de lealtad).
+        Los elementos con id los llena js/puntos.js con los datos reales de la API.
+        Se pueden cambiar estilos y acomodo, pero NO los id.
+    -->
+    <main class="cl-contenido">
+
+        <section class="adm-portada">
+            <div class="adm-saludo">
+                <span id="alianza-iniciales" class="adm-avatar" aria-hidden="true"></span>
+                <div>
+                    <span class="adm-etiqueta">Programa de lealtad</span>
+                    <h1 id="alianza-nombre">&nbsp;</h1>
+                    <p class="cl-texto-sec pts-nota">
+                        <i class="ph ph-info" aria-hidden="true"></i>
+                        100 puntos = $10 de descuento. Los ajustes que hagas los ve el cliente en su app.
+                    </p>
+                </div>
+            </div>
+
+            <div class="adm-ticket cl-ticket">
+                <span class="adm-ticket-etiqueta">Puntos en circulación</span>
+                <span class="adm-ticket-valor" id="pts-circulacion">0</span>
+                <span class="adm-ticket-nota" id="pts-circulacion-nota">Cargando…</span>
+            </div>
+        </section>
+
+        <p id="aviso-api" class="mensaje mensaje-error adm-aviso" role="alert" hidden></p>
+        <p id="aviso-ok" class="mensaje mensaje-info adm-aviso" role="status" hidden></p>
+
+        <section class="adm-kpis" aria-label="Resumen de puntos">
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono"><i class="ph ph-users" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">Clientes</span>
+                    <span class="adm-kpi-valor" id="kpi-clientes">0</span>
+                    <span class="adm-kpi-nota">Cuentas activas</span>
+                </div>
+            </div>
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono"><i class="ph ph-coins" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">Con puntos</span>
+                    <span class="adm-kpi-valor" id="kpi-con-puntos">0</span>
+                    <span class="adm-kpi-nota">Tienen saldo para canjear</span>
+                </div>
+            </div>
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono aviso"><i class="ph ph-sliders-horizontal" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">Ajustes</span>
+                    <span class="adm-kpi-valor" id="kpi-ajustes">0</span>
+                    <span class="adm-kpi-nota">Últimos 30 días</span>
+                </div>
+            </div>
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono"><i class="ph ph-plus-minus" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">Neto ajustado</span>
+                    <span class="adm-kpi-valor" id="kpi-neto">0</span>
+                    <span class="adm-kpi-nota">Puntos sumados menos quitados (30 días)</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="cl-tarjeta adm-filtros" aria-label="Filtros">
+            <div class="cl-campo adm-buscar">
+                <label for="buscar">Buscar cliente</label>
+                <div class="adm-buscar-caja">
+                    <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
+                    <input type="search" id="buscar" placeholder="Nombre, apellido o correo" autocomplete="off">
+                </div>
+            </div>
+            <div class="cl-campo">
+                <label for="orden">Ordenar por</label>
+                <select id="orden">
+                    <option value="puntos">Más puntos</option>
+                    <option value="recientes">Compra más reciente</option>
+                    <option value="nombre">Nombre</option>
+                </select>
+            </div>
+        </section>
+
+        <section class="cl-tarjeta" aria-labelledby="titulo-lista">
+            <div class="adm-tarjeta-encabezado">
+                <div>
+                    <h2 id="titulo-lista">Clientes</h2>
+                    <p class="cl-texto-sec" id="lista-nota">Toca "Ajustar" para ver su estado de cuenta y sumar o quitar puntos.</p>
+                </div>
+            </div>
+            <div class="adm-tabla-caja">
+                <table class="adm-tabla">
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th class="num">Compras</th>
+                            <th class="pts-col-fecha">Última compra</th>
+                            <th class="num">Puntos</th>
+                            <th class="num pts-col-pesos">Equivalen a</th>
+                            <th><span class="pts-oculto">Acciones</span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-clientes">
+                        <tr><td colspan="6" class="adm-vacio">Cargando clientes…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="cl-pie">MARK'S - Compra sin filas. Proyecto Integrador, Universidad Tecnológica Santa Catarina.</footer>
+
+    <!-- Ventana: estado de cuenta y ajuste de puntos -->
+    <dialog id="dlg-cliente" class="pts-dialogo" aria-labelledby="cl-nombre">
+        <div class="pts-cabeza">
+            <div>
+                <h2 id="cl-nombre">Cliente</h2>
+                <p id="cl-correo" class="cl-texto-sec"></p>
+            </div>
+            <div class="pts-saldo">
+                <span>Saldo actual</span>
+                <strong id="cl-saldo">0</strong>
+                <small id="cl-saldo-pesos"></small>
+            </div>
+            <button type="button" class="pts-cerrar" id="cl-cerrar" aria-label="Cerrar"><i class="ph ph-x" aria-hidden="true"></i></button>
+        </div>
+
+        <div class="pts-cuerpo">
+            <form id="form-ajuste" class="pts-form" novalidate>
+                <h3>Ajustar puntos</h3>
+
+                <div class="pts-tipo" role="radiogroup" aria-label="Tipo de ajuste">
+                    <label><input type="radio" name="tipo" value="sumar" checked><span><i class="ph ph-plus-circle" aria-hidden="true"></i>Sumar</span></label>
+                    <label><input type="radio" name="tipo" value="restar"><span><i class="ph ph-minus-circle" aria-hidden="true"></i>Quitar</span></label>
+                </div>
+
+                <div class="cl-campo">
+                    <label for="aj-puntos">Puntos</label>
+                    <input type="number" id="aj-puntos" min="1" max="5000" step="1" inputmode="numeric" placeholder="Ej. 100">
+                </div>
+
+                <div class="cl-campo">
+                    <label for="aj-motivo">Motivo <span class="cl-opcional">(el cliente lo verá en su app)</span></label>
+                    <select id="aj-motivo">
+                        <option value="Compensación por producto en mal estado">Compensación por producto en mal estado</option>
+                        <option value="Compensación por error en el cobro">Compensación por error en el cobro</option>
+                        <option value="Bonificación especial de MARK'S">Bonificación especial de MARK'S</option>
+                        <option value="Corrección de puntos mal asignados">Corrección de puntos mal asignados</option>
+                        <option value="otro">Otro motivo…</option>
+                    </select>
+                </div>
+                <div class="cl-campo" id="campo-otro" hidden>
+                    <label for="aj-otro">Escribe el motivo</label>
+                    <input type="text" id="aj-otro" maxlength="150" autocomplete="off">
+                </div>
+
+                <p id="aj-vista" class="pts-vista" aria-live="polite"></p>
+                <p id="aj-error" class="mensaje mensaje-error" role="alert" hidden></p>
+
+                <button type="submit" class="cl-boton" id="aj-guardar">Guardar ajuste</button>
+            </form>
+
+            <section class="pts-movimientos" aria-labelledby="mov-titulo">
+                <h3 id="mov-titulo">Estado de cuenta</h3>
+                <ul id="lista-movimientos" class="pts-lista">
+                    <li class="pts-vacio">Cargando…</li>
+                </ul>
+            </section>
+        </div>
+    </dialog>
+
+    <script src="js/api.js"></script>
+    <script src="js/sesion.js"></script>
+    <script src="js/puntos.js"></script>
+</body>
+</html>

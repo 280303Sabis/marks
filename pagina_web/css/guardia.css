@@ -1,0 +1,410 @@
+/*
+  guardia.css - Pantalla del guardia (PASO W12)
+  ----------------------------------------------
+  Solo la usa guardia.html. Se apoya en clientes.css y admin.css.
+  Pensada para verse bien en una computadora o en un celular en la salida:
+  el resultado es grande y de color (verde = puede salir, rojo = no).
+
+  Contenido:
+    1. Barra superior y sucursal
+    2. Cámara y folio a mano
+    3. Resultado (espera, ok, error, aviso)
+    4. Hoy en la sucursal
+    5. Celular
+*/
+
+/* ------------------------------------------------------------------
+   1. Barra superior y sucursal
+   ------------------------------------------------------------------ */
+.gda-barra {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 14px 24px;
+    margin-bottom: 22px;
+}
+
+.gda-barra h1 {
+    margin: 6px 0 2px;
+    font-size: 30px;
+}
+
+.gda-barra p {
+    margin: 0;
+}
+
+.gda-sucursal {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: var(--blanco);
+    box-shadow: var(--sombra);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--verde-bosque);
+}
+
+.gda-sucursal label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ------------------------------------------------------------------
+   2. Cámara y folio a mano
+   ------------------------------------------------------------------ */
+.gda-rejilla {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 22px;
+    margin-bottom: 22px;
+}
+
+.gda-camara h2,
+.gda-resultado h2 {
+    margin: 0;
+}
+
+.gda-camara > .cl-texto-sec {
+    margin: 4px 0 14px;
+    font-size: 13.5px;
+}
+
+.gda-visor {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radio-m);
+    background: #1B241A;
+    overflow: hidden;
+}
+
+#lector {
+    width: 100%;
+    height: 100%;
+}
+
+#lector video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+}
+
+.gda-visor-apagado {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px;
+    color: #C9D6C3;
+    font-size: 14px;
+    text-align: center;
+}
+
+.gda-visor-apagado i {
+    font-size: 44px;
+}
+
+.gda-visor-apagado[hidden] {
+    display: none;
+}
+
+.gda-botones-camara {
+    display: flex;
+    gap: 10px;
+    margin: 14px 0 18px;
+}
+
+.gda-botones-camara .cl-boton {
+    flex: 1;
+}
+
+.gda-folio label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--verde-bosque);
+}
+
+.gda-folio-fila {
+    display: flex;
+    gap: 10px;
+}
+
+.gda-folio-fila input {
+    flex: 1;
+    min-width: 0;
+    height: 44px;
+    padding: 0 14px;
+    border: 1.5px solid var(--linea);
+    border-radius: var(--radio-m);
+    background: #FBFCFA;
+    font: inherit;
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: 15px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.gda-folio-fila input:focus {
+    outline: none;
+    border-color: var(--verde-hoja);
+}
+
+.gda-folio-fila .cl-boton-sec {
+    height: 44px;
+}
+
+/* ------------------------------------------------------------------
+   3. Resultado (espera, ok, error, aviso)
+   ------------------------------------------------------------------ */
+.gda-resultado {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 100%;
+    text-align: center;
+    border: 3px solid transparent;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.gda-resultado-icono {
+    display: grid;
+    place-items: center;
+    width: 92px;
+    height: 92px;
+    margin-bottom: 6px;
+    border-radius: 50%;
+    font-size: 50px;
+}
+
+.gda-resultado h2 {
+    font-size: 26px;
+}
+
+.gda-resultado > p {
+    max-width: 420px;
+    margin: 0;
+    font-size: 15px;
+}
+
+.gda-resultado.espera .gda-resultado-icono {
+    background: var(--brote);
+    color: var(--verde-hoja);
+}
+
+.gda-resultado.ok {
+    background: #EAF8E3;
+    border-color: var(--verde-hoja);
+}
+
+.gda-resultado.ok .gda-resultado-icono {
+    background: var(--verde-hoja);
+    color: var(--blanco);
+}
+
+.gda-resultado.ok h2 {
+    color: var(--verde-hoja);
+}
+
+.gda-resultado.error {
+    background: var(--error-fondo);
+    border-color: var(--error);
+}
+
+.gda-resultado.error .gda-resultado-icono {
+    background: var(--error);
+    color: var(--blanco);
+}
+
+.gda-resultado.error h2 {
+    color: var(--error);
+}
+
+.gda-resultado.aviso {
+    background: var(--aviso-fondo);
+    border-color: #D9A21B;
+}
+
+.gda-resultado.aviso .gda-resultado-icono {
+    background: #D9A21B;
+    color: var(--blanco);
+}
+
+.gda-resultado.aviso h2 {
+    color: var(--aviso);
+}
+
+.gda-resultado.cargando .gda-resultado-icono i {
+    animation: gda-girar 1s linear infinite;
+}
+
+@keyframes gda-girar {
+    to { transform: rotate(360deg); }
+}
+
+.gda-venta {
+    width: 100%;
+    max-width: 420px;
+    margin-top: 12px;
+}
+
+.gda-venta[hidden] {
+    display: none;
+}
+
+.gda-venta dl {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 0;
+}
+
+.gda-venta dl div {
+    padding: 10px 12px;
+    border-radius: var(--radio-m);
+    background: rgba(255, 255, 255, 0.75);
+    text-align: left;
+}
+
+.gda-venta dt {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--salvia);
+}
+
+.gda-venta dd {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--verde-bosque);
+    overflow-wrap: anywhere;
+}
+
+.gda-detalle-extra {
+    margin: 8px 0 0;
+    font-size: 13px;
+    color: var(--tinta);
+}
+
+.gda-detalle-extra:empty {
+    display: none;
+}
+
+.gda-productos {
+    margin-top: 10px;
+    text-align: left;
+    font-size: 13.5px;
+}
+
+.gda-productos summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--verde-hoja);
+}
+
+.gda-productos ul {
+    margin: 8px 0 0;
+    padding-left: 20px;
+}
+
+.gda-siguiente {
+    margin-top: 14px;
+}
+
+.gda-siguiente[hidden] {
+    display: none;
+}
+
+/* ------------------------------------------------------------------
+   4. Hoy en la sucursal
+   ------------------------------------------------------------------ */
+.gda-contadores {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.gda-contadores span {
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: var(--papel);
+    font-size: 13.5px;
+}
+
+.gda-contadores strong {
+    color: var(--verde-bosque);
+}
+
+.gda-lista {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.gda-lista li {
+    display: grid;
+    grid-template-columns: 60px minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 4px;
+    border-bottom: 1px solid var(--linea);
+    font-size: 14px;
+}
+
+.gda-lista li:last-child {
+    border-bottom: none;
+}
+
+.gda-lista .hora {
+    font-weight: 700;
+    color: var(--verde-hoja);
+}
+
+.gda-lista .folio {
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: 13px;
+}
+
+.gda-lista .vacio {
+    display: block;
+    padding: 20px;
+    text-align: center;
+    color: var(--salvia);
+}
+
+/* ------------------------------------------------------------------
+   5. Celular
+   ------------------------------------------------------------------ */
+@media (max-width: 860px) {
+    .gda-rejilla {
+        grid-template-columns: 1fr;
+    }
+    .gda-resultado {
+        min-height: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .gda-sucursal {
+        width: 100%;
+        border-radius: var(--radio-m);
+    }
+    .gda-venta dl {
+        grid-template-columns: 1fr;
+    }
+    .gda-lista li {
+        grid-template-columns: 50px minmax(0, 1fr) auto;
+    }
+    .gda-lista li .articulos {
+        display: none;
+    }
+}

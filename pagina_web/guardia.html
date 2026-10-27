@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARK'S - Validar salida</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+    <link rel="stylesheet" href="css/clientes.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/guardia.css">
+</head>
+<body class="cl adm gda">
+
+    <header class="cl-encabezado">
+        <div class="cl-encabezado-interior">
+            <a href="guardia.html" class="cl-logo"><img src="img/logo_marks.png" alt="MARK'S"></a>
+            <nav aria-label="Menú del guardia">
+                <ul class="cl-menu">
+                    <li><a href="guardia.html" aria-current="page"><i class="ph ph-qr-code" aria-hidden="true"></i><span class="adm-menu-texto">Validar salida</span></a></li>
+                    <!-- Solo lo ve el administrador (js/guardia.js lo muestra) -->
+                    <li id="menu-panel" hidden><a href="dashboard.html"><i class="ph ph-squares-four" aria-hidden="true"></i><span class="adm-menu-texto">Panel</span></a></li>
+                    <!-- El JavaScript (js/guardia.js) usa este id para cerrar la sesión. No cambiarlo. -->
+                    <li><a href="index.html" id="btn-cerrar-sesion"><i class="ph ph-sign-out" aria-hidden="true"></i><span class="adm-menu-texto">Cerrar sesión</span></a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!--
+        PASO W12 - Pantalla del guardia: escanea el QR de salida y valida la compra.
+        Los elementos con id los llena js/guardia.js. Se pueden cambiar estilos, pero NO los id.
+    -->
+    <main class="cl-contenido">
+
+        <section class="gda-barra">
+            <div>
+                <span class="adm-etiqueta">Salida de la tienda</span>
+                <h1>Validar compra</h1>
+                <p class="cl-texto-sec" id="gda-guardia">&nbsp;</p>
+            </div>
+            <div class="gda-sucursal">
+                <label for="sucursal"><i class="ph ph-storefront" aria-hidden="true"></i> Estás en</label>
+                <select id="sucursal" class="adm-select"></select>
+            </div>
+        </section>
+
+        <p id="aviso-api" class="mensaje mensaje-error adm-aviso" role="alert" hidden></p>
+
+        <div class="gda-rejilla">
+
+            <!-- Cámara y folio a mano -->
+            <section class="cl-tarjeta gda-camara" aria-labelledby="titulo-camara">
+                <h2 id="titulo-camara">Escanea el QR del cliente</h2>
+                <p class="cl-texto-sec">El cliente lo muestra en su app, en <strong>Tu compra</strong>.</p>
+
+                <div class="gda-visor">
+                    <div id="lector"></div>
+                    <div id="visor-apagado" class="gda-visor-apagado">
+                        <i class="ph ph-camera" aria-hidden="true"></i>
+                        <span id="visor-texto">La cámara está apagada</span>
+                    </div>
+                </div>
+
+                <div class="gda-botones-camara">
+                    <button type="button" class="cl-boton" id="btn-camara">
+                        <i class="ph ph-camera" aria-hidden="true"></i><span>Encender cámara</span>
+                    </button>
+                </div>
+
+                <form id="form-folio" class="gda-folio" novalidate>
+                    <label for="folio">¿La cámara no lee el QR? Escribe el folio</label>
+                    <div class="gda-folio-fila">
+                        <input type="text" id="folio" placeholder="MK-261027-000001" autocomplete="off" maxlength="16" spellcheck="false">
+                        <button type="submit" class="cl-boton-sec" id="btn-folio">Validar</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Resultado -->
+            <section class="cl-tarjeta gda-resultado espera" id="resultado" aria-live="assertive">
+                <div class="gda-resultado-icono"><i id="res-icono" class="ph ph-scan" aria-hidden="true"></i></div>
+                <h2 id="res-titulo">Esperando cliente</h2>
+                <p id="res-mensaje">Escanea el QR o escribe el folio para validar la salida.</p>
+
+                <div id="res-venta" class="gda-venta" hidden>
+                    <dl>
+                        <div><dt>Folio</dt><dd id="res-folio"></dd></div>
+                        <div><dt>Cliente</dt><dd id="res-cliente"></dd></div>
+                        <div><dt>Artículos</dt><dd id="res-articulos"></dd></div>
+                        <div><dt>Total pagado</dt><dd id="res-total"></dd></div>
+                    </dl>
+                    <p class="gda-detalle-extra" id="res-extra"></p>
+                    <details class="gda-productos">
+                        <summary>Ver productos para revisar la bolsa</summary>
+                        <ul id="res-productos"></ul>
+                    </details>
+                </div>
+
+                <button type="button" class="cl-boton gda-siguiente" id="btn-siguiente" hidden>
+                    <i class="ph ph-arrow-right" aria-hidden="true"></i>Siguiente cliente
+                </button>
+            </section>
+        </div>
+
+        <!-- Hoy en la sucursal -->
+        <section class="cl-tarjeta gda-hoy" aria-labelledby="titulo-hoy">
+            <div class="adm-tarjeta-encabezado">
+                <div>
+                    <h2 id="titulo-hoy">Hoy en esta sucursal</h2>
+                    <p class="cl-texto-sec">Se actualiza cada vez que validas una compra.</p>
+                </div>
+                <div class="gda-contadores">
+                    <span><strong id="hoy-validadas">0</strong> validadas hoy</span>
+                    <span><strong id="hoy-por-salir">0</strong> pagadas sin salir</span>
+                </div>
+            </div>
+            <ul id="hoy-lista" class="gda-lista"></ul>
+        </section>
+
+    </main>
+
+    <footer class="cl-pie">MARK'S - Compra sin filas. Proyecto Integrador, Universidad Tecnológica Santa Catarina.</footer>
+
+    <!-- Lector de QR con la cámara (html5-qrcode) -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/sesion.js"></script>
+    <script src="js/guardia.js"></script>
+</body>
+</html>

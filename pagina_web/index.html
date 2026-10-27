@@ -46,10 +46,12 @@
                     data-roles:       roles que pueden entrar por aquí
                     data-destino:     página que se abre al entrar
                     data-mensaje-rol: mensaje si la cuenta es de otro tipo
+                    data-destino-guardia: página del guardia (PASO W12)
                 -->
                 <form id="form-login" class="login-form" novalidate
-                      data-roles="ADMIN"
+                      data-roles="ADMIN,GUARDIA"
                       data-destino="dashboard.html"
+                      data-destino-guardia="guardia.html"
                       data-mensaje-rol="Esta cuenta no tiene acceso al portal de administración. Si eres cliente, entra por la sección Clientes.">
                     <div class="input-group">
                         <label for="email">Correo</label>

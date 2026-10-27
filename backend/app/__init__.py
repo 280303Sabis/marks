@@ -45,6 +45,7 @@ def create_app():
     from .routes.admin_productos import bp as admin_productos_bp    # PASO W10: productos
     from .routes.admin_opiniones import bp as admin_opiniones_bp    # PASO W11: moderación de opiniones
     from .routes.guardia import bp as guardia_bp                    # PASO W12: guardia (QR de salida)
+    from .routes.admin_puntos import bp as admin_puntos_bp          # PASO W13: puntos de los clientes
     app.register_blueprint(productos_bp, url_prefix="/api")
     app.register_blueprint(carrito_bp, url_prefix="/api")
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
@@ -57,6 +58,7 @@ def create_app():
     app.register_blueprint(admin_productos_bp, url_prefix="/api/admin")    # PASO W10
     app.register_blueprint(admin_opiniones_bp, url_prefix="/api/admin")    # PASO W11
     app.register_blueprint(guardia_bp, url_prefix="/api/guardia")          # PASO W12
+    app.register_blueprint(admin_puntos_bp, url_prefix="/api/admin")      # PASO W13
 
     @app.get("/")
     def inicio():

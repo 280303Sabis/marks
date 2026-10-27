@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARK'S - Inventario</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+    <link rel="stylesheet" href="css/clientes.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/inventario.css">
+</head>
+<body class="cl adm">
+
+    <header class="cl-encabezado">
+        <div class="cl-encabezado-interior">
+            <a href="dashboard.html" class="cl-logo"><img src="img/logo_marks.png" alt="MARK'S"></a>
+            <nav aria-label="Menú del panel">
+                <ul class="cl-menu">
+                    <li><a href="dashboard.html"><i class="ph ph-squares-four" aria-hidden="true"></i><span class="adm-menu-texto">Inicio</span></a></li>
+                    <li><a href="inventario.html" aria-current="page"><i class="ph ph-package" aria-hidden="true"></i><span class="adm-menu-texto">Inventario</span></a></li>
+                    <li><a href="productos-vendidos.html"><i class="ph ph-trophy" aria-hidden="true"></i><span class="adm-menu-texto">Más vendidos</span></a></li>
+                    <li><a href="recuperar.html"><i class="ph ph-receipt" aria-hidden="true"></i><span class="adm-menu-texto">Historial</span></a></li>
+                    <!-- El JavaScript (js/inventario.js) usa este id para cerrar la sesión. No cambiarlo. -->
+                    <li><a href="index.html" id="btn-cerrar-sesion"><i class="ph ph-sign-out" aria-hidden="true"></i><span class="adm-menu-texto">Cerrar sesión</span></a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!--
+        PASO W9 - Inventario y kárdex.
+        Los elementos con id los llena js/inventario.js con los datos reales de la API.
+        Se pueden cambiar estilos y acomodo, pero NO los id.
+    -->
+    <main class="cl-contenido">
+
+        <section class="adm-portada">
+            <div class="adm-saludo">
+                <span id="alianza-iniciales" class="adm-avatar" aria-hidden="true"></span>
+                <div>
+                    <span class="adm-etiqueta">Inventario y kárdex</span>
+                    <h1 id="alianza-nombre">&nbsp;</h1>
+                    <div class="adm-sucursal">
+                        <i class="ph ph-storefront" aria-hidden="true"></i>
+                        <label for="sucursal" class="cl-texto-sec">Sucursal</label>
+                        <select id="sucursal" class="adm-select"></select>
+                        <span id="sucursal-direccion"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="adm-ticket cl-ticket">
+                <span class="adm-ticket-etiqueta">Productos en inventario</span>
+                <span class="adm-ticket-valor" id="inv-total">0</span>
+                <span class="adm-ticket-nota" id="inv-total-nota">Cargando…</span>
+            </div>
+        </section>
+
+        <p id="aviso-api" class="mensaje mensaje-error adm-aviso" role="alert" hidden></p>
+        <p id="aviso-ok" class="mensaje mensaje-info adm-aviso" role="status" hidden></p>
+
+        <section class="adm-kpis" aria-label="Alertas del inventario">
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono error"><i class="ph ph-package" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">Sin existencias</span>
+                    <span class="adm-kpi-valor" id="kpi-sin-stock">0</span>
+                    <span class="adm-kpi-nota">No se pueden vender</span>
+                </div>
+            </div>
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono aviso"><i class="ph ph-trend-down" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">Stock bajo</span>
+                    <span class="adm-kpi-valor" id="kpi-stock-bajo">0</span>
+                    <span class="adm-kpi-nota">En el mínimo o debajo</span>
+                </div>
+            </div>
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono aviso"><i class="ph ph-clock-countdown" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">Por caducar</span>
+                    <span class="adm-kpi-valor" id="kpi-caducar">0</span>
+                    <span class="adm-kpi-nota">Hoy o en los próximos 3 días</span>
+                </div>
+            </div>
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono error"><i class="ph ph-warning-octagon" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">Caducados</span>
+                    <span class="adm-kpi-valor" id="kpi-caducados">0</span>
+                    <span class="adm-kpi-nota">Registrar como merma</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pestañas: se ve una sección a la vez (js/inventario.js las cambia) -->
+        <div class="inv-pestanas" id="pestanas" role="tablist" aria-label="Secciones del inventario">
+            <button type="button" role="tab" class="inv-pestana activa" id="tab-existencias" aria-controls="seccion-existencias" aria-selected="true">
+                <i class="ph ph-package" aria-hidden="true"></i>Existencias
+            </button>
+            <button type="button" role="tab" class="inv-pestana" id="tab-kardex" aria-controls="seccion-kardex" aria-selected="false">
+                <i class="ph ph-list-bullets" aria-hidden="true"></i>Entradas y salidas
+            </button>
+        </div>
+
+        <!-- Existencias -->
+        <section class="cl-tarjeta inv-seccion" id="seccion-existencias" role="tabpanel" aria-labelledby="titulo-existencias">
+            <div class="adm-tarjeta-encabezado">
+                <div>
+                    <h2 id="titulo-existencias">Existencias</h2>
+                    <p class="cl-texto-sec">Primero lo que necesita atención. Usa los botones para registrar entradas, mermas o un conteo.</p>
+                </div>
+                <div class="cl-campo inv-buscar">
+                    <div class="adm-buscar-caja">
+                        <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
+                        <input type="search" id="buscar-producto" placeholder="Buscar producto o código" autocomplete="off" aria-label="Buscar producto">
+                    </div>
+                </div>
+            </div>
+            <div class="adm-tabla-caja">
+                <table class="adm-tabla">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th class="num">Existencia</th>
+                            <th class="num">Mínimo</th>
+                            <th>Caducidad</th>
+                            <th>Estado</th>
+                            <th class="num">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-inventario">
+                        <tr class="adm-cargando"><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td></tr>
+                        <tr class="adm-cargando"><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td></tr>
+                        <tr class="adm-cargando"><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Kárdex -->
+        <section class="cl-tarjeta inv-seccion" id="seccion-kardex" role="tabpanel" aria-labelledby="titulo-kardex" hidden>
+            <div class="adm-tarjeta-encabezado">
+                <div>
+                    <h2 id="titulo-kardex">Entradas y salidas (kárdex)</h2>
+                    <p class="cl-texto-sec">Cada movimiento del inventario: quién lo hizo, cuánto y con qué existencia quedó. Se muestran hasta 500.</p>
+                </div>
+            </div>
+
+            <div class="inv-filtros">
+                <div class="cl-campo">
+                    <label for="k-producto">Producto</label>
+                    <select id="k-producto"><option value="">Todos los productos</option></select>
+                </div>
+                <div class="cl-campo">
+                    <label for="k-tipo">Movimiento</label>
+                    <select id="k-tipo">
+                        <option value="todos">Todos</option>
+                        <option value="entrada">Entradas</option>
+                        <option value="salida_venta">Ventas (app)</option>
+                        <option value="merma">Mermas</option>
+                        <option value="ajuste">Ajustes por conteo</option>
+                    </select>
+                </div>
+                <div class="cl-campo">
+                    <label for="k-periodo">Periodo</label>
+                    <select id="k-periodo">
+                        <option value="hoy">Hoy</option>
+                        <option value="semana">Esta semana</option>
+                        <option value="mes" selected>Este mes</option>
+                        <option value="anio">Este año</option>
+                        <option value="todo">Todo</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="inv-totales" aria-label="Totales del periodo">
+                <div><span>Entradas</span><strong id="k-entradas">0</strong></div>
+                <div><span>Vendido en la app</span><strong id="k-ventas">0</strong></div>
+                <div><span>Mermas</span><strong id="k-mermas">0</strong></div>
+                <div><span>Ajustes por conteo</span><strong id="k-ajustes">0</strong></div>
+            </div>
+            <p class="inv-nota-totales" id="k-nota-totales">Los totales suman piezas y kilos; filtra un producto para verlos en su unidad.</p>
+
+            <div class="adm-tabla-caja">
+                <table class="adm-tabla">
+                    <thead>
+                        <tr>
+                            <th>Fecha y hora</th>
+                            <th>Producto</th>
+                            <th>Movimiento</th>
+                            <th class="num">Cantidad</th>
+                            <th class="num">Quedó en</th>
+                            <th>Quién</th>
+                            <th>Detalle</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-kardex">
+                        <tr class="adm-cargando"><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td></tr>
+                        <tr class="adm-cargando"><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td><td><span></span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="cl-pie">MARK'S - Compra sin filas. Proyecto Integrador, Universidad Tecnológica Santa Catarina.</footer>
+
+    <!-- Ventana: registrar entrada, merma o ajuste -->
+    <dialog id="dlg-movimiento" class="inv-dialogo" aria-labelledby="mov-titulo">
+        <form id="form-movimiento" class="inv-form" novalidate>
+            <h2 id="mov-titulo">Registrar movimiento</h2>
+            <p id="mov-producto" class="cl-texto-sec"></p>
+
+            <div class="cl-campo">
+                <label for="mov-tipo">Tipo de movimiento</label>
+                <select id="mov-tipo">
+                    <option value="ENTRADA">Entrada: llegó mercancía</option>
+                    <option value="MERMA">Merma: producto dañado o caducado</option>
+                    <option value="AJUSTE">Ajuste: conteo físico</option>
+                </select>
+            </div>
+
+            <div class="cl-campo">
+                <label for="mov-cantidad" id="mov-cantidad-label">Cantidad que llegó</label>
+                <div class="inv-con-unidad">
+                    <input type="number" id="mov-cantidad" min="0" step="1" inputmode="decimal" required>
+                    <span id="mov-unidad">pzas</span>
+                </div>
+            </div>
+
+            <div class="cl-campo" id="campo-caducidad">
+                <label for="mov-caducidad">Caducidad del lote <span class="cl-opcional">(opcional)</span></label>
+                <input type="date" id="mov-caducidad">
+            </div>
+
+            <div class="cl-campo">
+                <label for="mov-nota" id="mov-nota-label">Nota <span class="cl-opcional">(opcional)</span></label>
+                <input type="text" id="mov-nota" maxlength="200" autocomplete="off">
+            </div>
+
+            <p id="mov-resumen" class="inv-resumen"></p>
+            <p id="mov-error" class="mensaje mensaje-error" role="alert" hidden></p>
+
+            <div class="inv-botones">
+                <button type="button" class="cl-boton-sec" id="mov-cancelar">Cancelar</button>
+                <button type="submit" class="cl-boton" id="mov-guardar">Guardar</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- Ventana: stock mínimo y caducidad -->
+    <dialog id="dlg-editar" class="inv-dialogo" aria-labelledby="ed-titulo">
+        <form id="form-editar" class="inv-form" novalidate>
+            <h2 id="ed-titulo">Mínimo y caducidad</h2>
+            <p id="ed-producto" class="cl-texto-sec"></p>
+
+            <div class="cl-campo">
+                <label for="ed-minimo">Stock mínimo</label>
+                <div class="inv-con-unidad">
+                    <input type="number" id="ed-minimo" min="0" step="1" inputmode="decimal" required>
+                    <span id="ed-unidad">pzas</span>
+                </div>
+                <span class="inv-ayuda">Cuando la existencia llegue a este número se marca como stock bajo.</span>
+            </div>
+
+            <div class="cl-campo">
+                <label for="ed-caducidad">Fecha de caducidad <span class="cl-opcional">(opcional)</span></label>
+                <input type="date" id="ed-caducidad">
+                <span class="inv-ayuda">Déjala vacía si el producto no caduca (por ejemplo, frutas a granel).</span>
+            </div>
+
+            <p id="ed-error" class="mensaje mensaje-error" role="alert" hidden></p>
+
+            <div class="inv-botones">
+                <button type="button" class="cl-boton-sec" id="ed-cancelar">Cancelar</button>
+                <button type="submit" class="cl-boton" id="ed-guardar">Guardar</button>
+            </div>
+        </form>
+    </dialog>
+
+    <script src="js/api.js"></script>
+    <script src="js/sesion.js"></script>
+    <script src="js/inventario.js"></script>
+</body>
+</html>

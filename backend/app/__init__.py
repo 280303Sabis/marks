@@ -41,6 +41,7 @@ def create_app():
     from .routes.compras import bp as compras_bp
     from .routes.opiniones import bp as opiniones_bp          # PASO 13
     from .routes.admin import bp as admin_bp                  # portal web del administrador
+    from .routes.admin_inventario import bp as admin_inventario_bp  # PASO W9: inventario y kárdex
     app.register_blueprint(productos_bp, url_prefix="/api")
     app.register_blueprint(carrito_bp, url_prefix="/api")
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
@@ -49,6 +50,7 @@ def create_app():
     app.register_blueprint(compras_bp, url_prefix="/api")
     app.register_blueprint(opiniones_bp, url_prefix="/api")    # PASO 13
     app.register_blueprint(admin_bp, url_prefix="/api/admin")
+    app.register_blueprint(admin_inventario_bp, url_prefix="/api/admin")   # PASO W9
 
     @app.get("/")
     def inicio():

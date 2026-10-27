@@ -1,0 +1,438 @@
+/*
+  inventario.css - Página de Inventario y kárdex del panel (PASO W9)
+  -------------------------------------------------------------------
+  Solo la usa inventario.html. Se apoya en clientes.css (colores, botones,
+  campos) y admin.css (portada, tarjetas de indicadores y tablas).
+  Así no se toca el diseño de las otras páginas del panel.
+
+  Contenido:
+    1. Secciones, buscador y pestañas
+    2. Insignias de estado y caducidad
+    3. Botones de acciones de la tabla
+    4. Kárdex: filtros, totales y movimientos
+    5. Ventanas (entrada, merma, ajuste y mínimo)
+    6. Celular
+*/
+
+/* ------------------------------------------------------------------
+   1. Secciones, buscador y pestañas
+   ------------------------------------------------------------------ */
+.inv-seccion {
+    margin-bottom: 28px;
+}
+
+.inv-buscar {
+    flex: none;
+    width: 260px;
+}
+
+/* En pantallas angostas la tabla se desliza de lado; el nombre no se aprieta */
+.inv-seccion .adm-tabla td:first-child {
+    min-width: 200px;
+}
+
+/* Pestañas: Existencias | Entradas y salidas */
+.inv-pestanas {
+    display: inline-flex;
+    gap: 6px;
+    margin-bottom: 20px;
+    padding: 6px;
+    border-radius: 999px;
+    background: var(--blanco);
+    box-shadow: var(--sombra);
+}
+
+.inv-pestana {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 999px;
+    background: none;
+    color: var(--salvia);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.inv-pestana:hover {
+    background: var(--brote);
+    color: var(--verde-hoja);
+}
+
+.inv-pestana.activa {
+    background: var(--verde-hoja);
+    color: var(--blanco);
+}
+
+.inv-pestana:focus-visible {
+    outline: 2px solid var(--verde-hoja);
+    outline-offset: 2px;
+}
+
+.inv-pestana i {
+    font-size: 18px;
+}
+
+.inv-seccion[hidden] {
+    display: none;
+}
+
+/* ------------------------------------------------------------------
+   2. Insignias de estado y caducidad
+   ------------------------------------------------------------------ */
+.inv-insignias {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.inv-insignia {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.inv-insignia.ok {
+    background: var(--brote);
+    color: var(--verde-hoja);
+}
+
+.inv-insignia.aviso {
+    background: var(--aviso-fondo);
+    color: var(--aviso);
+}
+
+.inv-insignia.error {
+    background: var(--error-fondo);
+    color: var(--error);
+}
+
+.inv-insignia.gris {
+    background: #EEF1EC;
+    color: var(--salvia);
+}
+
+.inv-local {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: var(--brote);
+    color: var(--verde-hoja);
+    font-size: 11px;
+    font-weight: 600;
+    vertical-align: 2px;
+}
+
+.inv-existencia {
+    font-weight: 700;
+    color: var(--verde-bosque);
+}
+
+.inv-existencia.cero {
+    color: var(--error);
+}
+
+.inv-existencia.bajo {
+    color: var(--aviso);
+}
+
+.inv-cad {
+    display: block;
+    white-space: nowrap;
+}
+
+.inv-cad-dias {
+    display: block;
+    font-size: 12px;
+    color: var(--salvia);
+}
+
+.inv-cad-dias.aviso {
+    color: var(--aviso);
+    font-weight: 600;
+}
+
+.inv-cad-dias.error {
+    color: var(--error);
+    font-weight: 600;
+}
+
+.adm-tabla tr.inv-inactivo td {
+    opacity: 0.55;
+}
+
+/* ------------------------------------------------------------------
+   3. Botones de acciones de la tabla
+   ------------------------------------------------------------------ */
+.inv-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+.inv-accion {
+    display: inline-grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border: 1.5px solid var(--linea);
+    border-radius: 10px;
+    background: var(--blanco);
+    color: var(--verde-hoja);
+    font-size: 17px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.inv-accion:hover {
+    background: var(--brote);
+    border-color: var(--brote-borde);
+}
+
+.inv-accion.merma {
+    color: var(--error);
+}
+
+.inv-accion.merma:hover {
+    background: var(--error-fondo);
+    border-color: var(--error-borde);
+}
+
+.inv-accion:focus-visible {
+    outline: 2px solid var(--verde-hoja);
+    outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------
+   4. Kárdex: filtros, totales y movimientos
+   ------------------------------------------------------------------ */
+.inv-filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 18px;
+    margin-bottom: 18px;
+}
+
+.inv-filtros .cl-campo {
+    min-width: 190px;
+}
+
+.inv-totales {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 6px;
+}
+
+.inv-totales div {
+    padding: 12px 14px;
+    border-radius: var(--radio-m);
+    background: var(--papel);
+}
+
+.inv-totales span {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--salvia);
+}
+
+.inv-totales strong {
+    font-size: 20px;
+    color: var(--verde-bosque);
+}
+
+.inv-nota-totales {
+    margin: 0 0 16px;
+    font-size: 12px;
+    color: var(--salvia);
+}
+
+.inv-mov {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.inv-mov.entrada {
+    background: var(--brote);
+    color: var(--verde-hoja);
+}
+
+.inv-mov.venta {
+    background: #E8F0FB;
+    color: #1F4E8C;
+}
+
+.inv-mov.merma {
+    background: var(--error-fondo);
+    color: var(--error);
+}
+
+.inv-mov.ajuste {
+    background: var(--aviso-fondo);
+    color: var(--aviso);
+}
+
+.inv-cantidad {
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.inv-cantidad.positivo {
+    color: var(--verde-hoja);
+}
+
+.inv-cantidad.negativo {
+    color: var(--error);
+}
+
+.inv-detalle {
+    max-width: 240px;
+    font-size: 13px;
+    color: var(--salvia);
+}
+
+/* ------------------------------------------------------------------
+   5. Ventanas (entrada, merma, ajuste y mínimo)
+   ------------------------------------------------------------------ */
+.inv-dialogo {
+    width: min(460px, 92vw);
+    padding: 26px;
+    border: none;
+    border-radius: var(--radio-g);
+    box-shadow: 0 24px 60px rgba(31, 68, 22, 0.25);
+    font-family: 'Poppins', system-ui, sans-serif;
+    font-size: 14px;
+    color: var(--tinta);
+}
+
+.inv-dialogo::backdrop {
+    background: rgba(31, 68, 22, 0.35);
+}
+
+.inv-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* .cl-campo usa display:flex; esto hace que "hidden" sí lo oculte */
+.inv-form [hidden] {
+    display: none !important;
+}
+
+.inv-form h2 {
+    margin: 0;
+    font-size: 20px;
+    color: var(--verde-bosque);
+}
+
+.inv-form > .cl-texto-sec {
+    margin: -10px 0 0;
+    font-size: 13.5px;
+}
+
+.inv-con-unidad {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.inv-con-unidad input {
+    flex: 1;
+    min-width: 0;
+}
+
+.inv-con-unidad span {
+    min-width: 40px;
+    font-weight: 600;
+    color: var(--salvia);
+}
+
+.inv-ayuda {
+    font-size: 12px;
+    color: var(--salvia);
+}
+
+.inv-resumen {
+    margin: 0;
+    padding: 10px 14px;
+    border-radius: var(--radio-m);
+    background: var(--papel);
+    font-size: 13.5px;
+}
+
+.inv-resumen:empty {
+    display: none;
+}
+
+.inv-resumen strong {
+    color: var(--verde-bosque);
+}
+
+.inv-resumen.error strong {
+    color: var(--error);
+}
+
+.inv-botones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.inv-botones .cl-boton-sec {
+    height: 44px;
+}
+
+/* ------------------------------------------------------------------
+   6. Celular
+   ------------------------------------------------------------------ */
+@media (max-width: 760px) {
+    .adm-tarjeta-encabezado {
+        flex-wrap: wrap;
+    }
+    .inv-buscar {
+        width: 100%;
+    }
+    .inv-pestanas {
+        display: flex;
+    }
+    .inv-pestana {
+        flex: 1;
+        justify-content: center;
+        padding: 0 10px;
+    }
+    .inv-totales {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    .inv-filtros .cl-campo {
+        min-width: 100%;
+    }
+    .inv-botones {
+        flex-direction: column-reverse;
+    }
+    .inv-botones button {
+        width: 100%;
+    }
+}

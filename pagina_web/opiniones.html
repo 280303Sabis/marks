@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARK'S - Opiniones</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+    <link rel="stylesheet" href="css/clientes.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/opiniones-admin.css">
+</head>
+<body class="cl adm">
+
+    <header class="cl-encabezado">
+        <div class="cl-encabezado-interior">
+            <a href="dashboard.html" class="cl-logo"><img src="img/logo_marks.png" alt="MARK'S"></a>
+            <nav aria-label="Menú del panel">
+                <ul class="cl-menu">
+                    <li><a href="dashboard.html"><i class="ph ph-squares-four" aria-hidden="true"></i><span class="adm-menu-texto">Inicio</span></a></li>
+                    <li><a href="inventario.html"><i class="ph ph-package" aria-hidden="true"></i><span class="adm-menu-texto">Inventario</span></a></li>
+                    <li><a href="productos.html"><i class="ph ph-tag" aria-hidden="true"></i><span class="adm-menu-texto">Productos</span></a></li>
+                    <li><a href="opiniones.html" aria-current="page"><i class="ph ph-chat-circle-text" aria-hidden="true"></i><span class="adm-menu-texto">Opiniones</span></a></li>
+                    <li><a href="productos-vendidos.html"><i class="ph ph-trophy" aria-hidden="true"></i><span class="adm-menu-texto">Más vendidos</span></a></li>
+                    <li><a href="recuperar.html"><i class="ph ph-receipt" aria-hidden="true"></i><span class="adm-menu-texto">Historial</span></a></li>
+                    <!-- El JavaScript (js/opiniones-admin.js) usa este id para cerrar la sesión. No cambiarlo. -->
+                    <li><a href="index.html" id="btn-cerrar-sesion"><i class="ph ph-sign-out" aria-hidden="true"></i><span class="adm-menu-texto">Cerrar sesión</span></a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!--
+        PASO W11 - Moderación de opiniones.
+        Los elementos con id los llena js/opiniones-admin.js con los datos reales de la API.
+        Se pueden cambiar estilos y acomodo, pero NO los id.
+    -->
+    <main class="cl-contenido">
+
+        <section class="adm-portada">
+            <div class="adm-saludo">
+                <span id="alianza-iniciales" class="adm-avatar" aria-hidden="true"></span>
+                <div>
+                    <span class="adm-etiqueta">Moderación de opiniones</span>
+                    <h1 id="alianza-nombre">&nbsp;</h1>
+                    <p class="cl-texto-sec opa-nota">
+                        <i class="ph ph-info" aria-hidden="true"></i>
+                        Las opiniones se publican al momento. Aquí revisas las que reportan los clientes.
+                    </p>
+                </div>
+            </div>
+
+            <div class="adm-ticket cl-ticket">
+                <span class="adm-ticket-etiqueta">Reportes sin revisar</span>
+                <span class="adm-ticket-valor" id="opa-pendientes">0</span>
+                <span class="adm-ticket-nota" id="opa-pendientes-nota">Cargando…</span>
+            </div>
+        </section>
+
+        <p id="aviso-api" class="mensaje mensaje-error adm-aviso" role="alert" hidden></p>
+        <p id="aviso-ok" class="mensaje mensaje-info adm-aviso" role="status" hidden></p>
+
+        <section class="adm-kpis" aria-label="Resumen de opiniones">
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono"><i class="ph ph-chat-circle-text" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">Opiniones</span>
+                    <span class="adm-kpi-valor" id="kpi-total">0</span>
+                    <span class="adm-kpi-nota">Escritas por clientes</span>
+                </div>
+            </div>
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono"><i class="ph ph-star" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">Calificación promedio</span>
+                    <span class="adm-kpi-valor" id="kpi-promedio">0</span>
+                    <span class="adm-kpi-nota">De las publicadas</span>
+                </div>
+            </div>
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono error"><i class="ph ph-flag" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">Reportadas</span>
+                    <span class="adm-kpi-valor" id="kpi-reportadas">0</span>
+                    <span class="adm-kpi-nota">Esperan tu revisión</span>
+                </div>
+            </div>
+            <div class="cl-tarjeta adm-kpi">
+                <span class="adm-kpi-icono aviso"><i class="ph ph-eye-slash" aria-hidden="true"></i></span>
+                <div class="adm-kpi-texto">
+                    <span class="adm-kpi-etiqueta">Ocultas</span>
+                    <span class="adm-kpi-valor" id="kpi-ocultas">0</span>
+                    <span class="adm-kpi-nota">No se ven en la app</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="cl-tarjeta adm-filtros" aria-label="Filtros">
+            <div class="cl-campo">
+                <label for="filtro">Mostrar</label>
+                <select id="filtro">
+                    <option value="reportadas">Reportadas (sin revisar)</option>
+                    <option value="ocultas">Ocultas</option>
+                    <option value="todas">Todas</option>
+                </select>
+            </div>
+            <div class="cl-campo">
+                <label for="filtro-producto">Producto</label>
+                <select id="filtro-producto"><option value="">Todos</option></select>
+            </div>
+            <div class="cl-campo">
+                <label for="filtro-estrellas">Estrellas</label>
+                <select id="filtro-estrellas">
+                    <option value="">Todas</option>
+                    <option value="5">5 estrellas</option>
+                    <option value="4">4 estrellas</option>
+                    <option value="3">3 estrellas</option>
+                    <option value="2">2 estrellas</option>
+                    <option value="1">1 estrella</option>
+                </select>
+            </div>
+            <div class="cl-campo adm-buscar">
+                <label for="buscar">Buscar</label>
+                <div class="adm-buscar-caja">
+                    <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
+                    <input type="search" id="buscar" placeholder="Comentario, nombre o correo del cliente" autocomplete="off">
+                </div>
+            </div>
+        </section>
+
+        <section class="cl-tarjeta" aria-labelledby="titulo-lista">
+            <div class="adm-tarjeta-encabezado">
+                <div>
+                    <h2 id="titulo-lista">Reportadas</h2>
+                    <p class="cl-texto-sec" id="lista-nota">Primero las que tienen más reportes.</p>
+                </div>
+            </div>
+            <ul id="lista-opiniones" class="opa-lista">
+                <li class="opa-cargando"></li>
+                <li class="opa-cargando"></li>
+            </ul>
+        </section>
+
+    </main>
+
+    <footer class="cl-pie">MARK'S - Compra sin filas. Proyecto Integrador, Universidad Tecnológica Santa Catarina.</footer>
+
+    <!-- Ventana: ocultar opinión -->
+    <dialog id="dlg-ocultar" class="opa-dialogo" aria-labelledby="oc-titulo">
+        <form id="form-ocultar" class="opa-form" novalidate>
+            <h2 id="oc-titulo">Ocultar opinión</h2>
+            <p id="oc-texto" class="cl-texto-sec"></p>
+
+            <div class="cl-campo">
+                <label for="oc-motivo">Motivo</label>
+                <select id="oc-motivo">
+                    <option value="Lenguaje ofensivo o groserías">Lenguaje ofensivo o groserías</option>
+                    <option value="Spam o publicidad">Spam o publicidad</option>
+                    <option value="Información falsa o engañosa">Información falsa o engañosa</option>
+                    <option value="Datos personales de otra persona">Datos personales de otra persona</option>
+                    <option value="Foto inapropiada">Foto inapropiada</option>
+                    <option value="otro">Otro motivo…</option>
+                </select>
+            </div>
+            <div class="cl-campo" id="campo-otro" hidden>
+                <label for="oc-otro">Escribe el motivo</label>
+                <input type="text" id="oc-otro" maxlength="200" autocomplete="off">
+            </div>
+            <p class="opa-ayuda">El cliente que la escribió la seguirá viendo en su app, marcada como oculta. Puedes volver a mostrarla después.</p>
+
+            <p id="oc-error" class="mensaje mensaje-error" role="alert" hidden></p>
+
+            <div class="opa-botones">
+                <button type="button" class="cl-boton-sec" id="oc-cancelar">Cancelar</button>
+                <button type="submit" class="cl-boton opa-boton-peligro" id="oc-guardar">Ocultar opinión</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- Ventana: ver foto en grande -->
+    <dialog id="dlg-foto" class="opa-visor" aria-label="Foto de la opinión">
+        <button type="button" class="opa-visor-cerrar" id="foto-cerrar" aria-label="Cerrar"><i class="ph ph-x" aria-hidden="true"></i></button>
+        <img id="foto-grande" alt="Foto de la opinión">
+    </dialog>
+
+    <script src="js/api.js"></script>
+    <script src="js/sesion.js"></script>
+    <script src="js/opiniones-admin.js"></script>
+</body>
+</html>

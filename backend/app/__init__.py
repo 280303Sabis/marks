@@ -43,6 +43,7 @@ def create_app():
     from .routes.admin import bp as admin_bp                  # portal web del administrador
     from .routes.admin_inventario import bp as admin_inventario_bp  # PASO W9: inventario y kárdex
     from .routes.admin_productos import bp as admin_productos_bp    # PASO W10: productos
+    from .routes.admin_opiniones import bp as admin_opiniones_bp    # PASO W11: moderación de opiniones
     app.register_blueprint(productos_bp, url_prefix="/api")
     app.register_blueprint(carrito_bp, url_prefix="/api")
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
@@ -53,6 +54,7 @@ def create_app():
     app.register_blueprint(admin_bp, url_prefix="/api/admin")
     app.register_blueprint(admin_inventario_bp, url_prefix="/api/admin")   # PASO W9
     app.register_blueprint(admin_productos_bp, url_prefix="/api/admin")    # PASO W10
+    app.register_blueprint(admin_opiniones_bp, url_prefix="/api/admin")    # PASO W11
 
     @app.get("/")
     def inicio():

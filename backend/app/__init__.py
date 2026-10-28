@@ -8,14 +8,18 @@ from flask_cors import CORS
 
 from . import db
 from .config import Config
+from .utils.fechas import a_hora_mx   # PASO W14: fechas con la hora de Monterrey
 
 
 class MarksJSON(DefaultJSONProvider):
-    """Convierte Decimal a número y fechas a texto ISO (fácil de leer en Flutter)."""
+    """Convierte Decimal a número y fechas a texto ISO (fácil de leer en Flutter).
+       Las fechas con hora salen con la hora de Monterrey (PASO W14, utils/fechas.py)."""
     def default(self, o):
         if isinstance(o, Decimal):
             return float(o)
-        if isinstance(o, (datetime, date)):
+        if isinstance(o, datetime):
+            return a_hora_mx(o).isoformat()
+        if isinstance(o, date):
             return o.isoformat()
         return super().default(o)
 

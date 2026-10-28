@@ -1,0 +1,718 @@
+/*
+  mi-cuenta-historial.css - Pestañas de Mi cuenta (PASO W14)
+  -----------------------------------------------------------
+  Solo la usa mi-cuenta.html, junto con clientes.css y mi-cuenta.css.
+  No cambia nada de "Mi perfil" (eso sigue en mi-cuenta.css).
+
+  Contenido:
+    1. Pestañas
+    2. Listas (compras, puntos y opiniones)
+    3. Mis compras: resumen y filas
+    4. Mis puntos: reglas y movimientos
+    5. Mis opiniones
+    6. Ticket (ventana) y QR
+    7. Celular
+*/
+
+/* ------------------------------------------------------------------
+   1. Pestañas
+   ------------------------------------------------------------------ */
+.cth-pestanas {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 24px;
+    padding: 6px;
+    border-radius: 999px;
+    background: var(--blanco);
+    box-shadow: var(--sombra);
+}
+
+.cth-pestana {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 18px;
+    border: none;
+    border-radius: 999px;
+    background: none;
+    color: var(--salvia);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.cth-pestana:hover {
+    background: var(--brote);
+    color: var(--verde-hoja);
+}
+
+.cth-pestana.activa {
+    background: var(--verde-hoja);
+    color: var(--blanco);
+}
+
+.cth-pestana:focus-visible {
+    outline: 2px solid var(--verde-hoja);
+    outline-offset: 2px;
+}
+
+.cth-pestana i {
+    font-size: 18px;
+}
+
+.cth-contador {
+    display: inline-grid;
+    place-items: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: #E0A21B;
+    color: var(--blanco);
+    font-size: 11.5px;
+    font-weight: 700;
+}
+
+.cth-contador[hidden] {
+    display: none;
+}
+
+/* Paneles: solo se ve el de la pestaña elegida */
+.cta [data-panel][hidden] {
+    display: none !important;
+}
+
+.cth-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.cth-panel h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.cth-encabezado {
+    margin-bottom: 14px;
+}
+
+.cth-encabezado p {
+    margin-top: 4px;
+    font-size: 13.5px;
+}
+
+/* ------------------------------------------------------------------
+   2. Listas (compras, puntos y opiniones)
+   ------------------------------------------------------------------ */
+.cth-lista {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.cth-lista > li {
+    border-bottom: 1px solid var(--linea);
+}
+
+.cth-lista > li:last-child {
+    border-bottom: none;
+}
+
+.cth-vacio {
+    padding: 32px 12px;
+    text-align: center;
+    color: var(--salvia);
+}
+
+.cth-vacio i {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 34px;
+    color: var(--verde-hoja);
+}
+
+.cth-vacio strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--verde-bosque);
+}
+
+.cth-insignia {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.cth-insignia.por-salir {
+    background: var(--aviso-fondo);
+    color: var(--aviso);
+}
+
+.cth-insignia.salio {
+    background: var(--brote);
+    color: var(--verde-hoja);
+}
+
+.cth-insignia.cancelada,
+.cth-insignia.oculta {
+    background: var(--error-fondo);
+    color: var(--error);
+}
+
+.cth-insignia.gris {
+    background: #EEF1EC;
+    color: var(--salvia);
+}
+
+/* ------------------------------------------------------------------
+   3. Mis compras: resumen y filas
+   ------------------------------------------------------------------ */
+.cth-resumen {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.cth-resumen:empty {
+    display: none;
+}
+
+.cth-dato {
+    padding: 18px 20px;
+    border-radius: var(--radio-g);
+    background: var(--blanco);
+    box-shadow: var(--sombra);
+}
+
+.cth-dato span {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--salvia);
+}
+
+.cth-dato strong {
+    display: block;
+    margin-top: 2px;
+    font-size: 24px;
+    color: var(--verde-bosque);
+    font-variant-numeric: tabular-nums;
+}
+
+.cth-lista > li.cth-aviso-fila {
+    padding: 0 0 12px;
+    border-bottom: none;
+}
+
+.cth-aviso-salida {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: var(--radio-m);
+    background: var(--aviso-fondo);
+    color: var(--aviso);
+    font-size: 14px;
+}
+
+.cth-aviso-salida i {
+    font-size: 22px;
+}
+
+.cth-compra {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 6px 18px;
+    width: 100%;
+    padding: 14px 8px;
+    border: none;
+    border-radius: var(--radio-m);
+    background: none;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.cth-compra:hover {
+    background: #FAFCF8;
+}
+
+.cth-compra:focus-visible {
+    outline: 2px solid var(--verde-hoja);
+    outline-offset: -2px;
+}
+
+.cth-folio {
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--verde-bosque);
+}
+
+.cth-meta {
+    display: block;
+    margin-top: 2px;
+    font-size: 12.5px;
+    color: var(--salvia);
+}
+
+.cth-total {
+    text-align: right;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--tinta);
+    font-variant-numeric: tabular-nums;
+}
+
+.cth-total small {
+    display: block;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--verde-hoja);
+}
+
+.cth-flecha {
+    font-size: 18px;
+    color: var(--salvia);
+}
+
+/* ------------------------------------------------------------------
+   4. Mis puntos: reglas y movimientos
+   ------------------------------------------------------------------ */
+.cth-reglas {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.cth-reglas:empty {
+    display: none;
+}
+
+.cth-regla {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.cth-regla i {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--brote);
+    color: var(--verde-hoja);
+    font-size: 20px;
+}
+
+.cth-regla strong {
+    display: block;
+    color: var(--verde-bosque);
+}
+
+.cth-regla span {
+    font-size: 13px;
+    color: var(--salvia);
+}
+
+.cth-movimiento {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 2px 16px;
+    padding: 12px 4px;
+}
+
+.cth-mov-nota {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.cth-mov-meta {
+    grid-column: 1;
+    font-size: 12.5px;
+    color: var(--salvia);
+}
+
+.cth-mov-puntos {
+    grid-row: 1 / span 2;
+    grid-column: 2;
+    align-self: center;
+    text-align: right;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.cth-mov-puntos.mas {
+    color: var(--verde-hoja);
+}
+
+.cth-mov-puntos.menos {
+    color: var(--error);
+}
+
+.cth-mov-puntos small {
+    display: block;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--salvia);
+}
+
+.cth-etiqueta-ajuste {
+    display: inline-block;
+    margin-right: 6px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: var(--aviso-fondo);
+    color: var(--aviso);
+    font-size: 11px;
+    font-weight: 600;
+    vertical-align: 1px;
+}
+
+/* ------------------------------------------------------------------
+   5. Mis opiniones
+   ------------------------------------------------------------------ */
+.cth-opinion {
+    padding: 16px 4px;
+}
+
+.cth-opinion-cabeza {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+}
+
+.cth-opinion-producto {
+    font-weight: 700;
+    color: var(--verde-bosque);
+}
+
+.cth-estrellas {
+    display: inline-flex;
+    gap: 1px;
+    color: #E0A21B;
+    font-size: 15px;
+    letter-spacing: 1px;
+}
+
+.cth-estrellas .apagada {
+    color: #D9DED5;
+}
+
+.cth-opinion p {
+    margin: 6px 0 0;
+    font-size: 14px;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+.cth-opinion .cth-meta {
+    margin-top: 6px;
+}
+
+.cth-nota-oculta {
+    margin-top: 8px !important;
+    padding: 8px 12px;
+    border-radius: var(--radio-m);
+    background: var(--aviso-fondo);
+    color: var(--aviso);
+    font-size: 12.5px !important;
+}
+
+.cth-fotos {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.cth-fotos img {
+    width: 64px;
+    height: 64px;
+    border: 1px solid var(--linea);
+    border-radius: 10px;
+    object-fit: cover;
+    background: #EEF2EB;
+}
+
+.cth-pendientes h2 {
+    margin: 0;
+}
+
+.cth-pendientes p {
+    margin: 4px 0 12px;
+    font-size: 13.5px;
+}
+
+.cth-pendientes ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.cth-pendientes li {
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: var(--papel);
+    font-size: 13.5px;
+}
+
+/* ------------------------------------------------------------------
+   6. Ticket (ventana) y QR
+   ------------------------------------------------------------------ */
+.cth-dialogo {
+    width: min(440px, 94vw);
+    max-height: 92vh;
+    padding: 0;
+    border: none;
+    border-radius: var(--radio-g);
+    box-shadow: 0 24px 60px rgba(31, 68, 22, 0.25);
+    font-family: 'Poppins', system-ui, sans-serif;
+    font-size: 14px;
+    color: var(--tinta);
+}
+
+.cth-dialogo::backdrop {
+    background: rgba(31, 68, 22, 0.35);
+}
+
+.cth-ticket {
+    position: relative;
+    padding: 26px 24px 22px;
+    text-align: center;
+}
+
+.cth-ticket [hidden] {
+    display: none !important;
+}
+
+.cth-cerrar {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: var(--papel);
+    color: var(--tinta);
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.cth-cerrar:hover {
+    background: var(--brote);
+}
+
+.cth-ticket-marca {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--verde-hoja);
+}
+
+.cth-ticket h2 {
+    margin: 4px 0 2px;
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: 20px;
+    color: var(--verde-bosque);
+}
+
+.cth-ticket > .cl-texto-sec {
+    margin: 0;
+    font-size: 13px;
+}
+
+.cth-qr {
+    margin: 16px 0 6px;
+    padding: 16px;
+    border-radius: var(--radio-g);
+    background: var(--brote);
+}
+
+.cth-qr-imagen {
+    display: grid;
+    place-items: center;
+    width: 220px;
+    max-width: 100%;
+    aspect-ratio: 1;
+    margin: 0 auto;
+    padding: 10px;
+    border-radius: 14px;
+    background: var(--blanco);
+}
+
+.cth-qr-imagen svg,
+.cth-qr-imagen img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.cth-qr-imagen .cth-qr-texto {
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: 13px;
+    color: var(--salvia);
+    overflow-wrap: anywhere;
+}
+
+.cth-qr p {
+    margin: 10px 0 0;
+    font-size: 12.5px;
+    color: var(--verde-bosque);
+}
+
+.cth-ticket-estado {
+    margin: 12px 0 0;
+}
+
+.cth-validada {
+    font-size: 12.5px;
+    color: var(--salvia);
+}
+
+.cth-ticket-estado:empty {
+    display: none;
+}
+
+.cth-lineas {
+    margin: 16px 0 0;
+    padding: 12px 0 0;
+    border-top: 1px dashed var(--linea);
+    list-style: none;
+    text-align: left;
+}
+
+.cth-lineas li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0 12px;
+    padding: 6px 0;
+}
+
+.cth-lineas .detalle {
+    grid-column: 1;
+    font-size: 12px;
+    color: var(--salvia);
+}
+
+.cth-lineas .importe {
+    grid-row: 1 / span 2;
+    grid-column: 2;
+    align-self: center;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.cth-lineas .antes {
+    display: block;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--salvia);
+    text-decoration: line-through;
+    text-align: right;
+}
+
+.cth-local {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 0 7px;
+    border-radius: 999px;
+    background: var(--brote);
+    color: var(--verde-hoja);
+    font-size: 10.5px;
+    font-weight: 600;
+    vertical-align: 1px;
+}
+
+.cth-totales {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 12px;
+    margin: 12px 0 0;
+    padding: 12px 0 0;
+    border-top: 1px dashed var(--linea);
+    text-align: left;
+    font-variant-numeric: tabular-nums;
+}
+
+.cth-totales dt {
+    color: var(--salvia);
+}
+
+.cth-totales dd {
+    margin: 0;
+    text-align: right;
+}
+
+.cth-totales .verde {
+    color: var(--verde-hoja);
+}
+
+.cth-totales .total {
+    padding-top: 6px;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--verde-bosque);
+}
+
+.cth-ticket-pie {
+    margin: 14px 0 0;
+    font-size: 12px;
+    color: var(--salvia);
+}
+
+/* ------------------------------------------------------------------
+   7. Celular
+   ------------------------------------------------------------------ */
+@media (max-width: 760px) {
+    .cth-reglas {
+        grid-template-columns: 1fr;
+    }
+    .cth-resumen {
+        gap: 8px;
+    }
+    .cth-dato {
+        padding: 12px;
+    }
+    .cth-dato strong {
+        font-size: 17px;
+    }
+    .cth-pestanas {
+        display: flex;
+        border-radius: var(--radio-g);
+    }
+    .cth-pestana {
+        flex: 1 1 auto;
+        justify-content: center;
+        padding: 0 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .cth-compra {
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+    .cth-flecha {
+        display: none;
+    }
+}

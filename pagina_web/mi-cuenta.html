@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
     <link rel="stylesheet" href="css/clientes.css">
     <link rel="stylesheet" href="css/mi-cuenta.css">
+    <link rel="stylesheet" href="css/mi-cuenta-historial.css">
 </head>
 <body class="cl">
 
@@ -49,7 +50,24 @@
             </div>
         </section>
 
-        <div class="cta-rejilla">
+        <!-- PASO W14: pestañas de Mi cuenta (js/mi-cuenta-historial.js) -->
+        <nav class="cth-pestanas" id="cth-pestanas" role="tablist" aria-label="Secciones de mi cuenta">
+            <button type="button" role="tab" class="cth-pestana activa" data-pestana="perfil" aria-selected="true">
+                <i class="ph ph-user" aria-hidden="true"></i><span>Mi perfil</span>
+            </button>
+            <button type="button" role="tab" class="cth-pestana" data-pestana="compras" aria-selected="false">
+                <i class="ph ph-receipt" aria-hidden="true"></i><span>Mis compras</span>
+                <span class="cth-contador" id="cth-por-salir" hidden></span>
+            </button>
+            <button type="button" role="tab" class="cth-pestana" data-pestana="puntos" aria-selected="false">
+                <i class="ph ph-coins" aria-hidden="true"></i><span>Mis puntos</span>
+            </button>
+            <button type="button" role="tab" class="cth-pestana" data-pestana="opiniones" aria-selected="false">
+                <i class="ph ph-star" aria-hidden="true"></i><span>Mis opiniones</span>
+            </button>
+        </nav>
+
+        <div class="cta-rejilla" id="panel-perfil" data-panel="perfil">
 
             <!-- COLUMNA IZQUIERDA -->
             <div class="cta-columna">
@@ -144,21 +162,6 @@
                     </form>
                 </section>
 
-                <!-- EN CAMINO: lo que se agrega más adelante -->
-                <section class="cl-tarjeta cta-pronto" aria-labelledby="titulo-pronto">
-                    <h2 id="titulo-pronto" class="cta-titulo-tarjeta">En camino</h2>
-                    <ul>
-                        <li>
-                            <span class="cta-pronto-icono" aria-hidden="true"><i class="ph ph-receipt"></i></span>
-                            <div><strong>Mis compras</strong><span>Tus tickets de cada compra con la app.</span></div>
-                        </li>
-                        <li>
-                            <span class="cta-pronto-icono" aria-hidden="true"><i class="ph ph-piggy-bank"></i></span>
-                            <div><strong>Mis ahorros</strong><span>Lo que te ahorraste con las ofertas.</span></div>
-                        </li>
-                    </ul>
-                </section>
-
             </div>
 
             <!-- COLUMNA DERECHA -->
@@ -227,6 +230,61 @@
 
             </div>
         </div>
+
+        <!-- ========== PASO W14: MIS COMPRAS ========== -->
+        <section class="cth-panel" id="panel-compras" data-panel="compras" hidden>
+            <p id="compras-aviso" class="mensaje mensaje-error" role="alert" hidden></p>
+            <div class="cth-resumen" id="compras-resumen"></div>
+            <div class="cl-tarjeta">
+                <div class="cth-encabezado">
+                    <div>
+                        <h2>Mis compras</h2>
+                        <p class="cl-texto-sec">Toca una compra para ver su ticket. Las que siguen "Por salir" tienen su QR para el guardia.</p>
+                    </div>
+                </div>
+                <ul class="cth-lista" id="lista-compras">
+                    <li class="cth-vacio">Cargando tus compras…</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ========== PASO W14: MIS PUNTOS ========== -->
+        <section class="cth-panel" id="panel-puntos" data-panel="puntos" hidden>
+            <p id="puntos-aviso" class="mensaje mensaje-error" role="alert" hidden></p>
+            <div class="cth-reglas cl-tarjeta" id="puntos-reglas"></div>
+            <div class="cl-tarjeta">
+                <div class="cth-encabezado">
+                    <div>
+                        <h2>Estado de cuenta</h2>
+                        <p class="cl-texto-sec">Los puntos que ganaste, usaste o que MARK'S te ajustó.</p>
+                    </div>
+                </div>
+                <ul class="cth-lista" id="lista-puntos">
+                    <li class="cth-vacio">Cargando tus puntos…</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ========== PASO W14: MIS OPINIONES ========== -->
+        <section class="cth-panel" id="panel-opiniones" data-panel="opiniones" hidden>
+            <p id="opiniones-aviso" class="mensaje mensaje-error" role="alert" hidden></p>
+            <div class="cl-tarjeta">
+                <div class="cth-encabezado">
+                    <div>
+                        <h2>Mis opiniones</h2>
+                        <p class="cl-texto-sec">Para escribir, editar o borrar una opinión usa la app de MARK'S.</p>
+                    </div>
+                </div>
+                <ul class="cth-lista" id="lista-opiniones">
+                    <li class="cth-vacio">Cargando tus opiniones…</li>
+                </ul>
+            </div>
+            <div class="cl-tarjeta cth-pendientes" id="caja-pendientes" hidden>
+                <h2>Te falta calificar</h2>
+                <p class="cl-texto-sec">Productos que compraste. Califícalos desde la app, en el ticket de tu compra.</p>
+                <ul id="lista-pendientes"></ul>
+            </div>
+        </section>
     </main>
 
     <footer class="cl-pie">MARK'S - Compra sin filas. Proyecto Integrador, Universidad Tecnológica Santa Catarina.</footer>
@@ -252,8 +310,29 @@
         </form>
     </dialog>
 
+    <!-- PASO W14: ticket de una compra (con su QR si todavía no sale) -->
+    <dialog id="dlg-ticket" class="cth-dialogo" aria-labelledby="tk-folio">
+        <div class="cth-ticket">
+            <button type="button" class="cth-cerrar" id="tk-cerrar" aria-label="Cerrar"><i class="ph ph-x" aria-hidden="true"></i></button>
+            <span class="cth-ticket-marca">MARK'S</span>
+            <h2 id="tk-folio">Folio</h2>
+            <p id="tk-datos" class="cl-texto-sec"></p>
+            <div id="tk-qr" class="cth-qr" hidden>
+                <div id="tk-qr-imagen" class="cth-qr-imagen"></div>
+                <p>Muéstralo al guardia en la salida. Sube el brillo de tu pantalla.</p>
+            </div>
+            <p id="tk-estado" class="cth-ticket-estado"></p>
+            <ul id="tk-lineas" class="cth-lineas"></ul>
+            <dl id="tk-totales" class="cth-totales"></dl>
+            <p id="tk-pie" class="cth-ticket-pie"></p>
+        </div>
+    </dialog>
+
+    <!-- Dibuja el QR de salida en el ticket (qrcode-generator) -->
+    <script src="https://unpkg.com/qrcode-generator@1.4.4/qrcode.js"></script>
     <script src="js/api.js"></script>
     <script src="js/sesion.js"></script>
     <script src="js/mi-cuenta.js"></script>
+    <script src="js/mi-cuenta-historial.js"></script>
 </body>
 </html>

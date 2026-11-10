@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -31,6 +33,57 @@ class _TicketScreenState extends State<TicketScreen> {
 
   bool get recienPagada => widget.recienPagada;
 
+  /// Mientras el QR está pendiente se revisa la compra cada pocos segundos
+  /// para avisar en cuanto el guardia la escanea.
+  Timer? _revision;
+  bool _revisando = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (venta.pendienteDeSalida) {
+      _revision = Timer.periodic(const Duration(seconds: 4), (_) => _revisarSalida());
+    }
+  }
+
+  @override
+  void dispose() {
+    _revision?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _revisarSalida() async {
+    if (_revisando) return;
+    _revisando = true;
+    try {
+      final nueva = await ComprasService.verCompra(venta.folio);
+      if (!mounted || nueva.pendienteDeSalida) return;
+      _revision?.cancel();
+      setState(() => venta = nueva);
+      if (nueva.estado == 'VALIDADA') _avisarEscaneo();
+    } on ApiException {
+      // Sin conexión: se vuelve a intentar en la siguiente revisión
+    } finally {
+      _revisando = false;
+    }
+  }
+
+  void _avisarEscaneo() {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(const SnackBar(
+        backgroundColor: MarksColores.verde,
+        duration: Duration(seconds: 5),
+        content: Row(
+          children: [
+            Icon(PhosphorIconsLight.checkCircle, color: MarksColores.blanco),
+            SizedBox(width: 10),
+            Expanded(child: Text('Tu compra ha sido escaneada exitosamente')),
+          ],
+        ),
+      ));
+  }
+
   /// Calificar (si no ha opinado) o ver/editar mi opinión (si ya opinó).
   Future<void> _opinar(LineaVenta linea) async {
     final productoId = linea.productoId;
@@ -53,6 +106,7 @@ class _TicketScreenState extends State<TicketScreen> {
     try {
       final nueva = await ComprasService.verCompra(venta.folio);
       if (mounted) setState(() => venta = nueva);
+      if (!nueva.pendienteDeSalida) _revision?.cancel();
     } on ApiException {
       // Sin conexión: se queda el ticket que ya tenía
     }

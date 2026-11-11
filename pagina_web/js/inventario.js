@@ -14,6 +14,9 @@
     GET  /admin/kardex?sucursal_id=&producto_id=&tipo=&periodo=
     POST /admin/inventario/movimiento
     PUT  /admin/inventario/<producto_id>
+
+  7. Botones "Exportar Excel" junto a cada título: descargan un .xlsx
+     con las existencias o con los movimientos filtrados del kárdex.
 */
 
 // ---------- Ayudantes ----------
@@ -214,6 +217,7 @@ async function cargarInventario() {
 }
 
 // ---------- Kárdex ----------
+let kardexActual = null;   // última respuesta del kárdex (para exportarla)
 const MOVIMIENTOS = {
   ENTRADA: ["entrada", "arrow-circle-down", "Entrada"],
   SALIDA_VENTA: ["venta", "shopping-cart-simple", "Venta"],
@@ -229,6 +233,7 @@ async function cargarKardex() {
   });
   if ($("k-producto").value) filtros.set("producto_id", $("k-producto").value);
   const r = await api("/admin/kardex?" + filtros);
+  kardexActual = r;
 
   // Con un solo producto los totales van en su unidad (pzas o kg)
   const uno = productos.find((p) => String(p.producto_id) === $("k-producto").value);
@@ -261,6 +266,130 @@ async function cargarKardex() {
         </tr>`;
       }).join("")
     : filaVacia(7, "list-bullets", "Sin movimientos", "No hay entradas ni salidas con estos filtros.");
+}
+
+// ---------- Exportar a Excel ----------
+// La librería (SheetJS) se descarga solo la primera vez que se exporta.
+let cargaXlsx = null;
+function libreriaXlsx() {
+  if (window.XLSX) return Promise.resolve(window.XLSX);
+  if (!cargaXlsx) {
+    cargaXlsx = new Promise((resolver, rechazar) => {
+      const s = document.createElement("script");
+      s.src = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+      s.onload = () => resolver(window.XLSX);
+      s.onerror = () => { cargaXlsx = null; rechazar(new Error("No se pudo cargar el exportador de Excel. Revisa tu conexión.")); };
+      document.head.appendChild(s);
+    });
+  }
+  return cargaXlsx;
+}
+
+function textoSelect(id) {
+  const sel = $(id);
+  return sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : "";
+}
+
+// "Existencias_MARKS_Santa_Catarina_2026-11-10.xlsx"
+function nombreArchivo(base) {
+  const suc = (sucursalActual ? sucursalActual.nombre : "sucursal")
+    .normalize("NFD").replace(/\p{M}/gu, "").replace(/[^A-Za-z0-9]+/g, "_").replace(/^_|_$/g, "");
+  return `${base}_${suc}_${hoyIso()}.xlsx`;
+}
+
+function estadoTexto(p) {
+  const lista = [];
+  if (!p.activo) lista.push("Inactivo");
+  if (p.caducado) lista.push("Caducado");
+  if (Number(p.stock) <= 0) lista.push("Sin existencia");
+  else if (p.stock_bajo) lista.push("Stock bajo");
+  if (p.caducidad_proxima) lista.push("Caduca pronto");
+  return lista.join(", ") || "En orden";
+}
+
+// Encabezado del reporte + tabla. Las cantidades van como número para poder sumarlas en Excel.
+function hojaReporte(XLSX, titulo, notas, columnas, filas, anchos) {
+  const encabezado = [
+    [titulo],
+    ["Sucursal", sucursalActual ? sucursalActual.nombre : ""],
+    ["Generado", new Date().toLocaleString("es-MX", { timeZone: "America/Monterrey" })],
+    ...notas,
+    [],
+  ];
+  const hoja = XLSX.utils.aoa_to_sheet([...encabezado, columnas, ...filas]);
+  hoja["!cols"] = anchos.map((wch) => ({ wch }));
+  const filaColumnas = encabezado.length;
+  hoja["!autofilter"] = { ref: XLSX.utils.encode_range({ s: { r: filaColumnas, c: 0 }, e: { r: filaColumnas + filas.length, c: columnas.length - 1 } }) };
+  return hoja;
+}
+
+async function exportar(boton, generar) {
+  boton.disabled = true;
+  try {
+    const XLSX = await libreriaXlsx();
+    generar(XLSX);
+  } catch (e) {
+    mostrarError(e);
+  } finally {
+    boton.disabled = false;
+  }
+}
+
+function exportarExistencias(XLSX) {
+  const buscar = $("buscar-producto").value.trim().toLowerCase();
+  const lista = productos.filter((p) =>
+    !buscar || (p.nombre + " " + p.codigo_barras + " " + (p.plu || "")).toLowerCase().includes(buscar));
+  if (!lista.length) return mostrarError(new Error("No hay existencias para exportar."));
+
+  const filas = lista.map((p) => [
+    p.nombre,
+    p.categoria || "Sin categoría",
+    p.plu ? "PLU " + p.plu : p.codigo_barras,
+    Number(p.stock),
+    Number(p.stock_minimo),
+    unidadCorta(p.tipo_venta),
+    p.fecha_caducidad ? String(p.fecha_caducidad).slice(0, 10) : "No caduca",
+    estadoTexto(p),
+    p.es_local ? "Sí" : "No",
+  ]);
+  const notas = buscar ? [["Búsqueda", $("buscar-producto").value.trim()]] : [];
+  const hoja = hojaReporte(XLSX, "Reporte de existencias", notas,
+    ["Producto", "Categoría", "Código", "Existencia", "Mínimo", "Unidad", "Caducidad", "Estado", "Local NL"],
+    filas, [34, 20, 18, 12, 10, 8, 14, 30, 10]);
+  const libro = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(libro, hoja, "Existencias");
+  XLSX.writeFile(libro, nombreArchivo("Existencias"));
+}
+
+function exportarKardex(XLSX) {
+  const r = kardexActual;
+  if (!r || !r.movimientos.length) return mostrarError(new Error("No hay movimientos para exportar con estos filtros."));
+
+  const filas = r.movimientos.map((m) => [
+    m.fecha || "",
+    m.producto,
+    (MOVIMIENTOS[m.tipo] || ["", "", m.tipo])[2],
+    Number(m.cantidad),
+    Number(m.stock_final),
+    unidadCorta(m.tipo_venta),
+    m.usuario || "",
+    m.folio || m.nota || "",
+  ]);
+  const notas = [
+    ["Producto", textoSelect("k-producto")],
+    ["Movimiento", textoSelect("k-tipo")],
+    ["Periodo", textoSelect("k-periodo")],
+    ["Total entradas", Number(r.totales.entradas)],
+    ["Total vendido en la app", Number(r.totales.ventas)],
+    ["Total mermas", Number(r.totales.mermas)],
+    ["Total ajustes por conteo", Number(r.totales.ajustes)],
+  ];
+  const hoja = hojaReporte(XLSX, "Reporte de entradas y salidas (kárdex)", notas,
+    ["Fecha y hora", "Producto", "Movimiento", "Cantidad", "Quedó en", "Unidad", "Quién", "Detalle"],
+    filas, [24, 34, 14, 12, 12, 8, 24, 36]);
+  const libro = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(libro, hoja, "Entradas y salidas");
+  XLSX.writeFile(libro, nombreArchivo("Entradas_y_salidas"));
 }
 
 // ---------- Ventana: entrada, merma o ajuste ----------
@@ -515,6 +644,8 @@ async function recargarTodo() {
   mostrarPestana(sessionStorage.getItem(PESTANA_KEY) || "existencias");
 
   $("buscar-producto").addEventListener("input", filtrarTabla);
+  $("exportar-existencias").addEventListener("click", (e) => exportar(e.currentTarget, exportarExistencias));
+  $("exportar-kardex").addEventListener("click", (e) => exportar(e.currentTarget, exportarKardex));
   $("tabla-inventario").addEventListener("click", alHacerClicEnTabla);
   ["k-producto", "k-tipo", "k-periodo"].forEach((id) =>
     $(id).addEventListener("change", () => cargarKardex().then(ocultarError).catch(mostrarError)));

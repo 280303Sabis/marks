@@ -114,7 +114,12 @@
         <section class="cl-tarjeta inv-seccion" id="seccion-existencias" role="tabpanel" aria-labelledby="titulo-existencias">
             <div class="adm-tarjeta-encabezado">
                 <div>
-                    <h2 id="titulo-existencias">Existencias</h2>
+                    <div class="inv-titulo">
+                        <h2 id="titulo-existencias">Existencias</h2>
+                        <button type="button" class="inv-exportar" id="exportar-existencias" title="Descargar las existencias en Excel">
+                            <i class="ph ph-microsoft-excel-logo" aria-hidden="true"></i>Exportar Excel
+                        </button>
+                    </div>
                     <p class="cl-texto-sec">Primero lo que necesita atención. Usa los botones para registrar entradas, mermas o un conteo.</p>
                 </div>
                 <div class="cl-campo inv-buscar">
@@ -149,7 +154,12 @@
         <section class="cl-tarjeta inv-seccion" id="seccion-kardex" role="tabpanel" aria-labelledby="titulo-kardex" hidden>
             <div class="adm-tarjeta-encabezado">
                 <div>
-                    <h2 id="titulo-kardex">Entradas y salidas (kárdex)</h2>
+                    <div class="inv-titulo">
+                        <h2 id="titulo-kardex">Entradas y salidas (kárdex)</h2>
+                        <button type="button" class="inv-exportar" id="exportar-kardex" title="Descargar los movimientos filtrados en Excel">
+                            <i class="ph ph-microsoft-excel-logo" aria-hidden="true"></i>Exportar Excel
+                        </button>
+                    </div>
                     <p class="cl-texto-sec">Cada movimiento del inventario: quién lo hizo, cuánto y con qué existencia quedó. Se muestran hasta 500.</p>
                 </div>
             </div>

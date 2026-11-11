@@ -26,6 +26,50 @@
     width: 260px;
 }
 
+/* Título con el pill "Exportar Excel" a un lado */
+.inv-titulo {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+}
+
+.inv-exportar {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    border: 1px solid var(--brote-borde);
+    border-radius: 999px;
+    background: var(--brote);
+    color: var(--verde-hoja);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.inv-exportar i {
+    font-size: 16px;
+}
+
+.inv-exportar:hover {
+    background: var(--verde-hoja);
+    border-color: var(--verde-hoja);
+    color: var(--blanco);
+}
+
+.inv-exportar:focus-visible {
+    outline: none;
+    box-shadow: var(--anillo);
+}
+
+.inv-exportar:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
 /* En pantallas angostas la tabla se desliza de lado; el nombre no se aprieta */
 .inv-seccion .adm-tabla td:first-child {
     min-width: 200px;

@@ -405,6 +405,74 @@ a.cl-boton-sec {
     color: var(--salvia);
 }
 
+/* Gráfico de pastel del ranking */
+.adm-pastel {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.adm-pastel-svg {
+    width: 220px;
+    max-width: 100%;
+    height: auto;
+    flex-shrink: 0;
+}
+
+.adm-pastel-svg path,
+.adm-pastel-svg circle {
+    stroke: var(--blanco);
+    stroke-width: 2;
+    stroke-linejoin: round;
+    transition: opacity 0.15s;
+}
+
+.adm-pastel-svg:hover path:not(:hover) {
+    opacity: 0.55;
+}
+
+.adm-pastel-leyenda {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex: 1 1 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.adm-pastel-leyenda li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--linea);
+}
+
+.adm-pastel-leyenda li:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+}
+
+.adm-pastel-color {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.adm-pastel-nombre {
+    flex: 1;
+    min-width: 0;
+    font-weight: 500;
+}
+
+.adm-pastel-leyenda strong {
+    font-variant-numeric: tabular-nums;
+    color: var(--verde-bosque);
+}
+
 /* Estado de la compra */
 .adm-estado {
     display: inline-flex;

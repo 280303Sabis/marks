@@ -184,6 +184,73 @@ async function cargarMasVendidos() {
           <td class="num"><strong>${dinero(p.total)}</strong></td>
         </tr>`).join("")
     : filaVacia(6, "trophy", "Aún no hay productos vendidos", "El ranking se llena con las compras reales de la sucursal.");
+
+  pintarPastel(r.ranking);
+}
+
+// ---------- Gráfico de pastel del ranking ----------
+// Los 5 primeros con su color; el resto se junta en "Otros".
+const COLORES_PASTEL = ["#43C21F", "#FF9F1C", "#2D9CDB", "#FF5A7A", "#9B5DE5"];
+const COLOR_OTROS = "#C4CCC0";
+
+function pintarPastel(ranking) {
+  const caja = $("pastel-ranking");
+  if (!caja) return;
+  if (!ranking.length) {
+    caja.innerHTML = '<p class="cl-texto-sec">Aún no hay ventas en el periodo para graficar.</p>';
+    return;
+  }
+
+  const rebanadas = ranking.slice(0, 5).map((p, i) => ({
+    nombre: p.nombre,
+    detalle: cantidad(p.unidades) + (p.tipo_venta === "GRANEL" ? " kg" : " u."),
+    valor: Number(p.participacion) || 0,
+    color: COLORES_PASTEL[i],
+  }));
+  const resto = ranking.slice(5);
+  if (resto.length) {
+    rebanadas.push({
+      nombre: `Otros (${resto.length})`,
+      detalle: resto.length + " producto(s)",
+      valor: resto.reduce((s, p) => s + (Number(p.participacion) || 0), 0),
+      color: COLOR_OTROS,
+    });
+  }
+  const suma = rebanadas.reduce((s, r) => s + r.valor, 0) || 1;
+
+  // Cada rebanada es un arco SVG; empieza arriba (las 12 en punto) y gira a la derecha.
+  const R = 100, C = 110;
+  const punto = (frac) => {
+    const a = frac * 2 * Math.PI - Math.PI / 2;
+    return [C + R * Math.cos(a), C + R * Math.sin(a)];
+  };
+  let acumulado = 0;
+  const trazos = rebanadas.map((r) => {
+    const frac = r.valor / suma;
+    const titulo = `<title>${texto(r.nombre)}: ${r.valor.toFixed(1)}%</title>`;
+    if (frac >= 0.9999) {
+      return `<circle cx="${C}" cy="${C}" r="${R}" fill="${r.color}">${titulo}</circle>`;
+    }
+    const [x1, y1] = punto(acumulado);
+    acumulado += frac;
+    const [x2, y2] = punto(acumulado);
+    const grande = frac > 0.5 ? 1 : 0;
+    return `<path d="M${C},${C} L${x1.toFixed(2)},${y1.toFixed(2)} A${R},${R} 0 ${grande} 1 ${x2.toFixed(2)},${y2.toFixed(2)} Z"
+              fill="${r.color}">${titulo}</path>`;
+  }).join("");
+
+  const leyenda = rebanadas.map((r) => `<li>
+      <span class="adm-pastel-color" style="background:${r.color}"></span>
+      <span class="adm-pastel-nombre">${texto(r.nombre)}<span class="adm-sub">${texto(r.detalle)}</span></span>
+      <strong>${(r.valor / suma * 100).toFixed(1)}%</strong>
+    </li>`).join("");
+
+  caja.innerHTML = `
+    <svg class="adm-pastel-svg" viewBox="0 0 220 220" role="img"
+         aria-label="Gráfico de pastel con la participación de cada producto en las unidades vendidas">
+      ${trazos}
+    </svg>
+    <ul class="adm-pastel-leyenda">${leyenda}</ul>`;
 }
 
 // ---------- recuperar.html (historial de compras) ----------
